@@ -128,52 +128,14 @@ export default function AutoBestPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // --- NUOVA FUNZIONE DI COMPRESSIONE IMMAGINI ---
-  const compressImage = (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          // Ridimensiona a risoluzione HD per alleggerire il carico (perfetto per video social)
-          const MAX_WIDTH = 1920;
-          const MAX_HEIGHT = 1920;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-
-          // Esporta come JPEG qualità 80% (riduce il peso del 90% senza perdita visibile)
-          resolve(canvas.toDataURL('image/jpeg', 0.8));
-        };
-      };
-    });
-  };
-
-  // --- HANDLER CARICAMENTO MODIFICATO ---
   const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
 
     const compressImage = (file: File): Promise<string> => {
       return new Promise((resolve) => {
+        // Mostra il peso originale in console
+        console.log(`Comprimo: ${file.name} (Originale: ${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = (event) => {
@@ -181,29 +143,49 @@ export default function AutoBestPage() {
           img.src = event.target?.result as string;
           img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 1080; // Larghezza massima ottimizzata per video
+            const MAX_DIMENSION = 1080; // Lato massimo a 1080px (ideale per i video)
             let width = img.width;
             let height = img.height;
 
-            if (width > MAX_WIDTH) {
-              height = Math.round((height * MAX_WIDTH) / width);
-              width = MAX_WIDTH;
+            // Logica universale per mantenere le proporzioni (verticali o orizzontali)
+            if (width > height) {
+              if (width > MAX_DIMENSION) {
+                height = Math.round((height * MAX_DIMENSION) / width);
+                width = MAX_DIMENSION;
+              }
+            } else {
+              if (height > MAX_DIMENSION) {
+                width = Math.round((width * MAX_DIMENSION) / height);
+                height = MAX_DIMENSION;
+              }
             }
 
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
-            ctx?.drawImage(img, 0, 0, width, height);
 
-            // Compressione JPEG al 70% di qualità
-            resolve(canvas.toDataURL('image/jpeg', 0.7));
+            // Forza lo sfondo nero se l'immagine è un PNG con trasparenze
+            if (ctx) {
+              ctx.fillStyle = "#000000";
+              ctx.fillRect(0, 0, width, height);
+              ctx.drawImage(img, 0, 0, width, height);
+            }
+
+            // Esporta forzatamente in JPEG a 70% di qualità
+            const base64 = canvas.toDataURL('image/jpeg', 0.7);
+
+            // Calcola il peso finale (in Base64 un carattere = 0.75 byte)
+            const finalSizeMB = (base64.length * 0.75) / 1024 / 1024;
+            console.log(`✅ File ${file.name} compresso! (Nuovo peso: ~${finalSizeMB.toFixed(2)} MB)`);
+
+            resolve(base64);
           };
         };
       });
     };
 
+    // Attendiamo che tutte le immagini vengano compresse
     const promises = files.map(file => compressImage(file));
-
     Promise.all(promises).then(base64s => {
       setImages(prev => [...prev, ...base64s]);
     });
