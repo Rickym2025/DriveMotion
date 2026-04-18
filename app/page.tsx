@@ -128,22 +128,85 @@ export default function AutoBestPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleMultipleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
-    const promises = files.map(file => {
-      return new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
-    });
-    Promise.all(promises).then(base64s => {
-      setImages(prev => [...prev, ...base64s]);
+  // --- NUOVA FUNZIONE DI COMPRESSIONE IMMAGINI ---
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          // Ridimensiona a risoluzione HD per alleggerire il carico (perfetto per video social)
+          const MAX_WIDTH = 1920;
+          const MAX_HEIGHT = 1920;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Esporta come JPEG qualità 80% (riduce il peso del 90% senza perdita visibile)
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+      };
     });
   };
 
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+  // --- HANDLER CARICAMENTO MODIFICATO ---
+  const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
+
+    const compressImage = (file: File): Promise<string> => {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target?.result as string;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1080; // Larghezza massima ottimizzata per video
+            let width = img.width;
+            let height = img.height;
+
+            if (width > MAX_WIDTH) {
+              height = Math.round((height * MAX_WIDTH) / width);
+              width = MAX_WIDTH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx?.drawImage(img, 0, 0, width, height);
+
+            // Compressione JPEG al 70% di qualità
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
+          };
+        };
+      });
+    };
+
+    const promises = files.map(file => compressImage(file));
+
+    Promise.all(promises).then(base64s => {
+      setImages(prev => [...prev, ...base64s]);
+    });
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
