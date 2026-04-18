@@ -67,7 +67,38 @@ export default function AutoBestPage() {
   const [token, setToken] = useState<string | null>(null);
   const [showProModal, setShowProModal] = useState(false);
   const [demoStep, setDemoStep] = useState(0);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [supportLoading, setSupportLoading] = useState(false);
+  const [supportSuccess, setSupportSuccess] = useState(false);
 
+  // Funzione per invio form
+  const handleSupportSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSupportLoading(true);
+    const formData = new FormData(e.currentTarget);
+    
+    // Usiamo Web3Forms per inviare l'email senza backend
+    formData.append("access_key", "9013a8d5-0901-42a0-b9e6-4c45553f960d"); // Questa è la chiave del file che hai postato, assicurati sia attiva o usane una nuova su web3forms.com
+
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      }).then((res) => res.json());
+
+      if (res.success) {
+        setSupportSuccess(true);
+        setTimeout(() => {
+          setShowSupportModal(false);
+          setSupportSuccess(false);
+        }, 3000);
+      }
+    } catch (err) {
+      alert("Errore nell'invio del messaggio.");
+    } finally {
+      setSupportLoading(false);
+    }
+  };
   // Stati Form
   const [images, setImages] = useState<string[]>([]);
   const [logo, setLogo] = useState<string | null>(null);
@@ -210,14 +241,23 @@ export default function AutoBestPage() {
     let englishPrompt = selectedEnvId === "custom" ? customEnv : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
 
     try {
-      const modalRes = await fetch(MODAL_URL, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image_b64: images[0], env_english: englishPrompt }),
+      // PROCESSIAMO TUTTE LE IMMAGINI CON MODAL IN PARALLELO
+      const modalPromises = images.map(async (imgBase64) => {
+        try {
+          const res = await fetch(MODAL_URL, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_b64: imgBase64, env_english: englishPrompt }),
+          });
+          const data = await res.json();
+          // Se Modal ha successo restituisce l'immagine scontornata, altrimenti l'originale
+          return data.status === "success" ? data.image : imgBase64; 
+        } catch (e) {
+          return imgBase64; // Fallback di sicurezza in caso di errore di rete
+        }
       });
-      const modalData = await modalRes.json();
-      if (modalData.status !== "success") throw new Error(modalData.message);
 
-      const finalImagesArray = [modalData.image, ...images.slice(1)];
+      const finalImagesArray = await Promise.all(modalPromises);
+      
       setLoadingImg(false); setLoadingVideo(true);
 
       await fetch(N8N_WEBHOOK_URL, {
@@ -246,7 +286,7 @@ export default function AutoBestPage() {
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden relative pt-20">
 
-      {/* NAVBAR */}
+      {/* NAVBAR aggiornata */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -258,12 +298,16 @@ export default function AutoBestPage() {
             <a href="https://omniastudio-pro.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">OmniaStudio</a>
             <a href="https://concierge24.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Concierge24</a>
           </div>
-          <a href="mailto:modena.riccardo@gmail.com" className="flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-white hover:bg-white/20 transition-colors">
+          {/* PULSANTE MODIFICATO */}
+          <button 
+            onClick={() => setShowSupportModal(true)} 
+            className="flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-white hover:bg-white/20 transition-colors"
+          >
             <MessageSquare size={16} /> Supporto
-          </a>
+          </button>
         </div>
       </nav>
-
+      
       {/* SFONDO VIDEO */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-[#050505]">
         <video src="/bg.mp4" autoPlay loop muted playsInline style={{ transform: 'translate3d(0, 0, 0)' }} className="absolute inset-0 w-full h-full object-cover opacity-40" />
@@ -588,6 +632,83 @@ export default function AutoBestPage() {
           @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
           html { scroll-behavior: smooth; }
       `}} />
+      {/* MODAL SUPPORTO (Recuperato e adattato) */}
+      {showSupportModal && (
+        <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md animate-in fade-in">
+          <div className="bg-[#0a0a0c] border border-white/10 rounded-[2.5rem] p-8 md:p-10 max-w-lg w-full relative shadow-2xl">
+            <button 
+              onClick={() => setShowSupportModal(false)} 
+              className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors"
+            >
+              <X size={24} />
+            </button>
+
+            <div className="mb-8">
+              <h3 className="text-3xl font-black text-white mb-2 tracking-tighter uppercase">Contatta il Supporto</h3>
+              <p className="text-slate-400 text-sm">Hai bisogno di aiuto con i tuoi video o vuoi un progetto su misura? Scrivici e ti risponderemo subito.</p>
+            </div>
+
+            {supportSuccess ? (
+              <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-8 text-center animate-in zoom-in">
+                <CheckCircle2 size={48} className="text-green-500 mx-auto mb-4" />
+                <h4 className="text-white font-bold text-xl mb-1">Messaggio Inviato!</h4>
+                <p className="text-slate-400 text-sm">Riccardo ti risponderà a breve su modena.riccardo@gmail.com</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSupportSubmit} className="space-y-4">
+                {/* Honeypot per evitare spam */}
+                <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} />
+                
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Il tuo Nome</label>
+                  <input 
+                    type="text" 
+                    name="name" 
+                    required 
+                    placeholder="Mario Rossi" 
+                    className="w-full bg-black border border-white/10 rounded-xl py-4 px-5 text-white focus:border-cyan-500 outline-none transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Email di Contatto</label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    required 
+                    placeholder="mario@azienda.it" 
+                    className="w-full bg-black border border-white/10 rounded-xl py-4 px-5 text-white focus:border-cyan-500 outline-none transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Come possiamo aiutarti?</label>
+                  <textarea 
+                    name="message" 
+                    required 
+                    rows={4} 
+                    placeholder="Descrivi la tua richiesta..." 
+                    className="w-full bg-black border border-white/10 rounded-xl py-4 px-5 text-white focus:border-cyan-500 outline-none transition-all resize-none"
+                  ></textarea>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={supportLoading}
+                  className="w-full bg-white text-black font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-cyan-400 transition-all disabled:opacity-50 mt-4"
+                >
+                  {supportLoading ? <Loader2 className="animate-spin" size={20} /> : <Mail size={20} />}
+                  {supportLoading ? "Invio in corso..." : "Invia Messaggio"}
+                </button>
+              </form>
+            )}
+
+            <div className="mt-8 text-center">
+              <p className="text-[10px] text-slate-600 uppercase tracking-[0.2em]">Diretto: modena.riccardo@gmail.com</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
