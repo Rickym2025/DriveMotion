@@ -23,6 +23,11 @@ const LinkedinIcon = ({ size = 24, className = "" }) => (
     <circle cx="4" cy="4" r="2" />
   </svg>
 );
+const TiktokIcon = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
 
 // --- CONFIGURAZIONI ---
 const PREDEFINED_ENVIRONMENTS = [
@@ -286,7 +291,7 @@ export default function AutoBestPage() {
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden relative pt-20">
 
-      {/* NAVBAR aggiornata */}
+      {/* NAVBAR aggiornata con link esatti */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -298,11 +303,7 @@ export default function AutoBestPage() {
             <a href="https://omniastudio-pro.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">OmniaStudio</a>
             <a href="https://concierge24.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Concierge24</a>
           </div>
-          {/* PULSANTE MODIFICATO */}
-          <button 
-            onClick={() => setShowSupportModal(true)} 
-            className="flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-white hover:bg-white/20 transition-colors"
-          >
+          <button className="flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-white hover:bg-white/20 transition-colors">
             <MessageSquare size={16} /> Supporto
           </button>
         </div>
@@ -502,8 +503,8 @@ export default function AutoBestPage() {
           </div>
         </section>
 
-        {/* PRICING SECTION */}
-        <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
+        {/* PRICING SECTION AGGIORNATA */}
+      <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Piani Prepagati</h2>
             <p className="text-slate-400 text-lg">Acquista pacchetti video. Zero vincoli, zero abbonamenti.</p>
@@ -511,39 +512,37 @@ export default function AutoBestPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
-              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">1 Video</h3>
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter</h3>
               <div className="text-4xl font-black text-white mb-6">€ 14,90</div>
               <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video Singolo</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI</li>
-                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> No Logo DriveMotion</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Inclusi</li>
               </ul>
-              <a href="https://buy.stripe.com/test_8x25kEenAc34gcqg3Ndwc01" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista Ora</a>
+              <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista Ora</a>
             </div>
 
             <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.15)] transform md:-translate-y-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest px-4 py-1 rounded-full">Più Scelto</div>
-              <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Bundle 5 Video</h3>
-              <div className="text-4xl font-black text-white mb-2">€ 59,00</div>
-              <p className="text-cyan-400/80 text-sm mb-6 font-medium">€ 11,80 / video</p>
-              <ul className="space-y-4 text-sm text-white flex-1 mb-8">
+              <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro (5 Video)</h3>
+              <div className="text-4xl font-black text-white mb-2">€ 59,00<span className="text-lg font-normal text-slate-400">/mese</span></div>
+              <ul className="space-y-4 text-sm text-white flex-1 mb-8 mt-4">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 5 Video Mensili</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Logo Salone in Video</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Supporto Multi-lingua</li>
-                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Tutte le Voci Premium</li>
               </ul>
-              <a href="https://buy.stripe.com/test_7sY3cw0wKebc3pEcRBdwc00" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Acquista Ora</a>
+              <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Abbonati PRO</a>
             </div>
 
             <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all">
-              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">15 Video</h3>
-              <div className="text-4xl font-black text-white mb-2">€ 129,00</div>
-              <p className="text-slate-500 text-sm mb-6 font-medium">€ 8,60 / video</p>
-              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Enterprise (15 Video)</h3>
+              <div className="text-4xl font-black text-white mb-2">€ 129,00<span className="text-lg font-normal text-slate-400">/mese</span></div>
+              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8 mt-4">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 15 Video Mensili</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Funzioni PRO complete</li>
-                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Ideale per Grandi Saloni</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Supporto Prioritario</li>
               </ul>
-              <a href="https://buy.stripe.com/test_8x25kEenAc34gcqg3Ndwc01" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista Ora</a>
+              <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Abbonati Enterprise</a>
             </div>
           </div>
         </section>
@@ -560,21 +559,21 @@ export default function AutoBestPage() {
               <a href="https://hometour-studio.vercel.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
                 <div className="text-xs font-bold text-cyan-500 tracking-widest uppercase mb-4">Real Estate</div>
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">HomeTour AI</h3>
-                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Trasforma le foto dei tuoi immobili in Reel cinematografici con voce narrante professionale e testi pronti per i portali immobiliari.</p>
+                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Trasforma le foto dei tuoi immobili in Reel cinematografici con voce narrante professionale e testi pronti.</p>
                 <div className="flex items-center text-cyan-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
               </a>
 
               <a href="https://omniastudio-pro.vercel.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
                 <div className="text-xs font-bold text-purple-500 tracking-widest uppercase mb-4">Legal & Privacy</div>
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors">OmniaStudio</h3>
-                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Intelligenza Artificiale 100% locale installata sui tuoi server. Ideale per avvocati e commercialisti che necessitano della massima privacy.</p>
+                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Intelligenza Artificiale 100% locale installata sui tuoi server per avvocati e commercialisti.</p>
                 <div className="flex items-center text-purple-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
               </a>
 
               <a href="https://concierge24.vercel.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
                 <div className="text-xs font-bold text-orange-500 tracking-widest uppercase mb-4">Hospitality</div>
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-orange-400 transition-colors">Concierge24</h3>
-                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">L'assistente virtuale multilingua H24 per Hotel e Airbnb. Gestisce prenotazioni, risponde ai dubbi e consiglia ristoranti locali.</p>
+                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">L'assistente virtuale multilingua H24 per Hotel e Airbnb. Gestisce prenotazioni e consiglia ristoranti.</p>
                 <div className="flex items-center text-orange-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
               </a>
             </div>
@@ -582,6 +581,7 @@ export default function AutoBestPage() {
         </section>
 
         {/* FOOTER */}
+        {/* FOOTER AGGIORNATO CON SOCIAL */}
         <footer className="border-t border-white/10 bg-black py-16 relative z-10">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
             <div className="max-w-xs">
@@ -592,22 +592,20 @@ export default function AutoBestPage() {
 
             <div className="flex flex-col items-center md:items-start gap-4">
               <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-2">Social Hub</h4>
-              <div className="flex gap-6">
-                <a href="#" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all group"><InstagramIcon size={24} /></a>
-                <a href="#" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all group"><FacebookIcon size={24} /></a>
-                <a href="#" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50 hover:bg-blue-600/10 transition-all group"><LinkedinIcon size={24} /></a>
+              <div className="flex gap-4">
+                <a href="https://www.instagram.com/riccardo_mode_/" target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all group"><InstagramIcon size={20} /></a>
+                <a href="https://www.facebook.com/riccardo.modena.792" target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all group"><FacebookIcon size={20} /></a>
+                <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50 hover:bg-blue-600/10 transition-all group"><LinkedinIcon size={20} /></a>
+                <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-pink-500/50 hover:bg-pink-500/10 transition-all group"><TiktokIcon size={20} /></a>
               </div>
             </div>
 
             <div className="flex flex-col items-center md:items-end gap-2">
-              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Download App</h4>
-              <div className="px-6 py-3 border border-white/20 rounded-xl text-white font-bold flex items-center gap-2 cursor-pointer hover:bg-white/5 transition-all">
-                <Play size={16} fill="white" /> Prossimamente su Store
-              </div>
+              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Supporto</h4>
+              <a href="mailto:modena.riccardo@gmail.com" className="text-slate-400 text-sm hover:text-white">modena.riccardo@gmail.com</a>
             </div>
           </div>
         </footer>
-
       </div>
 
       {/* MODAL BLOCCO PRO */}
