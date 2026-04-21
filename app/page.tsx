@@ -524,8 +524,8 @@ export default function AutoBestPage() {
             <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.15)] transform md:-translate-y-4">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest px-4 py-1 rounded-full">Più Scelto</div>
               <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Bundle 5 Video</h3>
-              <div className="text-4xl font-black text-white mb-2">€ 49,00</div>
-              <p className="text-cyan-400/80 text-sm mb-6 font-medium">€ 9,80 / video</p>
+              <div className="text-4xl font-black text-white mb-2">€ 59,00</div>
+              <p className="text-cyan-400/80 text-sm mb-6 font-medium">€ 11,80 / video</p>
               <ul className="space-y-4 text-sm text-white flex-1 mb-8">
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Logo Salone in Video</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Supporto Multi-lingua</li>
@@ -536,8 +536,8 @@ export default function AutoBestPage() {
 
             <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all">
               <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">15 Video</h3>
-              <div className="text-4xl font-black text-white mb-2">€ 99,00</div>
-              <p className="text-slate-500 text-sm mb-6 font-medium">€ 6,60 / video</p>
+              <div className="text-4xl font-black text-white mb-2">€ 129,00</div>
+              <p className="text-slate-500 text-sm mb-6 font-medium">€ 8,60 / video</p>
               <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Funzioni PRO complete</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Ideale per Grandi Saloni</li>
