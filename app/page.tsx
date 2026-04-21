@@ -587,7 +587,7 @@ export default function AutoBestPage() {
             <div className="max-w-xs">
               <div className="flex items-center justify-center md:justify-start gap-2 text-white font-black text-2xl mb-4 tracking-tighter">DriveMotion <span className="text-cyan-500">AI</span></div>
               <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria MR Studio. Semplifichiamo il marketing automotive attraverso l'Intelligenza Artificiale Generativa.</p>
-              <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} MR Studio. P.IVA IT02951300000</p>
+              <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} MR Studio. </p>
             </div>
 
             <div className="flex flex-col items-center md:items-start gap-4">
