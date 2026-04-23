@@ -128,7 +128,7 @@ export default function AutoBestPage() {
   const [loadingVideo, setLoadingVideo] = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
-  const MODAL_URL = "https://smartai-riccardo--auto-best-backend-fastapi-app.modal.run/process";
+  const MODAL_URL = "https://smartai-riccardo--drive-motion-backend-fastapi-app.modal.run/process";
   const N8N_WEBHOOK_URL = "https://n8n.labottegadeldelta.it/webhook/autobest";
   const VERIFICA_TOKEN_URL = "https://n8n.labottegadeldelta.it/webhook/verifica-token";
 
