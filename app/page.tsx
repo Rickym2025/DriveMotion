@@ -278,7 +278,7 @@ export default function AutoBestPage() {
 
   const MODAL_URL = "https://smartai-riccardo--drive-motion-backend-fastapi-app.modal.run/process";
   const N8N_WEBHOOK_URL = "https://n8n.labottegadeldelta.it/webhook/autobest";
-  const VERIFICA_TOKEN_URL = "https://n8n.labottegadeldelta.it/webhook-test/verifica-token-drivemotion";
+  const VERIFICA_TOKEN_URL = "https://n8n.labottegadeldelta.it/webhook/verifica-token-drivemotion";
 
   // Gestione Cambio Lingua
   const handleLanguageChange = (lang: string) => {
