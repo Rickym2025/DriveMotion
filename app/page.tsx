@@ -76,7 +76,7 @@ export default function AutoBestPage() {
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportSuccess, setSupportSuccess] = useState(false);
 
-  // --- LOGICA CHATBOT AURORA AI ---
+  // --- LOGICA CHATBOT AURORA AI POTENZIATA ---
   useEffect(() => {
     const CHATBOT_WEBHOOK_URL = 'https://n8n.labottegadeldelta.it/webhook/drivemotion-chat';
     let chatSessionId = localStorage.getItem('dm_chat_session') || 'dm_' + Math.random().toString(36).substring(7);
@@ -90,29 +90,61 @@ export default function AutoBestPage() {
         <style>
           #dm-bubble { position:fixed; bottom:30px; left:30px; width:65px; height:65px; border-radius:50%; background:#06b6d4; box-shadow:0 10px 25px rgba(6, 182, 212, 0.4); cursor:pointer; z-index:9999; display:flex; align-items:center; justify-content:center; border:2px solid #161616; transition:transform 0.3s; }
           #dm-bubble:hover { transform:scale(1.1); }
-          #dm-window { position:fixed; bottom:110px; left:30px; width:360px; height:500px; background:#0a0a0c; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.8); z-index:9999; display:none; flex-direction:column; overflow:hidden; font-family: sans-serif; border: 1px solid rgba(6, 182, 212, 0.2); transition: all 0.3s ease; opacity:0; transform:translateY(20px); }
-          .dm-header { background:#161616; border-bottom: 1px solid rgba(6, 182, 212, 0.2); color:#fff; padding:16px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
+          
+          /* Finestra Ridimensionabile */
+          #dm-window { 
+            position:fixed; bottom:110px; left:30px; 
+            width:380px; height:580px; 
+            min-width: 300px; min-height: 400px;
+            max-width: 90vw; max-height: 80vh;
+            background:#0a0a0c; border-radius:20px; 
+            box-shadow:0 20px 60px rgba(0,0,0,0.8); z-index:9999; 
+            display:none; flex-direction:column; overflow:hidden; 
+            font-family: sans-serif; border: 1px solid rgba(6, 182, 212, 0.2); 
+            transition: opacity 0.3s ease, transform 0.3s ease; 
+            opacity:0; transform:translateY(20px);
+            resize: both; /* ABILITA IL RIDIMENSIONAMENTO */
+          }
+
+          .dm-header { background:#161616; border-bottom: 1px solid rgba(6, 182, 212, 0.2); color:#fff; padding:16px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; cursor:default; flex-shrink: 0; }
           .dm-messages { flex:1; padding:20px; overflow-y:auto; background:#050505; display:flex; flex-direction:column; gap:14px; }
+          
+          /* Pulsanti suggerimenti (Chips) */
+          .dm-chips { display:flex; flex-wrap:wrap; gap:8px; padding:10px 20px; background:#050505; border-top: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+          .dm-chip { background:#161616; border:1px solid rgba(6, 182, 212, 0.3); color:#22d3ee; padding:8px 12px; border-radius:15px; font-size:12px; cursor:pointer; transition: 0.2s; white-space: nowrap; }
+          .dm-chip:hover { background:#06b6d4; color:#000; }
+
           .dm-msg { padding:12px 16px; border-radius:15px; font-size:14px; max-width:85%; line-height:1.5; }
           .dm-msg.bot { background:#161616; color:#f0f0f0; align-self:flex-start; border-bottom-left-radius:2px; border: 1px solid rgba(255,255,255,0.05); }
           .dm-msg.user { background:#06b6d4; color:#000; align-self:flex-end; border-bottom-right-radius:2px; font-weight:500; }
-          .dm-input-area { padding:15px; border-top:1px solid rgba(6, 182, 212, 0.2); display:flex; gap:8px; background:#161616; }
-          .dm-input-area input { flex:1; border:1px solid #333; border-radius:8px; padding:8px 12px; background:#000; color:#fff; outline:none; }
+          
+          .dm-input-area { padding:15px; border-top:1px solid rgba(6, 182, 212, 0.2); display:flex; gap:8px; background:#161616; flex-shrink: 0; }
+          .dm-input-area input { flex:1; border:1px solid #333; border-radius:8px; padding:8px 12px; background:#000; color:#fff; outline:none; font-size:14px; }
           .dm-input-area button { background:#06b6d4; border:none; border-radius:8px; color:#000; font-weight:bold; padding:0 15px; cursor:pointer; }
+          
           .typing-dot { width: 4px; height: 4px; background: #06b6d4; border-radius: 50%; display: inline-block; animation: typing 1.4s infinite; margin-right: 2px; }
           @keyframes typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
         </style>
+
         <div id="dm-bubble">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
+
         <div id="dm-window">
             <div class="dm-header">
                 <span>Aurora AI 🏎️</span>
                 <button id="close-chat" style="background:none; border:none; color:#666; font-size:20px; cursor:pointer;">&times;</button>
             </div>
             <div id="dm-messages" class="dm-messages">
-                <div class="dm-msg bot">Ciao! Sono <b>Aurora</b>. 🏎️<br><br>Ti aiuto a creare video pazzeschi per le tue auto in 5 minuti. Cosa vuoi sapere?</div>
+                <div class="dm-msg bot">Ciao! Sono <b>Aurora</b>. 🏎️<br><br>Sapevi che i video con <b>cambio sfondo AI</b> aumentano i click del 200%? Come posso aiutarti oggi?</div>
             </div>
+            
+            <div id="dm-chips-container" class="dm-chips">
+                <div class="dm-chip" data-msg="Come funziona il cambio sfondo?">Cambio Sfondo?</div>
+                <div class="dm-chip" data-msg="Quali sono i prezzi dei pacchetti?">Prezzi pacchetti</div>
+                <div class="dm-chip" data-msg="Funziona anche per gli interni?">Foto interni?</div>
+            </div>
+
             <div class="dm-input-area">
                 <input type="text" id="dm-input" placeholder="Scrivi qui...">
                 <button id="send-btn">Invia</button>
@@ -120,15 +152,15 @@ export default function AutoBestPage() {
         </div>
       `;
 
-      // Eventi
       const bubble = document.getElementById('dm-bubble');
       const win = document.getElementById('dm-window');
       const close = document.getElementById('close-chat');
       const input = document.getElementById('dm-input') as HTMLInputElement;
       const sendBtn = document.getElementById('send-btn');
+      const chipsContainer = document.getElementById('dm-chips-container');
 
-      const toggleChat = () => {
-        if (win!.style.display === 'none' || win!.style.display === '') {
+      const toggleChat = (forceOpen = false) => {
+        if (forceOpen || win!.style.display === 'none' || win!.style.display === '') {
           win!.style.display = 'flex';
           setTimeout(() => { win!.style.opacity = '1'; win!.style.transform = 'translateY(0)'; }, 10);
         } else {
@@ -137,9 +169,6 @@ export default function AutoBestPage() {
           setTimeout(() => { win!.style.display = 'none'; }, 300);
         }
       };
-
-      bubble!.onclick = toggleChat;
-      close!.onclick = toggleChat;
 
       const addMsg = (text: string, sender: 'bot' | 'user', id?: string) => {
         const msgDiv = document.createElement('div');
@@ -151,12 +180,14 @@ export default function AutoBestPage() {
         box?.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
       };
 
-      const sendMsg = async () => {
-        const text = input.value.trim();
+      const sendMsg = async (textOverride?: string) => {
+        const text = textOverride || input.value.trim();
         if (!text) return;
-        input.value = '';
-        addMsg(text, 'user');
         
+        input.value = '';
+        if (chipsContainer) chipsContainer.style.display = 'none'; // Nasconde i suggerimenti dopo la prima domanda
+        
+        addMsg(text, 'user');
         const loadingId = 'loading-' + Date.now();
         addMsg('<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>', 'bot', loadingId);
 
@@ -171,8 +202,21 @@ export default function AutoBestPage() {
         }
       };
 
-      sendBtn!.onclick = sendMsg;
+      // Gestione click sui suggerimenti (Chips)
+      document.querySelectorAll('.dm-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const msg = chip.getAttribute('data-msg');
+          if (msg) sendMsg(msg);
+        });
+      });
+
+      bubble!.onclick = () => toggleChat();
+      close!.onclick = () => toggleChat();
+      sendBtn!.onclick = () => sendMsg();
       input.onkeypress = (e) => { if (e.key === 'Enter') sendMsg(); };
+
+      // --- AUTO-APERTURA DOPO 1.5 SECONDI ---
+      setTimeout(() => toggleChat(true), 1500);
     };
 
     injectChatbot();
