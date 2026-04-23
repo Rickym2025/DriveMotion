@@ -709,4 +709,137 @@ export default function AutoBestPage() {
       )}
     </div>
   );
+
+  <!-- START CHATBOT DRIVEMOTION AI -->
+<div id="chatbot-container"></div>
+<script>
+/* CONFIGURAZIONE WEBHOOK N8N */
+const CHATBOT_WEBHOOK_URL = 'https://n8n.labottegadeldelta.it/webhook/drivemotion-chat';
+
+/* GESTIONE SESSIONE (Memoria Aurora) */
+let chatSessionId = localStorage.getItem('dm_chat_session') || 'dm_' + Math.random().toString(36).substring(7);
+localStorage.setItem('dm_chat_session', chatSessionId);
+
+function injectChatbot() {
+    const container = document.getElementById('chatbot-container');
+    container.innerHTML = `
+    <style>
+    /* Posizionamento a sinistra (Neuro-UX) */
+    #dm-bubble { position:fixed; bottom:30px; left:30px; width:65px; height:65px;
+    border-radius:50%; background:#06b6d4; box-shadow:0 10px 25px rgba(6, 182, 212, 0.4);
+    cursor:pointer; z-index:9999; display:flex; align-items:center; justify-content:center; border:2px solid #161616; transition:transform 0.3s; }
+    #dm-bubble:hover { transform:scale(1.1); }
+    
+    #dm-window { position:fixed; bottom:110px; left:30px; width:360px; height:550px;
+    background:#0a0a0c; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.8); z-index:9999;
+    display:none; flex-direction:column; overflow:hidden; font-family: 'DM Sans', sans-serif;
+    border: 1px solid rgba(6, 182, 212, 0.2); transition: all 0.3s ease; opacity:0; transform:translateY(20px); }
+    
+    .dm-header { background:#161616; border-bottom: 1px solid rgba(6, 182, 212, 0.2); color:#fff; padding:16px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; }
+    .dm-messages { flex:1; padding:20px; overflow-y:auto; background:#050505; display:flex; flex-direction:column; gap:14px; scroll-behavior: smooth; }
+    
+    .dm-msg { padding:14px 18px; border-radius:18px; font-size:15px; max-width:88%; line-height:1.5; }
+    .dm-msg.bot { background:#161616; color:#f0f0f0; border: 1px solid rgba(6, 182, 212, 0.1); align-self:flex-start; border-bottom-left-radius:4px; }
+    .dm-msg.user { background:#06b6d4; color:#000; font-weight:600; align-self:flex-end; border-bottom-right-radius:4px; }
+    .dm-msg b { font-weight: 700; color: #22d3ee; }
+    
+    .dm-input-area { padding:16px; border-top:1px solid rgba(6, 182, 212, 0.2); display:flex; gap:10px; background:#161616; }
+    .dm-input-area input { flex:1; border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px 14px; outline:none; font-size:15px; color:#fff; background: #000; }
+    .dm-input-area input:focus { border-color: #06b6d4; }
+    .dm-input-area button { background:#06b6d4; border:none; border-radius:8px; color:#000; cursor:pointer; font-weight:700; padding: 0 16px; }
+    
+    .dm-chips { display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 20px; background:#050505; }
+    .dm-chip { background:#161616; border:1px solid rgba(6, 182, 212, 0.3); color:#22d3ee; padding:8px 14px; border-radius:20px; font-size:13px; cursor:pointer; transition: 0.2s; }
+    .dm-chip:hover { background:#06b6d4; color:#000; }
+
+    .typing-dot { width: 6px; height: 6px; background: #06b6d4; border-radius: 50%; display: inline-block; animation: typing 1.4s infinite ease-in-out; margin-right: 3px; }
+    @keyframes typing { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-5px); } }
+    </style>
+
+    <div id="dm-bubble">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+    </div>
+
+    <div id="dm-window">
+        <div class="dm-header">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; background:#06b6d4; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#000; font-weight:700;">A</div>
+                <div style="display:flex; flex-direction:column;">
+                    <span style="font-size:15px;">Aurora AI</span>
+                    <span style="font-size:10px; color:#22d3ee;">Automotive Specialist</span>
+                </div>
+            </div>
+            <button onclick="toggleDmChat()" style="background:none; border:none; color:#666; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        <div id="dm-messages" class="dm-messages">
+            <div class="dm-msg bot">
+                Ciao! Sono <b>Aurora</b>. 🏎️<br><br>
+                Ti aiuto a trasformare le foto del tuo piazzale in video da showroom cinematografico.<br><br>
+                Vuoi sapere come funziona il <b>cambio sfondo AI</b> o come ricevere i post social già scritti?
+            </div>
+        </div>
+        <div id="dm-chips-container" class="dm-chips">
+            <div class="dm-chip" onclick="sendDmMsg('Come funziona il cambio sfondo?')">Cambio sfondo AI?</div>
+            <div class="dm-chip" onclick="sendDmMsg('Quanto costa un video?')">Prezzi singoli</div>
+            <div class="dm-chip" onclick="sendDmMsg('Sostituisce anche gli interni?')">Foto interni?</div>
+        </div>
+        <div class="dm-input-area">
+            <input type="text" id="dm-input" placeholder="Chiedimi tutto..." onkeypress="if(event.key==='Enter') sendDmMsg()">
+            <button onclick="sendDmMsg()">Invia</button>
+        </div>
+    </div>
+    `;
+    document.getElementById('dm-bubble').onclick = toggleDmChat;
+}
+
+function toggleDmChat() {
+    const win = document.getElementById('dm-window');
+    if (win.style.display === 'none' || win.style.display === '') {
+        win.style.display = 'flex';
+        setTimeout(() => { win.style.opacity = '1'; win.style.transform = 'translateY(0)'; }, 10);
+    } else {
+        win.style.opacity = '0';
+        win.style.transform = 'translateY(20px)';
+        setTimeout(() => { win.style.display = 'none'; }, 300);
+    }
+}
+
+async function sendDmMsg(textOverride) {
+    const input = document.getElementById('dm-input');
+    const text = textOverride || input.value;
+    if (!text.trim()) return;
+    input.value = '';
+    addDmMsg(text, 'user');
+    const chips = document.getElementById('dm-chips-container');
+    if (chips) chips.style.display = 'none';
+    const loadingId = 'loading-' + Date.now();
+    addDmMsg('<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>', 'bot', loadingId);
+    try {
+        const res = await fetch(`${CHATBOT_WEBHOOK_URL}?message=${encodeURIComponent(text)}&sessionId=${chatSessionId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        document.getElementById(loadingId).remove();
+        addDmMsg(data.response || "Scusami, riprova tra poco.", 'bot');
+    } catch (e) {
+        document.getElementById(loadingId).remove();
+        addDmMsg("Errore di connessione. Riprova.", 'bot');
+    }
+}
+
+function addDmMsg(text, sender, id) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `dm-msg ${sender}`;
+    if (id) msgDiv.id = id;
+    msgDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+    const chatBox = document.getElementById('dm-messages');
+    chatBox.appendChild(msgDiv);
+    chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
+}
+window.addEventListener('DOMContentLoaded', injectChatbot);
+</script>
+                  
 }
