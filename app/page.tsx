@@ -403,7 +403,7 @@ export default function AutoBestPage() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           images: finalImagesArray,
-          logo: logo || "",
+          logo: logo || "https://hometour-studio.vercel.app/logo.png",
           email,
           formato: videoFormat,
           lingua: language,
