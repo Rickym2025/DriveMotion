@@ -236,8 +236,12 @@ export default function AutoBestPage() {
     sendBtn.onclick  = () => sendMsg();
     input.onkeypress = (e) => { if (e.key === "Enter") sendMsg(); };
 
-    // Apri automaticamente dopo 1.5s
-    setTimeout(() => toggleChat(true), 1500);
+    // Apri automaticamente dopo 1.5s SOLO se su PC (schermo > 900px)
+    setTimeout(() => {
+      if (window.innerWidth > 900) {
+        toggleChat(true);
+      }
+    }, 1500);
   }, []);
 
   // ═══════════════════════════════════════════════════════════════
@@ -446,10 +450,7 @@ export default function AutoBestPage() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="text-cyan-400" size={20} />
-            <span className="font-bold text-white tracking-wide text-lg">
-              DriveMotion <span className="text-cyan-500">AI</span>
-            </span>
+            <img src="/logo.png" alt="DriveMotion AI Logo" className="h-10 w-auto object-contain bg-white rounded-lg px-2 py-1 shadow-sm" />
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="https://hometour-studio.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">HomeTour</a>
@@ -798,8 +799,8 @@ export default function AutoBestPage() {
         <footer className="border-t border-white/10 bg-black py-16 relative z-10">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
             <div className="max-w-xs">
-              <div className="flex items-center justify-center md:justify-start gap-2 text-white font-black text-2xl mb-4 tracking-tighter">
-                DriveMotion <span className="text-cyan-500">AI</span>
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                <img src="/logo.png" alt="DriveMotion AI Logo" className="h-12 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
               </div>
               <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria MR Studio. Semplifichiamo il marketing automotive attraverso l'Intelligenza Artificiale Generativa.</p>
               <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} MR Studio.</p>
