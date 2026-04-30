@@ -450,7 +450,10 @@ export default function AutoBestPage() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="DriveMotion AI Logo" className="h-10 w-auto object-contain bg-white rounded-lg px-2 py-1 shadow-sm" />
+            <Sparkles className="text-cyan-400" size={20} />
+            <span className="font-bold text-white tracking-wide text-lg">
+              DriveMotion <span className="text-cyan-500">AI</span>
+            </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
             <a href="https://hometour-studio.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">HomeTour</a>
@@ -800,7 +803,7 @@ export default function AutoBestPage() {
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
             <div className="max-w-xs">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                <img src="/logo.png" alt="DriveMotion AI Logo" className="h-12 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
+                <img src="/logo.png" alt="DriveMotion AI Logo" className="h-24 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
               </div>
               <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria MR Studio. Semplifichiamo il marketing automotive attraverso l'Intelligenza Artificiale Generativa.</p>
               <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} MR Studio.</p>
