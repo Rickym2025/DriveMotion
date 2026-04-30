@@ -159,7 +159,7 @@ export default function AutoBestPage() {
 
       <div id="dm-window">
         <div class="dm-header">
-          <span>Aurora AI 🏎️</span>
+          <span>Aurora AI</span>
           <button id="close-chat" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;">&times;</button>
         </div>
         <div id="dm-messages" class="dm-messages">
