@@ -255,7 +255,8 @@ export default function AutoBestPage() {
       if (!tokenToUse) return;
 
       try {
-        const res  = await fetch(`${VERIFICA_TOKEN_URL}?token=${encodeURIComponent(tokenToUse)}`);
+        const res = await fetch(`${VERIFICA_TOKEN_URL}?token=${encodeURIComponent(tokenToUse)}&project=DriveMotion`);
+        const data = await res.json();
         const text = await res.text();
         if (!text || text.trim() === "") return;
 
@@ -372,10 +373,9 @@ export default function AutoBestPage() {
       setLoadingVideo(true);
 
       // 2. Invia a n8n
-      // Logo: base64 se PRO con logo caricato, URL fallback altrimenti
       const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
 
-      await fetch(N8N_WEBHOOK_URL, {
+      const res = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -386,19 +386,29 @@ export default function AutoBestPage() {
           lingua:      language,
           voice:       selectedVoice,
           token,
+          project:     "DriveMotion", // Lo passiamo per sicurezza
           environment: englishPrompt,
           car_details: { make: carMake, price: carPrice, year: carYear, engine: carEngine },
           agency:      { name: agencyName, address: agencyAddress, phone: agencyPhone },
         }),
       });
 
-      setLoadingVideo(false);
-      setVideoCompleted(true);
+      // Leggiamo la risposta di n8n
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(`Errore n8n: ${res.status} ${res.statusText}`);
+        // Se n8n ci manda l'errore del limite free raggiunto
+        if (data.error === "free_limit_reached") {
+          alert(data.message);
+          setShowProModal(true); // Apriamo il modal per invitare all'acquisto
+        } else {
+          alert("Errore n8n: " + (data.message || "Riprova più tardi"));
+        }
+        setLoadingVideo(false);
+        return; // Blocchiamo tutto qui
       }
 
+      // Se arriviamo qui, il video è in fase di rendering con successo
       setLoadingVideo(false);
       setVideoCompleted(true);
 
@@ -406,11 +416,11 @@ export default function AutoBestPage() {
       if (isPro) setVideoRimanenti(prev => Math.max(0, prev - 1));
 
     } catch (err) {
-      alert("Errore durante la generazione. Riprova.");
+      console.error(err);
+      alert("Errore durante la generazione. Controlla la connessione.");
       setLoadingImg(false);
       setLoadingVideo(false);
     }
-  };
 
   // ═══════════════════════════════════════════════════════════════
   // FORM CONTATTI
@@ -733,8 +743,8 @@ export default function AutoBestPage() {
         {/* ── PRICING ────────────────────────────────────────── */}
         <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Piani Prepagati</h2>
-            <p className="text-slate-400 text-lg">Acquista pacchetti video. Zero vincoli, zero abbonamenti.</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Piani in Abbonamento</h2>
+            <p className="text-slate-400 text-lg">Scegli la potenza del marketing AI per il tuo salone. Cancella quando vuoi.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
 
@@ -742,7 +752,7 @@ export default function AutoBestPage() {
               <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter</h3>
               <div className="text-4xl font-black text-white mb-6">€ 14,90</div>
               <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
-                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video Singolo</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Piano Entry - 1 Video</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Inclusi</li>
               </ul>
