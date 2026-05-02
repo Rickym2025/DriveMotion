@@ -297,7 +297,7 @@ export default function AutoBestPage() {
   // ═══════════════════════════════════════════════════════════════
   // UPLOAD IMMAGINI (Con correzione Aspect Ratio Anti-Deformazione)
   // ═══════════════════════════════════════════════════════════════
-  const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  /*  const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
 
     const compressImage = (file: File): Promise<string> =>
@@ -336,7 +336,42 @@ export default function AutoBestPage() {
             resolve(canvas.toDataURL("image/jpeg", 0.9));
           };
         };
-      });
+      }); */
+  const compressImage = (file: File): Promise<string> =>
+    new Promise(resolve => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = event => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const SIZE = 1080; // Creiamo un quadrato perfetto per l'AI
+          
+          canvas.width = SIZE;
+          canvas.height = SIZE;
+          const ctx = canvas.getContext("2d")!;
+          
+          // 1. Sfondo nero (così l'AI sa cosa ignorare)
+          ctx.fillStyle = "#000"; 
+          ctx.fillRect(0, 0, SIZE, SIZE);
+          
+          // 2. Calcolo proporzioni perfette (senza deformare nulla)
+          const ratio = Math.min(SIZE / img.width, SIZE / img.height);
+          const newW = Math.round(img.width * ratio);
+          const newH = Math.round(img.height * ratio);
+          
+          // 3. Centriamo l'auto nel quadrato
+          const offsetX = (SIZE - newW) / 2;
+          const offsetY = (SIZE - newH) / 2;
+          
+          // 4. Disegniamo l'auto intatta
+          ctx.drawImage(img, offsetX, offsetY, newW, newH);
+          
+          resolve(canvas.toDataURL("image/jpeg", 0.9));
+        };
+      };
+    });
 
     const compressed = await Promise.all(files.map(compressImage));
     setImages(prev => [...prev, ...compressed]);
