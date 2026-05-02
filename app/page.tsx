@@ -345,30 +345,28 @@ export default function AutoBestPage() {
         const img = new Image();
         img.src = event.target?.result as string;
         img.onload = () => {
+          const MAX_SIZE = 1080;
+          let width = img.width;
+          let height = img.height;
+
+          // 1. Calcola le nuove dimensioni mantenendo PROPORZIONI PERFETTE
+          if (width > MAX_SIZE || height > MAX_SIZE) {
+            const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+
           const canvas = document.createElement("canvas");
-          const SIZE = 1080; // Creiamo un quadrato perfetto per l'AI
-          
-          canvas.width = SIZE;
-          canvas.height = SIZE;
+          // 2. La canvas avrà le dimensioni esatte dell'auto, niente quadrati forzati
+          canvas.width = width;
+          canvas.height = height;
           const ctx = canvas.getContext("2d")!;
           
-          // 1. Sfondo nero (così l'AI sa cosa ignorare)
-          ctx.fillStyle = "#000"; 
-          ctx.fillRect(0, 0, SIZE, SIZE);
+          // 3. Disegna l'immagine pulita (senza aggiunta di sfondi neri)
+          ctx.drawImage(img, 0, 0, width, height);
           
-          // 2. Calcolo proporzioni perfette (senza deformare nulla)
-          const ratio = Math.min(SIZE / img.width, SIZE / img.height);
-          const newW = Math.round(img.width * ratio);
-          const newH = Math.round(img.height * ratio);
-          
-          // 3. Centriamo l'auto nel quadrato
-          const offsetX = (SIZE - newW) / 2;
-          const offsetY = (SIZE - newH) / 2;
-          
-          // 4. Disegniamo l'auto intatta
-          ctx.drawImage(img, offsetX, offsetY, newW, newH);
-          
-          resolve(canvas.toDataURL("image/jpeg", 0.9));
+          // 4. Invia l'immagine con qualità molto alta (0.95) per un taglio netto
+          resolve(canvas.toDataURL("image/jpeg", 0.95));
         };
       };
     });
