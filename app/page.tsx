@@ -245,7 +245,7 @@ export default function AutoBestPage() {
   }, []);
 
   // ═══════════════════════════════════════════════════════════════
-  // VERIFICA TOKEN — identica a HomeTour
+  // VERIFICA TOKEN
   // ═══════════════════════════════════════════════════════════════
   useEffect(() => {
     const checkToken = async () => {
@@ -260,13 +260,13 @@ export default function AutoBestPage() {
         const text = await res.text();
         if (!text || text.trim() === "") return;
 
-        let data: any;
-        try { data = JSON.parse(text); } catch { return; }
+        let parsedData: any;
+        try { parsedData = JSON.parse(text); } catch { return; }
 
-        if (data.valido === true) {
+        if (parsedData.valido === true) {
           setIsPro(true);
           setToken(tokenToUse);
-          setVideoRimanenti(data.video_rimanenti ?? 0);
+          setVideoRimanenti(parsedData.video_rimanenti ?? 0);
           localStorage.setItem("ab_token", tokenToUse);
           if (urlToken) window.history.replaceState({}, "", window.location.pathname);
         } else {
@@ -295,7 +295,7 @@ export default function AutoBestPage() {
   };
 
   // ═══════════════════════════════════════════════════════════════
-  // UPLOAD IMMAGINI (con compressione)
+  // UPLOAD IMMAGINI (Con correzione Aspect Ratio Anti-Deformazione)
   // ═══════════════════════════════════════════════════════════════
   const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
@@ -310,14 +310,30 @@ export default function AutoBestPage() {
           img.onload = () => {
             const canvas = document.createElement("canvas");
             const MAX = 1080;
-            let w = img.width, h = img.height;
-            if (w > h) { if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; } }
-            else        { if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; } }
-            canvas.width = w; canvas.height = h;
+            
+            let w = img.width;
+            let h = img.height;
+
+            // Calcolo del ratio esatto per scalare l'immagine SENZA DEFORMARLA
+            if (w > MAX || h > MAX) {
+              const ratio = Math.min(MAX / w, MAX / h);
+              w = Math.round(w * ratio);
+              h = Math.round(h * ratio);
+            }
+
+            canvas.width = w;
+            canvas.height = h;
+            
             const ctx = canvas.getContext("2d")!;
-            ctx.fillStyle = "#000"; ctx.fillRect(0, 0, w, h);
+            // Sfondo nero per evitare corruzioni se ci sono trasparenze originarie
+            ctx.fillStyle = "#000"; 
+            ctx.fillRect(0, 0, w, h);
+            
+            // Disegna l'immagine rispettando rigorosamente le proporzioni calcolate
             ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL("image/jpeg", 0.7));
+            
+            // Qualità al 90% per fornire al Modal un'immagine nitida da scontornare
+            resolve(canvas.toDataURL("image/jpeg", 0.9));
           };
         };
       });
@@ -336,14 +352,13 @@ export default function AutoBestPage() {
     if (!file) return;
     const objectUrl = URL.createObjectURL(file);
     setLogo(objectUrl);
-    // Convertiamo in base64 per l'invio
     const reader = new FileReader();
     reader.onloadend = () => setLogo(reader.result as string);
     reader.readAsDataURL(file);
   };
 
   // ═══════════════════════════════════════════════════════════════
-  // INVIO FORM — identico a HomeTour nella logica crediti
+  // INVIO FORM
   // ═══════════════════════════════════════════════════════════════
   const processAndTrigger = async () => {
     if (images.length === 0 || !email) return;
@@ -386,33 +401,29 @@ export default function AutoBestPage() {
           lingua:      language,
           voice:       selectedVoice,
           token,
-          project:     "DriveMotion", // Lo passiamo per sicurezza
+          project:     "DriveMotion",
           environment: englishPrompt,
           car_details: { make: carMake, price: carPrice, year: carYear, engine: carEngine },
           agency:      { name: agencyName, address: agencyAddress, phone: agencyPhone },
         }),
       });
 
-      // Leggiamo la risposta di n8n
       const data = await res.json();
 
       if (!res.ok) {
-        // Se n8n ci manda l'errore del limite free raggiunto
         if (data.error === "free_limit_reached") {
           alert(data.message);
-          setShowProModal(true); // Apriamo il modal per invitare all'acquisto
+          setShowProModal(true);
         } else {
           alert("Errore n8n: " + (data.message || "Riprova più tardi"));
         }
         setLoadingVideo(false);
-        return; // Blocchiamo tutto qui
+        return;
       }
 
-      // Se arriviamo qui, il video è in fase di rendering con successo
       setLoadingVideo(false);
       setVideoCompleted(true);
 
-      // Scala crediti localmente dopo il successo
       if (isPro) setVideoRimanenti(prev => Math.max(0, prev - 1));
 
     } catch (err) {
@@ -421,6 +432,7 @@ export default function AutoBestPage() {
       setLoadingImg(false);
       setLoadingVideo(false);
     }
+  };
 
   // ═══════════════════════════════════════════════════════════════
   // FORM CONTATTI
@@ -744,7 +756,7 @@ export default function AutoBestPage() {
         <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Piani in Abbonamento</h2>
-            <p className="text-slate-400 text-lg">Scegli la potenza del marketing AI per il tuo salone. Cancella quando vuoi.</p>
+            <p className="text-slate-400 text-lg">Scegli il piano mensile perfetto per il tuo salone. Genera video professionali in automatico, aumenta le vendite e disdici quando vuoi.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
 
@@ -849,9 +861,9 @@ export default function AutoBestPage() {
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
             <Lock className="text-cyan-400 mx-auto mb-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" size={48} />
             <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L'inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente nei pacchetti video prepagati.</p>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L'inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani in abbonamento.</p>
             <div className="space-y-3">
-              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Pacchetti</a>
+              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Piani Mensili</a>
               <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest">Chiudi</button>
             </div>
           </div>
