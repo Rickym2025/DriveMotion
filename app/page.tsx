@@ -395,6 +395,13 @@ export default function AutoBestPage() {
       setLoadingVideo(false);
       setVideoCompleted(true);
 
+      if (!res.ok) {
+        throw new Error(`Errore n8n: ${res.status} ${res.statusText}`);
+      }
+
+      setLoadingVideo(false);
+      setVideoCompleted(true);
+
       // Scala crediti localmente dopo il successo
       if (isPro) setVideoRimanenti(prev => Math.max(0, prev - 1));
 
