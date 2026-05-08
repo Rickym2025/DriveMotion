@@ -74,7 +74,7 @@ const LANGUAGES = [
 
 // ─── COSTANTI URL ─────────────────────────────────────────────────
 const MODAL_URL          = "https://smartai-riccardo--drive-motion-backend-fastapi-app.modal.run/process";
-const N8N_WEBHOOK_URL    = "https://n8n.labottegadeldelta.it/webhook/autobest";
+const N8N_WEBHOOK_URL    = "https://n8n.labottegadeldelta.it/webhook/crea-video";
 const VERIFICA_TOKEN_URL = "https://n8n.labottegadeldelta.it/webhook/verifica-token-drivemotion";
 const CHATBOT_WEBHOOK_URL= "https://n8n.labottegadeldelta.it/webhook/drivemotion-chat";
 const FALLBACK_LOGO_URL  = "https://drive-motion.vercel.app/logo.png";
@@ -427,6 +427,9 @@ export default function AutoBestPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          sector:      "auto",
+          descrizione: carMake + " " + carEngine + " " + carYear,
+          prezzo:      carPrice,
           images:      finalImages,
           logo:        logoPayload,
           email,
