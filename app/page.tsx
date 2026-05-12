@@ -832,7 +832,7 @@ export default function AutoBestPage() {
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI + Voce</li>
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Inclusi</li>
       </ul>
-      <a href="TUO_NUOVO_LINK_STRIPE_1_VIDEO" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista Ora</a>
+      <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista Ora</a>
     </div>
 
     {/* Pacchetto 5 Video */}
@@ -845,7 +845,7 @@ export default function AutoBestPage() {
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Logo Salone in Video</li>
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
       </ul>
-      <a href="TUO_NUOVO_LINK_STRIPE_5_VIDEO" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Acquista 5 Video</a>
+      <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Acquista 5 Video</a>
     </div>
 
     {/* Pacchetto 15 Video */}
@@ -857,7 +857,7 @@ export default function AutoBestPage() {
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Funzioni PRO complete</li>
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Supporto Prioritario</li>
       </ul>
-      <a href="TUO_NUOVO_LINK_STRIPE_15_VIDEO" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 15 Video</a>
+      <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 15 Video</a>
     </div>
 
   </div>
