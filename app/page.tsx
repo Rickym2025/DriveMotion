@@ -74,9 +74,10 @@ const LANGUAGES = [
 
 // ─── COSTANTI URL ─────────────────────────────────────────────────
 const MODAL_URL          = "https://smartai-riccardo--drive-motion-backend-fastapi-app.modal.run/process";
-const N8N_WEBHOOK_URL    = "https://n8n.labottegadeldelta.it/webhook/crea-video";
-const VERIFICA_TOKEN_URL = "https://n8n.labottegadeldelta.it/webhook/verifica-token-drivemotion";
-const CHATBOT_WEBHOOK_URL= "https://n8n.labottegadeldelta.it/webhook/drivemotion-chat";
+const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
+const VERIFICA_TOKEN_URL = "https://n8n.rmstudio.app/webhook/verifica-token-drivemotion";
+const CHATBOT_WEBHOOK_URL= "https://n8n.rmstudio.app/webhook/drivemotion-chat";
+const CHECK_EMAIL_URL    = "https://n8n.rmstudio.app/webhook/check-email";
 const FALLBACK_LOGO_URL  = "https://drive-motion.vercel.app/logo.png";
 
 // ═════════════════════════════════════════════════════════════════
@@ -88,6 +89,7 @@ export default function AutoBestPage() {
   const [isPro,          setIsPro]          = useState(false);
   const [token,          setToken]          = useState<string | null>(null);
   const [videoRimanenti, setVideoRimanenti] = useState<number>(0);
+  const [freeUsed, setFreeUsed] = useState(false);
 
   // ─── STATO UI ──────────────────────────────────────────────────
   const [showProModal,    setShowProModal]    = useState(false);
@@ -489,10 +491,30 @@ export default function AutoBestPage() {
     finally  { setSupportLoading(false); }
   };
 
+  // ═══════════════════════════════════════════════════════════════
+  // CHECK EMAIL (Evita scrocconi)
+  // ═══════════════════════════════════════════════════════════════
+  const checkEmailUsed = async (emailToCheck: string) => {
+    if (!emailToCheck || !emailToCheck.includes("@") || isPro) return;
+    try {
+      const res = await fetch(`${CHECK_EMAIL_URL}?email=${encodeURIComponent(emailToCheck)}`);
+      const text = await res.text();
+      if (!text || text.trim() === "") return;
+      const data = JSON.parse(text);
+      if (data.gia_usato === true) {
+        localStorage.setItem("dm_free_used", "true");
+        setFreeUsed(true);
+        alert("Abbiamo visto che hai già provato il servizio gratuitamente.\nPer creare nuovi video, scegli uno dei nostri pacchetti!");
+        setShowProModal(true);
+      }
+    } catch (e) { console.error("Errore check email:", e); }
+  };
+
   // ─── TESTO PULSANTE GENERA ──────────────────────────────────────
   const btnLabel = () => {
     if (loadingImg)                      return "Rielaborazione AI...";
     if (loadingVideo)                    return "Rendering Video...";
+    if (!isPro && freeUsed)              return "Prova gratuita terminata 🔒";
     if (isPro && videoRimanenti === 0)   return "Crediti esauriti — Rinnova il piano ⚠️";
     if (isPro)                           return `Genera Video (${videoRimanenti} crediti rimasti)`;
     return "Genera Video e Post Social";
@@ -504,6 +526,7 @@ export default function AutoBestPage() {
     loadingVideo ||
     !email.includes("@") ||
     (isPro && videoRimanenti === 0);
+    (!isPro && freeUsed);
 
   // ═══════════════════════════════════════════════════════════════
   // RENDER
@@ -765,6 +788,7 @@ export default function AutoBestPage() {
                   placeholder="La tua Email per ricevere i materiali..."
                   value={email}
                   onChange={e => setEmail(e.target.value)}
+                  onBlur={e => checkEmailUsed(e.target.value)}
                   className="w-full bg-black border border-white/20 rounded-xl py-4 pl-12 pr-4 text-white focus:border-cyan-500 outline-none shadow-inner transition-all"
                 />
               </div>
