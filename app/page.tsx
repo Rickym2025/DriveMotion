@@ -258,7 +258,7 @@ export default function AutoBestPage() {
 
       try {
         const res = await fetch(`${VERIFICA_TOKEN_URL}?token=${encodeURIComponent(tokenToUse)}&project=DriveMotion`);
-        const text = await res.text(); // Leggiamo come testo una sola volta
+        const text = await res.text();
         if (!text || text.trim() === "") return;
 
         let parsedData;
@@ -269,7 +269,6 @@ export default function AutoBestPage() {
           setToken(tokenToUse);
           setVideoRimanenti(parsedData.video_rimanenti ?? 0);
           
-          // COMPILAZIONE AUTOMATICA CAMPI
           if (parsedData.email) setEmail(parsedData.email);
           if (parsedData.nome) setAgencyName(parsedData.nome);
           
@@ -286,11 +285,15 @@ export default function AutoBestPage() {
     checkToken();
   }, []);
 
+  // ─── ANIMAZIONE DEMO PHONE ──────────────────────────────────────
+  useEffect(() => {
+    const interval = setInterval(() => setDemoStep(p => (p + 1) % 3), 3500);
+    return () => clearInterval(interval);
+  }, []);
+
   // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ──────────────────────
   useEffect(() => {
-    // Il setTimeout garantisce che l'interfaccia React sia completamente caricata
     const timer = setTimeout(() => {
-      // Leggiamo i parametri dall'URL
       const urlParams = new URLSearchParams(window.location.search);
       const urlEmail = urlParams.get("email");
       const urlNome = urlParams.get("nome");
@@ -301,7 +304,7 @@ export default function AutoBestPage() {
       if (urlEmail) setEmail(urlEmail);
       if (urlNome) setAgencyName(urlNome);
       if (urlCitta) setAgencyAddress(urlCitta);
-    }, 500); // Mezzo secondo di ritardo per sicurezza
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -315,9 +318,9 @@ export default function AutoBestPage() {
   };
 
   // ═══════════════════════════════════════════════════════════════
-  // UPLOAD IMMAGINI (Con correzione Aspect Ratio Anti-Deformazione)
+  // UPLOAD IMMAGINI
   // ═══════════════════════════════════════════════════════════════
-  /*  const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
 
     const compressImage = (file: File): Promise<string> =>
@@ -328,68 +331,26 @@ export default function AutoBestPage() {
           const img = new Image();
           img.src = event.target?.result as string;
           img.onload = () => {
-            const canvas = document.createElement("canvas");
-            const MAX = 1080;
-            
-            let w = img.width;
-            let h = img.height;
+            const MAX_SIZE = 1080;
+            let width = img.width;
+            let height = img.height;
 
-            // Calcolo del ratio esatto per scalare l'immagine SENZA DEFORMARLA
-            if (w > MAX || h > MAX) {
-              const ratio = Math.min(MAX / w, MAX / h);
-              w = Math.round(w * ratio);
-              h = Math.round(h * ratio);
+            if (width > MAX_SIZE || height > MAX_SIZE) {
+              const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
+              width = Math.round(width * ratio);
+              height = Math.round(height * ratio);
             }
 
-            canvas.width = w;
-            canvas.height = h;
-            
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
             const ctx = canvas.getContext("2d")!;
-            // Sfondo nero per evitare corruzioni se ci sono trasparenze originarie
-            ctx.fillStyle = "#000"; 
-            ctx.fillRect(0, 0, w, h);
             
-            // Disegna l'immagine rispettando rigorosamente le proporzioni calcolate
-            ctx.drawImage(img, 0, 0, w, h);
-            
-            // Qualità al 90% per fornire al Modal un'immagine nitida da scontornare
-            resolve(canvas.toDataURL("image/jpeg", 0.9));
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", 0.95));
           };
         };
-      }); */
-  const compressImage = (file: File): Promise<string> =>
-    new Promise(resolve => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = event => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const MAX_SIZE = 1080;
-          let width = img.width;
-          let height = img.height;
-
-          // 1. Calcola le nuove dimensioni mantenendo PROPORZIONI PERFETTE
-          if (width > MAX_SIZE || height > MAX_SIZE) {
-            const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
-            width = Math.round(width * ratio);
-            height = Math.round(height * ratio);
-          }
-
-          const canvas = document.createElement("canvas");
-          // 2. La canvas avrà le dimensioni esatte dell'auto, niente quadrati forzati
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d")!;
-          
-          // 3. Disegna l'immagine pulita (senza aggiunta di sfondi neri)
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // 4. Invia l'immagine con qualità molto alta (0.95) per un taglio netto
-          resolve(canvas.toDataURL("image/jpeg", 0.95));
-        };
-      };
-    });
+      });
 
     const compressed = await Promise.all(files.map(compressImage));
     setImages(prev => [...prev, ...compressed]);
@@ -423,7 +384,6 @@ export default function AutoBestPage() {
       : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
 
     try {
-      // 1. Cambio sfondo AI (Modal)
       const modalPromises = images.map(async imgBase64 => {
         try {
           const res  = await fetch(MODAL_URL, {
@@ -440,7 +400,6 @@ export default function AutoBestPage() {
       setLoadingImg(false);
       setLoadingVideo(true);
 
-      // 2. Invia a n8n
       const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
 
       const res = await fetch(N8N_WEBHOOK_URL, {
@@ -837,63 +796,60 @@ export default function AutoBestPage() {
         </section>
 
        {/* ── PRICING ────────────────────────────────────────── */}
-<section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
-  <div className="text-center mb-16">
-    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
-      Modello a Consumo
-    </div>
-    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Paga solo i video che generi</h2>
-    <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-      Nessun abbonamento, nessun vincolo. Acquista i crediti che ti servono, non scadono mai. Genera i tuoi video professionali quando hai auto da vendere.
-    </p>
-  </div>
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-    
-    {/* Pacchetto Singolo */}
-    <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
-      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
-      <div className="text-4xl font-black text-white mb-6">€ 14,90<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
-      <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video Credit</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI + Voce Umana</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Inclusi</li>
-      </ul>
-      {/* Sostituisci questo link con il tuo checkout Stripe per 14.90 */}
-      <a href="https://buy.stripe.com/..." className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 1 Video</a>
-    </div>
+        <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
+              Modello a Consumo
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Paga solo i video che generi</h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Nessun abbonamento, nessun vincolo. Acquista i crediti che ti servono, non scadono mai. Genera i tuoi video professionali quando hai auto da vendere.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            
+            {/* Pacchetto Singolo */}
+            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
+              <div className="text-4xl font-black text-white mb-6">€ 14,90<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
+              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video Credit</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI + Voce Umana</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Inclusi</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 1 Video</a>
+            </div>
 
-    {/* Pacchetto 5 Video (Il più scelto) */}
-    <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.15)] transform md:-translate-y-4 z-10">
-      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest px-4 py-1 rounded-full">Il più scelto</div>
-      <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack</h3>
-      <div className="text-4xl font-black text-white mb-2">€ 59,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
-      <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Solo 11,80€ a video</p>
-      <ul className="space-y-4 text-sm text-white flex-1 mb-8">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Inserimento Logo Salone</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Lingue Straniere Sbloccate</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
-      </ul>
-      {/* Sostituisci questo link con il tuo checkout Stripe per 59.00 */}
-      <a href="https://buy.stripe.com/..." className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Acquista 5 Video</a>
-    </div>
+            {/* Pacchetto 5 Video (Il più scelto) */}
+            <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.15)] transform md:-translate-y-4 z-10">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest px-4 py-1 rounded-full">Il più scelto</div>
+              <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack</h3>
+              <div className="text-4xl font-black text-white mb-2">€ 59,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
+              <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Solo 11,80€ a video</p>
+              <ul className="space-y-4 text-sm text-white flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Inserimento Logo Salone</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Lingue Straniere Sbloccate</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Acquista 5 Video</a>
+            </div>
 
-    {/* Pacchetto 15 Video */}
-    <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all">
-      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Maxi Pack</h3>
-      <div className="text-4xl font-black text-white mb-2">€ 129,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
-      <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Meno di 9€ a video</p>
-      <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits</strong></li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Funzioni PRO complete</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Elaborazione Prioritaria</li>
-      </ul>
-      {/* Sostituisci questo link con il tuo checkout Stripe per 129.00 */}
-      <a href="https://buy.stripe.com/..." className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 15 Video</a>
-    </div>
+            {/* Pacchetto 15 Video */}
+            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all">
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Maxi Pack</h3>
+              <div className="text-4xl font-black text-white mb-2">€ 129,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
+              <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Meno di 9€ a video</p>
+              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Funzioni PRO complete</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Elaborazione Prioritaria</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 15 Video</a>
+            </div>
 
-  </div>
-</section>
+          </div>
+        </section>
 
         {/* ── ECOSISTEMA ─────────────────────────────────────── */}
         <section className="border-t border-white/10 bg-[#020202]/80 backdrop-blur-xl py-24 relative z-10">
@@ -932,7 +888,7 @@ export default function AutoBestPage() {
               <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                 <img src="/logo.png" alt="DriveMotion AI Logo" className="h-24 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria MR Studio. Semplifichiamo il marketing automotive attraverso l'Intelligenza Artificiale Generativa.</p>
+              <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria MR Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa.</p>
               <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} MR Studio.</p>
             </div>
             <div className="flex flex-col items-center md:items-start gap-4">
@@ -961,7 +917,7 @@ export default function AutoBestPage() {
             <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
             <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L&apos;inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
             <div className="space-y-3">
-              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Piani Mensili</a>
+              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Piani</a>
               <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest">Chiudi</button>
             </div>
           </div>
