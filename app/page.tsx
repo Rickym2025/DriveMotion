@@ -544,6 +544,12 @@ export default function AutoBestPage() {
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
+            {isPro && (
+              <div className="bg-cyan-500/10 border border-cyan-500/30 px-4 py-1.5 rounded-full flex items-center gap-2">
+                <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{videoRimanenti} Crediti Residui</span>
+              </div>
+            )}
             <a href="https://hometour-studio.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">HomeTour</a>
             <a href="https://omniastudio-pro.vercel.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">OmniaStudio</a>
             <a href="https://concierge24.vercel.app/"     target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Concierge24</a>
