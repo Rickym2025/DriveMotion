@@ -286,22 +286,22 @@ export default function AutoBestPage() {
     checkToken();
   }, []);
 
-  // ─── ANIMAZIONE DEMO PHONE ──────────────────────────────────────
+  // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ─────────────
   useEffect(() => {
-    const interval = setInterval(() => setDemoStep(p => (p + 1) % 3), 3500);
-    return () => clearInterval(interval);
+    // Usiamo un piccolo ritardo per assicurarci che React abbia montato i campi
+    const timer = setTimeout(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlEmail = urlParams.get("email");
+      const urlNome = urlParams.get("nome");
+      const urlCitta = urlParams.get("citta");
+
+      if (urlEmail) setEmail(urlEmail);
+      if (urlNome) setAgencyName(urlNome);
+      if (urlCitta) setAgencyAddress(urlCitta);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlEmail = urlParams.get("email");
-    const urlNome = urlParams.get("nome");
-    const urlCitta = urlParams.get("citta");
-
-    if (urlEmail) setEmail(urlEmail);
-    if (urlNome) setAgencyName(urlNome);
-    if (urlCitta) setAgencyAddress(urlCitta);
-   }, []);
 
   // ═══════════════════════════════════════════════════════════════
   // GESTIONE LINGUA
@@ -836,49 +836,57 @@ export default function AutoBestPage() {
        {/* ── PRICING ────────────────────────────────────────── */}
 <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
   <div className="text-center mb-16">
-    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Pacchetti a Consumo</h2>
-    <p className="text-slate-400 text-lg">
-      Acquista i crediti video che ti servono. Nessun abbonamento, nessuna scadenza. 
-      Genera i tuoi video professionali quando vuoi.
+    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
+      Modello a Consumo
+    </div>
+    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Paga solo i video che generi</h2>
+    <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+      Nessun abbonamento, nessun vincolo. Acquista i crediti che ti servono, non scadono mai. Genera i tuoi video professionali quando hai auto da vendere.
     </p>
   </div>
   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
     
     {/* Pacchetto Singolo */}
     <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
-      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">1 Video</h3>
+      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
       <div className="text-4xl font-black text-white mb-6">€ 14,90<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
       <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video Credit</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI + Voce</li>
+        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI + Voce Umana</li>
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Inclusi</li>
       </ul>
-      <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista Ora</a>
+      {/* Sostituisci questo link con il tuo checkout Stripe per 14.90 */}
+      <a href="https://buy.stripe.com/..." className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 1 Video</a>
     </div>
 
-    {/* Pacchetto 5 Video */}
-    <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.15)] transform md:-translate-y-4">
+    {/* Pacchetto 5 Video (Il più scelto) */}
+    <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.15)] transform md:-translate-y-4 z-10">
       <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest px-4 py-1 rounded-full">Il più scelto</div>
-      <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pack 5 Video</h3>
+      <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack</h3>
       <div className="text-4xl font-black text-white mb-2">€ 59,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
-      <ul className="space-y-4 text-sm text-white flex-1 mb-8 mt-4">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 5 Video Credits</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Logo Salone in Video</li>
+      <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Solo 11,80€ a video</p>
+      <ul className="space-y-4 text-sm text-white flex-1 mb-8">
+        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
+        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Inserimento Logo Salone</li>
+        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Lingue Straniere Sbloccate</li>
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
       </ul>
-      <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Acquista 5 Video</a>
+      {/* Sostituisci questo link con il tuo checkout Stripe per 59.00 */}
+      <a href="https://buy.stripe.com/..." className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-3.5 rounded-full font-bold transition-all shadow-lg shadow-cyan-500/25">Acquista 5 Video</a>
     </div>
 
     {/* Pacchetto 15 Video */}
     <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all">
-      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Pack 15 Video</h3>
+      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Maxi Pack</h3>
       <div className="text-4xl font-black text-white mb-2">€ 129,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
-      <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8 mt-4">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 15 Video Credits</li>
+      <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Meno di 9€ a video</p>
+      <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits</strong></li>
         <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Funzioni PRO complete</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Supporto Prioritario</li>
+        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Elaborazione Prioritaria</li>
       </ul>
-      <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 15 Video</a>
+      {/* Sostituisci questo link con il tuo checkout Stripe per 129.00 */}
+      <a href="https://buy.stripe.com/..." className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all">Acquista 15 Video</a>
     </div>
 
   </div>
