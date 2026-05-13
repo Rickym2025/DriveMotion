@@ -269,6 +269,10 @@ export default function AutoBestPage() {
           setIsPro(true);
           setToken(tokenToUse);
           setVideoRimanenti(parsedData.video_rimanenti ?? 0);
+          
+          if (parsedData.email) setEmail(parsedData.email);
+          if (parsedData.nome) setAgencyName(parsedData.nome);
+          
           localStorage.setItem("ab_token", tokenToUse);
           if (urlToken) window.history.replaceState({}, "", window.location.pathname);
         } else {
@@ -287,6 +291,17 @@ export default function AutoBestPage() {
     const interval = setInterval(() => setDemoStep(p => (p + 1) % 3), 3500);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlEmail = urlParams.get("email");
+    const urlNome = urlParams.get("nome");
+    const urlCitta = urlParams.get("citta");
+
+    if (urlEmail) setEmail(urlEmail);
+    if (urlNome) setAgencyName(urlNome);
+    if (urlCitta) setAgencyAddress(urlCitta);
+  },
 
   // ═══════════════════════════════════════════════════════════════
   // GESTIONE LINGUA
