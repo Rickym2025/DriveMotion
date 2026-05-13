@@ -309,6 +309,35 @@ export default function AutoBestPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // ─── MEMORIA DEL FORM (LOCALSTORAGE) ──────────────────────────────
+  // Salva i dati ogni volta che l'utente scrive qualcosa
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const formData = { carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email };
+      localStorage.setItem("dm_form_memory", JSON.stringify(formData));
+    }, 500); // Ritardo per non stressare il browser ad ogni singola lettera
+    return () => clearTimeout(timer);
+  }, [carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email]);
+
+  // Carica i dati salvati quando la pagina si apre
+  useEffect(() => {
+    const saved = localStorage.getItem("dm_form_memory");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.carMake) setCarMake(parsed.carMake);
+        if (parsed.carPrice) setCarPrice(parsed.carPrice);
+        if (parsed.carYear) setCarYear(parsed.carYear);
+        if (parsed.carEngine) setCarEngine(parsed.carEngine);
+        // Evitiamo di sovrascrivere se ci sono dati più aggiornati (es. n8n)
+        if (!agencyName && parsed.agencyName) setAgencyName(parsed.agencyName);
+        if (!agencyAddress && parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
+        if (!agencyPhone && parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
+        if (!email && parsed.email) setEmail(parsed.email);
+      } catch (e) { console.warn("Errore lettura memoria form"); }
+    }
+  }, []);
+
   // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ──────────────────────
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -316,12 +345,22 @@ export default function AutoBestPage() {
       const urlEmail = urlParams.get("email");
       const urlNome = urlParams.get("nome");
       const urlCitta = urlParams.get("citta");
+      const urlTelefono = urlParams.get("telefono"); // Aggiunto!
 
-      console.log("DriveMotion Debug - Parametri trovati:", { urlEmail, urlNome, urlCitta });
-
-      if (urlEmail) setEmail(urlEmail);
-      if (urlNome) setAgencyName(urlNome);
-      if (urlCitta) setAgencyAddress(urlCitta);
+      if (urlEmail) setEmail(decodeURIComponent(urlEmail));
+      if (urlNome) setAgencyName(decodeURIComponent(urlNome));
+      if (urlCitta) setAgencyAddress(decodeURIComponent(urlCitta));
+      if (urlTelefono) setAgencyPhone(decodeURIComponent(urlTelefono)); // Aggiunto!
+      
+      // Pulisce l'URL dopo aver letto i dati per fare "ordine"
+      if (urlEmail || urlNome) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('email');
+        url.searchParams.delete('nome');
+        url.searchParams.delete('citta');
+        url.searchParams.delete('telefono');
+        window.history.replaceState({}, document.title, url.toString());
+      }
     }, 500);
 
     return () => clearTimeout(timer);
