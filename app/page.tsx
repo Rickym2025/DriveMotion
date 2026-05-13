@@ -543,7 +543,7 @@ export default function AutoBestPage() {
     loadingImg ||
     loadingVideo ||
     !email.includes("@") ||
-    (isPro && videoRimanenti === 0);
+    (isPro && videoRimanenti === 0) ||
     (!isPro && freeUsed);
 
   // ═══════════════════════════════════════════════════════════════
