@@ -286,19 +286,22 @@ export default function AutoBestPage() {
     checkToken();
   }, []);
 
-  // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ─────────────
+  // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ──────────────────────
   useEffect(() => {
-    // Usiamo un piccolo ritardo per assicurarci che React abbia montato i campi
+    // Il setTimeout garantisce che l'interfaccia React sia completamente caricata
     const timer = setTimeout(() => {
+      // Leggiamo i parametri dall'URL
       const urlParams = new URLSearchParams(window.location.search);
       const urlEmail = urlParams.get("email");
       const urlNome = urlParams.get("nome");
       const urlCitta = urlParams.get("citta");
 
+      console.log("DriveMotion Debug - Parametri trovati:", { urlEmail, urlNome, urlCitta });
+
       if (urlEmail) setEmail(urlEmail);
       if (urlNome) setAgencyName(urlNome);
       if (urlCitta) setAgencyAddress(urlCitta);
-    }, 100);
+    }, 500); // Mezzo secondo di ritardo per sicurezza
 
     return () => clearTimeout(timer);
   }, []);
