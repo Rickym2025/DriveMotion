@@ -258,11 +258,10 @@ export default function AutoBestPage() {
 
       try {
         const res = await fetch(`${VERIFICA_TOKEN_URL}?token=${encodeURIComponent(tokenToUse)}&project=DriveMotion`);
-        const data = await res.json();
-        const text = await res.text();
+        const text = await res.text(); // Leggiamo come testo una sola volta
         if (!text || text.trim() === "") return;
 
-        let parsedData: any;
+        let parsedData;
         try { parsedData = JSON.parse(text); } catch { return; }
 
         if (parsedData.valido === true) {
@@ -270,6 +269,7 @@ export default function AutoBestPage() {
           setToken(tokenToUse);
           setVideoRimanenti(parsedData.video_rimanenti ?? 0);
           
+          // COMPILAZIONE AUTOMATICA CAMPI
           if (parsedData.email) setEmail(parsedData.email);
           if (parsedData.nome) setAgencyName(parsedData.nome);
           
