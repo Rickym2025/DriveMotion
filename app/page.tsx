@@ -821,7 +821,7 @@ export default function AutoBestPage() {
             {/* Pacchetto Singolo */}
             <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
               <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
-              <div className="text-4xl font-black text-white mb-6">€ 14,90<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
+              <div className="text-4xl font-black text-white mb-6">€ 14,90<span className="text-lg font-normal text-slate-400"></span></div>
               <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video Credit</li>
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI + Voce Umana</li>
@@ -834,7 +834,7 @@ export default function AutoBestPage() {
             <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.15)] transform md:-translate-y-4 z-10">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest px-4 py-1 rounded-full">Il più scelto</div>
               <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack</h3>
-              <div className="text-4xl font-black text-white mb-2">€ 59,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
+              <div className="text-4xl font-black text-white mb-2">€ 59,00<span className="text-lg font-normal text-slate-400"></span></div>
               <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Solo 11,80€ a video</p>
               <ul className="space-y-4 text-sm text-white flex-1 mb-8">
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
@@ -848,7 +848,7 @@ export default function AutoBestPage() {
             {/* Pacchetto 15 Video */}
             <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all">
               <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Maxi Pack</h3>
-              <div className="text-4xl font-black text-white mb-2">€ 129,00<span className="text-lg font-normal text-slate-400">/una tantum</span></div>
+              <div className="text-4xl font-black text-white mb-2">€ 129,00<span className="text-lg font-normal text-slate-400"></span></div>
               <p className="text-slate-400 text-xs mb-6 border-b border-white/10 pb-4">Meno di 9€ a video</p>
               <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
                 <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits</strong></li>
