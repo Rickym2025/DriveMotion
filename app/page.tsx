@@ -301,7 +301,7 @@ export default function AutoBestPage() {
     if (urlEmail) setEmail(urlEmail);
     if (urlNome) setAgencyName(urlNome);
     if (urlCitta) setAgencyAddress(urlCitta);
-  },
+   }, []);
 
   // ═══════════════════════════════════════════════════════════════
   // GESTIONE LINGUA
