@@ -73,7 +73,7 @@ const LANGUAGES = [
 ];
 
 // ─── COSTANTI URL ─────────────────────────────────────────────────
-const MODAL_URL          = "https://smartai-riccardo--drive-motion-backend-fastapi-app.modal.run/process";
+const MODAL_URL          = "https://modena-riccardo--drive-motion-backend-fastapi-app.modal.run/process";
 const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
 const VERIFICA_TOKEN_URL = "https://n8n.rmstudio.app/webhook/verifica-token-drivemotion";
 const CHATBOT_WEBHOOK_URL= "https://n8n.rmstudio.app/webhook/drivemotion-chat";
