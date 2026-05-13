@@ -247,10 +247,10 @@ export default function AutoBestPage() {
   }, []);
 
   // ═══════════════════════════════════════════════════════════════
-  // VERIFICA TOKEN
+  // VERIFICA TOKEN (Con sistema di Polling Anti-Race-Condition Stripe)
   // ═══════════════════════════════════════════════════════════════
   useEffect(() => {
-    const checkToken = async () => {
+    const checkToken = async (attempt = 1) => {
       const urlToken   = new URLSearchParams(window.location.search).get("token");
       const savedToken = localStorage.getItem("ab_token");
       const tokenToUse = urlToken || savedToken;
@@ -259,10 +259,10 @@ export default function AutoBestPage() {
       try {
         const res = await fetch(`${VERIFICA_TOKEN_URL}?token=${encodeURIComponent(tokenToUse)}&project=DriveMotion`);
         const text = await res.text();
-        if (!text || text.trim() === "") return;
+        if (!text || text.trim() === "") throw new Error("Empty response");
 
         let parsedData;
-        try { parsedData = JSON.parse(text); } catch { return; }
+        try { parsedData = JSON.parse(text); } catch { throw new Error("JSON Parsing failed"); }
 
         if (parsedData.valido === true) {
           setIsPro(true);
@@ -273,12 +273,30 @@ export default function AutoBestPage() {
           if (parsedData.nome) setAgencyName(parsedData.nome);
           
           localStorage.setItem("ab_token", tokenToUse);
-          if (urlToken) window.history.replaceState({}, "", window.location.pathname);
+          
+          // Rimuovi il token dall'URL SOLO dopo aver confermato che è valido
+          if (urlToken) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('token');
+            window.history.replaceState({}, document.title, url.toString());
+          }
         } else {
-          localStorage.removeItem("ab_token");
+          // SE IL TOKEN VIENE DALL'URL E NON E' VALIDO: 
+          // Stripe non ha ancora finito di scriverlo su Google Sheets. Riprova!
+          if (urlToken && attempt < 4) {
+            console.log(`[DriveMotion] Token non ancora sincronizzato. Ritento... (${attempt}/4)`);
+            setTimeout(() => checkToken(attempt + 1), 2500); // Aspetta 2.5 secondi
+          } else if (!urlToken) {
+            // Se è un vecchio token preso dal localStorage che è scaduto, eliminalo
+            localStorage.removeItem("ab_token");
+          }
         }
       } catch (err) {
         console.warn("[DriveMotion] Errore verifica token:", err);
+        // Ritenta in caso di glitch di rete momentaneo
+        if (urlToken && attempt < 4) {
+          setTimeout(() => checkToken(attempt + 1), 2500);
+        }
       }
     };
 
