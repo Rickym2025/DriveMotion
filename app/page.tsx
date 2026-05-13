@@ -384,22 +384,32 @@ export default function AutoBestPage() {
       : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
 
     try {
-      const modalPromises = images.map(async imgBase64 => {
+      // 1. Cambio sfondo AI (Modal) - SEQUENZIALE PER NON FAR CRASHARE LA GPU
+      const finalImages = [];
+      
+      for (const imgBase64 of images) {
         try {
-          const res  = await fetch(MODAL_URL, {
+          const res = await fetch(MODAL_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ image_b64: imgBase64, env_english: englishPrompt }),
           });
+          
+          if (!res.ok) throw new Error("Errore Server Modal");
+          
           const data = await res.json();
-          return data.status === "success" ? data.image : imgBase64;
-        } catch { return imgBase64; }
-      });
+          // Se ha successo salva l'immagine scontornata, altrimenti usa l'originale
+          finalImages.push(data.status === "success" ? data.image : imgBase64);
+        } catch (err) {
+          console.warn("Errore AI per un'immagine, procedo con l'originale.", err);
+          finalImages.push(imgBase64); 
+        }
+      }
 
-      const finalImages = await Promise.all(modalPromises);
       setLoadingImg(false);
       setLoadingVideo(true);
 
+      // 2. Invia a n8n
       const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
 
       const res = await fetch(N8N_WEBHOOK_URL, {
