@@ -959,7 +959,7 @@ export default function AutoBestPage() {
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
             <Lock className="text-cyan-400 mx-auto mb-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" size={48} />
             <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L'inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani in abbonamento.</p>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L'inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
             <div className="space-y-3">
               <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Piani Mensili</a>
               <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest">Chiudi</button>
