@@ -605,7 +605,7 @@ export default function AutoBestPage() {
             <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white leading-[1.1] drop-shadow-lg">
               Vendi più Auto. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                Con l'Intelligenza Artificiale.
+                Con l&apos;Intelligenza Artificiale.
               </span>
             </h1>
             <p className="text-slate-300 text-lg md:text-xl max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-medium">
@@ -900,7 +900,7 @@ export default function AutoBestPage() {
           <div className="max-w-6xl mx-auto px-6 text-center">
             <div className="mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 italic">Ecosistema MR Studio</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto">Sfrutta la potenza dell'Intelligenza Artificiale per ottimizzare ogni aspetto del tuo business.</p>
+              <p className="text-slate-400 max-w-2xl mx-auto">Sfrutta la potenza dell&apos;Intelligenza Artificiale per ottimizzare ogni aspetto del tuo business.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <a href="https://hometour-studio.vercel.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
@@ -918,7 +918,7 @@ export default function AutoBestPage() {
               <a href="https://concierge24.vercel.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
                 <div className="text-xs font-bold text-orange-500 tracking-widest uppercase mb-4">Hospitality</div>
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-orange-400 transition-colors">Concierge24</h3>
-                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">L'assistente virtuale multilingua H24 per Hotel e Airbnb. Gestisce prenotazioni e consiglia ristoranti.</p>
+                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">L&apos;assistente virtuale multilingua H24 per Hotel e Airbnb. Gestisce prenotazioni e consiglia ristoranti.</p>
                 <div className="flex items-center text-orange-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
               </a>
             </div>
@@ -959,7 +959,7 @@ export default function AutoBestPage() {
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
             <Lock className="text-cyan-400 mx-auto mb-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" size={48} />
             <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L'inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L&apos;inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
             <div className="space-y-3">
               <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Piani Mensili</a>
               <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest">Chiudi</button>
