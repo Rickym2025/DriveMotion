@@ -270,7 +270,7 @@ export default function AutoBestPage() {
           setVideoRimanenti(parsedData.video_rimanenti ?? 0);
           
           if (parsedData.email) setEmail(parsedData.email);
-          if (parsedData.nome && !agencyName) setAgencyName(parsedData.nome);
+         // if (parsedData.nome && !agencyName) setAgencyName(parsedData.nome);
           
           localStorage.setItem("ab_token", tokenToUse);
           
