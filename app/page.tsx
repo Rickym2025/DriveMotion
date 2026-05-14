@@ -330,9 +330,12 @@ export default function AutoBestPage() {
         if (parsed.carYear) setCarYear(parsed.carYear);
         if (parsed.carEngine) setCarEngine(parsed.carEngine);
         // Evitiamo di sovrascrivere se ci sono dati più aggiornati (es. n8n)
-        if (!agencyName && parsed.agencyName) setAgencyName(parsed.agencyName);
-        if (!agencyAddress && parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
-        if (!agencyPhone && parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
+        //if (!agencyName && parsed.agencyName) setAgencyName(parsed.agencyName);
+        //if (!agencyAddress && parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
+        //if (!agencyPhone && parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
+        if (parsed.agencyName) setAgencyName(parsed.agencyName);
+        if (parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
+        if (parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
         if (!email && parsed.email) setEmail(parsed.email);
       } catch (e) { console.warn("Errore lettura memoria form"); }
     }
@@ -347,21 +350,27 @@ export default function AutoBestPage() {
       const urlCitta = urlParams.get("citta");
       const urlTelefono = urlParams.get("telefono"); // Aggiunto!
 
-      if (urlEmail) setEmail(decodeURIComponent(urlEmail));
-      if (urlNome) setAgencyName(decodeURIComponent(urlNome));
-      if (urlCitta) setAgencyAddress(decodeURIComponent(urlCitta));
-      if (urlTelefono) setAgencyPhone(decodeURIComponent(urlTelefono)); // Aggiunto!
+      // Verifichiamo se abbiamo GIA' i dati in memoria
+      const saved = localStorage.getItem("dm_form_memory");
+      const parsed = saved ? JSON.parse(saved) : {};
+
+      // Inseriamo i dati dall'URL SOLO SE la memoria del browser è vuota
+      if (urlEmail && !parsed.email) setEmail(decodeURIComponent(urlEmail));
+      if (urlNome && !parsed.agencyName) setAgencyName(decodeURIComponent(urlNome));
+      if (urlCitta && !parsed.agencyAddress) setAgencyAddress(decodeURIComponent(urlCitta));
+      if (urlTelefono && !parsed.agencyPhone) setAgencyPhone(decodeURIComponent(urlTelefono));
       
-      // Pulisce l'URL dopo aver letto i dati per fare "ordine"
-      if (urlEmail || urlNome) {
+      // Pulizia URL per evitare riletture
+      if (urlEmail || urlNome || urlParams.get('token')) {
         const url = new URL(window.location.href);
         url.searchParams.delete('email');
         url.searchParams.delete('nome');
         url.searchParams.delete('citta');
         url.searchParams.delete('telefono');
+        url.searchParams.delete('token'); // Togliamo anche il token dall'URL dopo averlo letto
         window.history.replaceState({}, document.title, url.toString());
       }
-    }, 500);
+    }, 600);
 
     return () => clearTimeout(timer);
   }, []);
