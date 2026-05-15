@@ -442,7 +442,10 @@ export default function AutoBestPage() {
   // ═══════════════════════════════════════════════════════════════
   const processAndTrigger = async () => {
     if (images.length === 0 || !email) return;
-    setLoadingImg(true);
+    
+    // Saltiamo il caricamento infinito, passiamo subito a "Rendering Video"
+    setLoadingImg(false);
+    setLoadingVideo(true);
     setVideoCompleted(false);
 
     const englishPrompt = selectedEnvId === "custom"
@@ -450,34 +453,9 @@ export default function AutoBestPage() {
       : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
 
     try {
-      // 1. Cambio sfondo AI (Modal) - SEQUENZIALE PER NON FAR CRASHARE LA GPU
-      const finalImages = [];
-      
-      for (const imgBase64 of images) {
-        try {
-          const res = await fetch(MODAL_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_b64: imgBase64, env_english: englishPrompt }),
-          });
-          
-          if (!res.ok) throw new Error("Errore Server Modal");
-          
-          const data = await res.json();
-          // Se ha successo salva l'immagine scontornata, altrimenti usa l'originale
-          finalImages.push(data.status === "success" ? data.image : imgBase64);
-        } catch (err) {
-          console.warn("Errore AI per un'immagine, procedo con l'originale.", err);
-          finalImages.push(imgBase64); 
-        }
-      }
-
-      setLoadingImg(false);
-      setLoadingVideo(true);
-
-      // 2. Invia a n8n
       const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
 
+      // Invia a n8n: le immagini sono grezze (base64). Modal lo farà n8n al sicuro!
       const res = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -485,7 +463,7 @@ export default function AutoBestPage() {
           sector:      "auto",
           descrizione: carMake + " " + carEngine + " " + carYear,
           prezzo:      carPrice,
-          images:      finalImages,
+          images:      images, // Invia direttamente le foto originali!
           logo:        logoPayload,
           email,
           formato:     videoFormat,
