@@ -50,26 +50,35 @@ const PREDEFINED_ENVIRONMENTS = [
 
 const VOICES_CONFIG = {
   it: [
-    { id: "aura-2-livia-it",     name: "Livia (F) — Elegante",        pro: false },
-    { id: "aura-2-cinzia-it",    name: "Cinzia (F) — Dinamica",       pro: true  },
-    { id: "aura-2-demetra-it",   name: "Demetra (F) — Social",        pro: true  },
-    { id: "aura-2-cesare-it",    name: "Cesare (M) — Serio",          pro: true  },
-    { id: "aura-2-arcangelo-it", name: "Arcangelo (M) — Professionale", pro: true },
+    { id: "d718e944-b313-4998-b011-d1cc078d4ef3", name: "Liv (F) — Naturale", pro: false },
+    { id: "d609f27f-f1a4-410f-85bb-10037b4fba99", name: "Francesca (F) — Elegante", pro: true },
+    { id: "0e21713a-5e9a-428a-bed4-90d410b87f13", name: "Alessandra (F) — Melodica", pro: true },
+    { id: "90c7d657-9599-4cd0-9ed2-2568359e4d1a", name: "Sofia (F) — Professionale", pro: true },
+    { id: "36d94908-c5b9-4014-b521-e69aee5bead0", name: "Giulia (F) — Autorevole", pro: true },
+    { id: "ee16f140-f6dc-490e-a1ed-c1d537ea0086", name: "Lorenzo (M) — Ospitale", pro: true },
   ],
   en: [
-    { id: "aura-2-thalia-en", name: "Thalia (F) — English", pro: true },
-    { id: "aura-asteria-en",  name: "Asteria (F) — English", pro: true },
+    { id: "dc30854e-e398-4579-9dc8-16f6cb2c19b9", name: "Victoria (F) — UK Elegante", pro: true },
+    { id: "2f251ac3-89a9-4a77-a452-704b474ccd01", name: "Lucy (F) — UK Rassicurante", pro: true },
+    { id: "4f7f1324-1853-48a6-b294-4e78e8036a83", name: "Casper (M) — Emozionale", pro: true },
+    { id: "0ad65e7f-006c-47cf-bd31-52279d487913", name: "Rupert (M) — Maturo e Caldo", pro: true },
   ],
   de: [
-    { id: "aura-2-aurelia-de", name: "Aurelia (F) — Deutsch", pro: true },
-    { id: "aura-2-fabian-de",  name: "Fabian (M) — Deutsch",  pro: true },
+    { id: "b9de4a89-2257-424b-94c2-db18ba68c81a", name: "Viktoria (F) — Conversazionale", pro: true },
+    { id: "d1cbea67-e4d3-47cd-be2a-2bd4e646b002", name: "Henrik (M) — Business", pro: true },
+  ],
+  es: [
+    { id: "9d8c6b2e-0a23-4a15-ae1b-121d5b5af417", name: "Nuria (F) — Professionale", pro: true },
+    { id: "13ff5deb-2591-42ad-a356-63a04e524411", name: "Marcos (M) — Calmo e Sicuro", pro: true },
   ],
 };
 
+// Devi anche aggiornare LANGUAGES subito sotto per includere lo Spagnolo
 const LANGUAGES = [
   { id: "it", flag: "🇮🇹", name: "Italiano" },
   { id: "en", flag: "🇬🇧", name: "English"  },
   { id: "de", flag: "🇩🇪", name: "Deutsch"  },
+  { id: "es", flag: "🇪🇸", name: "Español"  },
 ];
 
 // ─── COSTANTI URL ─────────────────────────────────────────────────
@@ -115,7 +124,7 @@ export default function AutoBestPage() {
   const [customEnv,     setCustomEnv]     = useState("");
   const [videoFormat,   setVideoFormat]   = useState("verticale");
   const [language,      setLanguage]      = useState("it");
-  const [selectedVoice, setSelectedVoice] = useState("aura-2-livia-it");
+  const [selectedVoice, setSelectedVoice] = useState("d718e944-b313-4998-b011-d1cc078d4ef3")
 
   // ─── STATO RETE ────────────────────────────────────────────────
   const [loadingImg,     setLoadingImg]     = useState(false);
@@ -816,8 +825,19 @@ export default function AutoBestPage() {
               </div>
             </div>
 
-            {/* PULSANTE FINALE */}
+           {/* PULSANTE FINALE */}
             <div className="mt-12 pt-8 border-t border-white/10 max-w-2xl mx-auto relative z-10">
+              
+              {/* INFORMAZIONE REGIA AI (Inserito qui!) */}
+              <div className="mb-6 p-6 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl text-center">
+                <span className="inline-block px-3 py-1 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest rounded-full mb-3">
+                  ✨ REGIA AI INCLUSA
+                </span>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Oltre al cambio sfondo, la nostra Intelligenza Artificiale trasformerà <strong>fino a {isPro ? '4' : '2'} foto in veri video in movimento</strong> (l'auto che sfreccia sull'asfalto o carrellate cinematiche nel salone).
+                </p>
+              </div>
+
               <div className="relative mb-4">
                 <Mail className="absolute left-4 top-4 text-slate-500" size={20} />
                 <input
@@ -830,7 +850,14 @@ export default function AutoBestPage() {
                 />
               </div>
               <button
-                onClick={processAndTrigger}
+                onClick={(e) => {
+                  if ((!isPro && freeUsed) || (isPro && videoRimanenti === 0)) {
+                    e.preventDefault();
+                    setShowProModal(true);
+                  } else {
+                    processAndTrigger();
+                  }
+                }}
                 disabled={btnDisabled}
                 className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-lg py-5 rounded-xl flex items-center justify-center gap-3 transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(34,211,238,0.25)] transform active:scale-95"
               >
