@@ -1,0 +1,29 @@
+# DriveMotion AI - Cinema AI per Autosaloni
+
+> Strumento avanzato di intelligenza artificiale per la generazione automatica di video promozionali e post social per rivenditori di auto, basato su foto reali di veicoli.
+
+## Informazioni Generali
+- **Sito Web principale:** https://drivemotion.rmstudio.app/
+- **Integrazione Tecnica:** Frontend Next.js ("use client") integrato con backend FastAPI e automazione workflow tramite n8n.
+- **Funzionalità Core:** Rimozione sfondo, sostituzione con scenari fotorealistici tramite IA, animazione 2.5D delle immagini fisse ("Regia AI"), generazione di testi persuasivi e sintesi vocale multilingua.
+
+## Configurazione del Servizio
+
+### 1. Requisiti di Input
+- **Immagini:** Da 3 a 8 fotografie del veicolo (la foto principale viene rielaborata dall'IA).
+- **Logo aziendale:** Caricabile in formato PNG/JPEG (disponibile per gli utenti con piano PRO).
+- **Dati Veicolo:** Marca, modello, anno, prezzo, allestimento/motore.
+- **Informazioni Autosalone:** Nome, indirizzo/città, telefono del salone.
+
+### 2. Opzioni di Generazione
+- **Scenari AI Predefiniti:** Salone Lusso, Città Moderna, Montagna, Notte Cyber, Loft Industriale, Studio Foto, Tramonto Mare, Deserto, Neve, Pista da Corsa, Scenario Custom descritto dall'utente.
+- **Voci e Lingue:** Supporto completo per Italiano, Inglese, Tedesco e Spagnolo, con selezione di speaker maschili e femminili nativi.
+- **Formato Video:** Verticale (9:16) per Reels/TikTok/Shorts, Orizzontale (16:9) per YouTube e siti web.
+
+### 3. Piani d'Acquisto (Modello Pay-per-Result)
+- **Starter Pack (€ 14,90):** 1 credito video HD, sfondo AI personalizzato, post social pronti all'uso.
+- **Pro Pack (€ 59,00):** 5 crediti video, inserimento logo aziendale personalizzato, sblocco lingue straniere.
+- **Maxi Pack (€ 129,00):** 15 crediti video HD, inserimento logo, elaborazione prioritaria.
+
+## Risorse per Modelli Linguistici e Crawler
+- Full Markdown Mirror: https://drivemotion.rmstudio.app/mirrors.md
