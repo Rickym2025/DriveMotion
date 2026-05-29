@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Upload, Camera, Sparkles, Loader2, CheckCircle2,
   MapPin, Video, Mail, Car, Building2, Volume2,
@@ -18,7 +18,7 @@ const InstagramIcon = ({ size = 24, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
     <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    <line x1="17.5" x2="17.51" y1="6.5" x2="17.51" y2="6.5" />
   </svg>
 );
 const LinkedinIcon = ({ size = 24, className = "" }) => (
@@ -129,7 +129,7 @@ export default function AutoBestPage() {
   const [loadingVideo,   setLoadingVideo]   = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
-  // Iniezione automatica dello Schema Markup JSON-LD all'avvio
+  // Iniezione automatica dello Schema Markup JSON-LD all'avvio per Google SEO
   useEffect(() => {
     const script = document.createElement("script");
     script.type = "application/ld+json";
@@ -931,31 +931,124 @@ export default function AutoBestPage() {
           <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
         </section>
 
-        {/* ── ECOSISTEMA ── */}
-        <section className="border-t border-white/10 bg-[#020202]/80 backdrop-blur-xl py-24 relative z-10">
-          <div className="max-w-6xl mx-auto px-6 text-center">
-            <div className="mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 italic">Ecosistema RM Studio</h2>
-              <p className="text-slate-400 max-w-2xl mx-auto">Sfrutta la potenza dell&apos;Intelligenza Artificiale per ottimizzare ogni aspetto del tuo business.</p>
+        {/* ── SEZIONE FOUNDER & ECOSISTEMA ORBITALE (6 ELEMENTI SIMMETRICI) ── */}
+        <section id="ecosistema" className="border-t border-white/10 bg-[#020202]/80 py-24 px-6 relative">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+            
+            {/* Widget Orbitale ad Esagono Regolare (60 gradi) */}
+            <div className="w-full lg:w-1/2 flex justify-center items-center relative min-h-[440px] orbit-area">
+              <div className="absolute w-72 h-72 bg-cyan-500/10 blur-3xl rounded-full"></div>
+              
+              <div className="orbit-ring-container relative w-80 h-80 rounded-full border border-white/5 flex items-center justify-center">
+                
+                {/* 1. Concierge24 (0° - Alto al centro | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "0%", left: "50%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://concierge24.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-2.5 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/concierge24pro/main/logo.png" alt="Concierge24" className="w-full h-full object-contain" />
+                    </a>
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">Concierge24</b>
+                      Assistente vocale e testuale multilingua H24 per hotel e strutture ricettive.
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. DriveMotion (60° - Alto a destra | Sfondo Bianco) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "25%", left: "93.3%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://drivemotion.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-white border border-slate-200 rounded-full p-1.5 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_drivemotion_bg2.jpg" alt="DriveMotion" className="w-full h-full object-contain" />
+                    </a>
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">DriveMotion</b>
+                      Video promozionali con rimozione dello sfondo per saloni auto.
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Nexus AI (120° - Basso a destra | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "75%", left: "93.3%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://nexus.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-3 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/nexus/main/logo_nexus.png" alt="Nexus AI" className="w-full h-full object-contain" />
+                    </a>
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b class="text-white block mb-1">Nexus AI</b>
+                      Inietta un assistente virtuale intelligente su qualsiasi sito esistente.
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. OmniaStudio (180° - Basso al centro | Sfondo Bianco) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "100%", left: "50%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://omniastudio.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-white border border-slate-200 rounded-full p-1 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_OmniaStudio.png" alt="OmniaStudio" className="w-full h-full object-contain" />
+                    </a>
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">OmniaStudio</b>
+                      AI locale e privata 100% offline per studi professionali.
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. FF Edizioni (240° - Basso a sinistra | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "75%", left: "6.7%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://ff-edizioni.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-0.5 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/fausto-fusetti-links/main/logo6.jpg" alt="FF Edizioni" className="w-full h-full object-cover rounded-full" />
+                    </a>
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">FF Edizioni</b>
+                      Canzoni, sigle commerciali e sound design creati su misura con l'AI.
+                    </div>
+                  </div>
+                </div>
+
+                {/* 6. HomeTour AI (300° - Alto a sinistra | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "25%", left: "6.7%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://hometour.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-1 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_hometour%2Bbg.jpg" alt="HomeTour AI" className="w-full h-full object-contain" />
+                    </a>
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">HomeTour AI</b>
+                      Reel immobiliari cinematografici realizzati da semplici foto.
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Foto del Fondatore fissa al centro (Massimo fattore di fiducia e E-E-A-T) */}
+              <div className="absolute w-36 h-36 rounded-full border-4 border-cyan-500 p-1 bg-black overflow-hidden shadow-2xl z-10">
+                <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/riccardo_founder.jpeg" alt="Riccardo Modena - Fondatore RM Studio" className="w-full h-full object-cover rounded-full" />
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <a href="https://hometour.rmstudio.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
-                <div className="text-xs font-bold text-cyan-500 tracking-widest uppercase mb-4">Real Estate</div>
-                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">HomeTour AI</h3>
-                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Trasforma le foto dei tuoi immobili in Reel cinematografici con voce narrante professionale e testi pronti.</p>
-                <div className="flex items-center text-cyan-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
-              </a>
-              <a href="https://omniastudio.rmstudio.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
-                <div className="text-xs font-bold text-purple-500 tracking-widest uppercase mb-4">Legal & Privacy</div>
-                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors">OmniaStudio</h3>
-                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Intelligenza Artificiale 100% locale installata sui tuoi server per avvocati e commercialisti.</p>
-                <div className="flex items-center text-purple-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
-              </a>
-              <a href="https://concierge24.rmstudio.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
-                <div className="text-xs font-bold text-orange-500 tracking-widest uppercase mb-4">Hospitality</div>
-                <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-orange-400 transition-colors">Concierge24</h3>
-                <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">L&apos;assistente virtuale multilingua H24 per Hotel e Airbnb. Gestisce prenotazioni e consiglia ristoranti.</p>
-                <div className="flex items-center text-orange-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
+
+            {/* Informazioni Profilo ed E-E-A-T con link di citazione scientifica ad alta autorevolezza */}
+            <div className="w-full lg:w-1/2">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6">
+                Esperienza & Autorevolezza
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tighter">
+                Non ti vendo software.<br />
+                <span className="text-cyan-400">Ti costruisco un vantaggio.</span>
+              </h2>
+              <p className="text-white/60 mb-6 leading-relaxed text-lg font-light italic">
+                "Prendo i tuoi colli di bottiglia e li trasformo in ecosistemi autonomi che producono media,
+                gestiscono clienti e generano vendite H24."
+              </p>
+              <p className="text-white/40 mb-8 leading-relaxed text-base font-light">
+                Sono Riccardo Modena, founder di <b>RM Studio</b>. Ho fondato questo lab perché oggi l'AI non è più
+                un lusso, è l'unico modo per scalare senza un esercito di dipendenti. Come evidenziato nelle <a href="https://www.w3.org/community/tourism/" target="_blank" rel="noopener" className="text-cyan-400 underline hover:text-cyan-300">linee guida del consorzio internazionale W3C sull'IA applicata al turismo</a>, l'integrazione di sistemi conversazionali intelligenti abbatte la frizione operativa e ottimizza l'esperienza d'uso dell'utente finale.
+              </p>
+              <a
+                href="#progetti"
+                className="inline-flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 pb-1 font-black uppercase text-sm tracking-widest hover:text-white hover:border-white transition-all"
+              >
+                Esplora le Soluzioni ↓
               </a>
             </div>
           </div>
@@ -1052,4 +1145,3 @@ export default function AutoBestPage() {
     </div>
   );
 }
-applica stessa logica, pronto copia incolla
