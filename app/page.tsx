@@ -1,11 +1,562 @@
-import React from 'react';
+"use client";
 
-export default function LandingPage() {
-  return (
-    <div className="min-h-screen bg-[#030303] text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-black overflow-x-hidden">
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Upload, Camera, Sparkles, Loader2, CheckCircle2,
+  MapPin, Video, Mail, Car, Building2, Volume2,
+  ImageIcon, Lock, Globe, Play, Scan, ArrowRight,
+  X, Plus, MessageSquare
+} from "lucide-react";
+
+// ─── ICONE SOCIAL ────────────────────────────────────────────────
+const FacebookIcon = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+const InstagramIcon = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" x2="17.51" y2="6.5" />
+  </svg>
+);
+const LinkedinIcon = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
+const TiktokIcon = ({ size = 24, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+  </svg>
+);
+
+// ─── CONFIGURAZIONI ───────────────────────────────────────────────
+const PREDEFINED_ENVIRONMENTS = [
+  { id: "luxury",  icon: "✨", it: "Salone Lusso",      en: "Luxury car showroom, bright studio lighting, floor reflections" },
+  { id: "city",    icon: "🏙️", it: "Città Moderna",     en: "Modern city street downtown, daylight, realistic urban setting" },
+  { id: "mountain",icon: "⛰️", it: "Montagna",           en: "Winding mountain road, scenic view, nature background" },
+  { id: "night",   icon: "🌃", it: "Notte Cyber",        en: "Night city street, neon lights, cyberpunk style, wet reflections" },
+  { id: "loft",    icon: "🧱", it: "Loft Industriale",   en: "Industrial loft interior, brick walls, cinematic lighting" },
+  { id: "studio",  icon: "📸", it: "Studio Foto",        en: "Professional photo studio, infinite white cove, softbox lights" },
+  { id: "coast",   icon: "🌅", it: "Tramonto Mare",      en: "Coastal road at sunset, golden hour, ocean in background" },
+  { id: "desert",  icon: "🏜️", it: "Deserto",            en: "Desert landscape, warm sand, dramatic sky" },
+  { id: "snow",    icon: "❄️", it: "Neve",               en: "Snowy forest road, winter landscape, crisp lighting" },
+  { id: "track",   icon: "🏁", it: "Pista da Corsa",     en: "Professional race track, curbs, motion blur background" },
+];
+
+const VOICES_CONFIG = {
+  it: [
+    { id: "d718e944-b313-4998-b011-d1cc078d4ef3", name: "Liv (F) — Naturale", pro: false },
+    { id: "d609f27f-f1a4-410f-85bb-10037b4fba99", name: "Francesca (F) — Elegante", pro: true },
+    { id: "0e21713a-5e9a-428a-bed4-90d410b87f13", name: "Alessandra (F) — Melodica", pro: true },
+    { id: "90c7d657-9599-4cd0-9ed2-2568359e4d1a", name: "Sofia (F) — Professionale", pro: true },
+    { id: "36d94908-c5b9-4014-b521-e69aee5bead0", name: "Giulia (F) — Autorevole", pro: true },
+    { id: "ee16f140-f6dc-490e-a1ed-c1d537ea0086", name: "Lorenzo (M) — Ospitale", pro: true },
+  ],
+  en: [
+    { id: "dc30854e-e398-4579-9dc8-16f6cb2c19b9", name: "Victoria (F) — UK Elegante", pro: true },
+    { id: "2f251ac3-89a9-4a77-a452-704b474ccd01", name: "Lucy (F) — UK Rassicurante", pro: true },
+    { id: "4f7f1324-1853-48a6-b294-4e78e8036a83", name: "Casper (M) — Emozionale", pro: true },
+    { id: "0ad65e7f-006c-47cf-bd31-52279d487913", name: "Rupert (M) — Maturo e Caldo", pro: true },
+  ],
+  de: [
+    { id: "b9de4a89-2257-424b-94c2-db18ba68c81a", name: "Viktoria (F) — Conversazionale", pro: true },
+    { id: "d1cbea67-e4d3-47cd-be2a-2bd4e646b002", name: "Henrik (M) — Business", pro: true },
+  ],
+  es: [
+    { id: "9d8c6b2e-0a23-4a15-ae1b-121d5b5af417", name: "Nuria (F) — Professionale", pro: true },
+    { id: "13ff5deb-2591-42ad-a356-63a04e524411", name: "Marcos (M) — Calmo e Sicuro", pro: true },
+  ],
+};
+
+const LANGUAGES = [
+  { id: "it", flag: "🇮🇹", name: "Italiano" },
+  { id: "en", flag: "🇬🇧", name: "English"  },
+  { id: "de", flag: "🇩🇪", name: "Deutsch"  },
+  { id: "es", flag: "🇪🇸", name: "Español"  },
+];
+
+// ─── COSTANTI URL ─────────────────────────────────────────────────
+const VERIFICA_TOKEN_URL = "https://n8n.rmstudio.app/webhook/verifica-token-drivemotion";
+const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
+const CHATBOT_WEBHOOK_URL= "https://n8n.rmstudio.app/webhook/drivemotion-chat";
+const CHECK_EMAIL_URL    = "https://n8n.rmstudio.app/webhook/check-email";
+const FALLBACK_LOGO_URL  = "https://drive-motion.vercel.app/logo.png";
+
+// ═════════════════════════════════════════════════════════════════
+// COMPONENTE PRINCIPALE
+// ═════════════════════════════════════════════════════════════════
+export default function AutoBestPage() {
+
+  // ─── STATO UTENTE ──────────────────────────────────────────────
+  const [isPro,          setIsPro]          = useState(false);
+  const [token,          setToken]          = useState<string | null>(null);
+  const [videoRimanenti, setVideoRimanenti] = useState<number>(0);
+  const [freeUsed,       setFreeUsed]       = useState(false);
+
+  // ─── STATO UI ──────────────────────────────────────────────────
+  const [showProModal,    setShowProModal]    = useState(false);
+  const [demoStep,        setDemoStep]        = useState(0);
+  const [showSupportModal,setShowSupportModal]= useState(false);
+  const [supportLoading,  setSupportLoading]  = useState(false);
+  const [supportSuccess,  setSupportSuccess]  = useState(false);
+
+  // ─── STATO FORM VIDEO ──────────────────────────────────────────
+  const [images,       setImages]       = useState<string[]>([]);
+  const [logo,         setLogo]         = useState<string | null>(null);
+  const [email,        setEmail]        = useState("");
+  const [carMake,      setCarMake]      = useState("");
+  const [carPrice,     setCarPrice]     = useState("");
+  const [carYear,      setCarYear]      = useState("");
+  const [carEngine,    setCarEngine]    = useState("");
+  const [agencyName,   setAgencyName]   = useState("");
+  const [agencyAddress,setAgencyAddress]= useState("");
+  const [agencyPhone,  setAgencyPhone]  = useState("");
+
+  // ─── IMPOSTAZIONI VIDEO ────────────────────────────────────────
+  const [selectedEnvId, setSelectedEnvId] = useState(PREDEFINED_ENVIRONMENTS[0].id);
+  const [customEnv,     setCustomEnv]     = useState("");
+  const [videoFormat,   setVideoFormat]   = useState("verticale");
+  const [language,      setLanguage]      = useState("it");
+  const [selectedVoice, setSelectedVoice] = useState("d718e944-b313-4998-b011-d1cc078d4ef3");
+
+  // ─── STATO RETE ────────────────────────────────────────────────
+  const [loadingImg,     setLoadingImg]     = useState(false);
+  const [loadingVideo,   setLoadingVideo]   = useState(false);
+  const [videoCompleted, setVideoCompleted] = useState(false);
+
+  // Iniezione automatica dello Schema Markup JSON-LD all'avvio per Google SEO
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.innerHTML = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "DriveMotion",
+      "operatingSystem": "All",
+      "applicationCategory": "BusinessApplication",
+      "description": "Generatore AI di video e sfondi fotorealistici per concessionari e autosaloni. Ottimizza la presentazione online dei veicoli in tempo reale.",
+      "offers": {
+        "@type": "Offer",
+        "price": "14.90",
+        "priceCurrency": "EUR"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "94"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Riccardo Modena",
+        "url": "https://www.linkedin.com/in/riccardo-modena-13918a61/"
+      }
+    });
+    document.head.appendChild(script);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
+
+  // ═══════════════════════════════════════════════════════════════
+  // CHATBOT AURORA
+  // ═══════════════════════════════════════════════════════════════
+  useEffect(() => {
+    let chatSessionId = localStorage.getItem("dm_chat_session") ||
+      "dm_" + Math.random().toString(36).substring(7);
+    localStorage.setItem("dm_chat_session", chatSessionId);
+
+    const container = document.getElementById("chatbot-container");
+    if (!container) return;
+
+    container.innerHTML = `
+      <style>
+        #dm-bubble { position:fixed; bottom:30px; left:30px; width:65px; height:65px; border-radius:50%; background:#06b6d4; box-shadow:0 10px 25px rgba(6,182,212,0.4); cursor:pointer; z-index:9999; display:flex; align-items:center; justify-content:center; border:2px solid #161616; transition:transform 0.3s; }
+        #dm-bubble:hover { transform:scale(1.1); }
+        #dm-window { position:fixed; bottom:110px; left:30px; width:380px; height:580px; min-width:300px; min-height:400px; max-width:90vw; max-height:80vh; background:#0a0a0c; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.8); z-index:9999; display:none; flex-direction:column; overflow:hidden; font-family:sans-serif; border:1px solid rgba(6,182,212,0.2); transition:opacity 0.3s ease,transform 0.3s ease; opacity:0; transform:translateY(20px); resize:both; }
+        .dm-header { background:#161616; border-bottom:1px solid rgba(6,182,212,0.2); color:#fff; padding:16px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+        .dm-messages { flex:1; padding:20px; overflow-y:auto; background:#050505; display:flex; flex-direction:column; gap:14px; }
+        .dm-chips { display:flex; flex-wrap:wrap; gap:8px; padding:10px 20px; background:#050505; border-top:1px solid rgba(255,255,255,0.05); flex-shrink:0; }
+        .dm-chip { background:#161616; border:1px solid rgba(6,182,212,0.3); color:#22d3ee; padding:8px 12px; border-radius:15px; font-size:12px; cursor:pointer; transition:0.2s; white-space:nowrap; }
+        .dm-chip:hover { background:#06b6d4; color:#000; }
+        .dm-msg { padding:12px 16px; border-radius:15px; font-size:14px; max-width:85%; line-height:1.5; }
+        .dm-msg.bot { background:#161616; color:#f0f0f0; align-self:flex-start; border-bottom-left-radius:2px; border:1px solid rgba(255,255,255,0.05); }
+        .dm-msg.user { background:#06b6d4; color:#000; align-self:flex-end; border-bottom-right-radius:2px; font-weight:500; }
+        .dm-input-area { padding:15px; border-top:1px solid rgba(6,182,212,0.2); display:flex; gap:8px; background:#161616; flex-shrink:0; }
+        .dm-input-area input { flex:1; border:1px solid #333; border-radius:8px; padding:8px 12px; background:#000; color:#fff; outline:none; font-size:14px; }
+        .dm-input-area button { background:#06b6d4; border:none; border-radius:8px; color:#000; font-weight:bold; padding:0 15px; cursor:pointer; }
+        .typing-dot { width:4px; height:4px; background:#06b6d4; border-radius:50%; display:inline-block; animation:typing 1.4s infinite; margin-right:2px; }
+        @keyframes typing { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+      </style>
+
+      <div id="dm-bubble">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+
+      <div id="dm-window">
+        <div class="dm-header">
+          <span>Aurora AI</span>
+          <button id="close-chat" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;">&times;</button>
+        </div>
+        <div id="dm-messages" class="dm-messages">
+          <div class="dm-msg bot">Ciao! Sono <b>Aurora</b>. 🏎️<br><br>Sapevi che i video con <b>cambio sfondo AI</b> aumentano i click del 200%? Come posso aiutarti oggi?</div>
+        </div>
+        <div id="dm-chips-container" class="dm-chips">
+          <div class="dm-chip" data-msg="Come funziona il cambio sfondo?">Cambio Sfondo?</div>
+          <div class="dm-chip" data-msg="Quali sono i prezzi dei pacchetti?">Prezzi pacchetti</div>
+          <div class="dm-chip" data-msg="Funziona anche per gli interni?">Foto interni?</div>
+        </div>
+        <div class="dm-input-area">
+          <input type="text" id="dm-input" placeholder="Scrivi qui...">
+          <button id="send-btn">Invia</button>
+        </div>
+      </div>
+    `;
+
+    const bubble        = document.getElementById("dm-bubble")!;
+    const win           = document.getElementById("dm-window")!;
+    const closeBtn      = document.getElementById("close-chat")!;
+    const input         = document.getElementById("dm-input") as HTMLInputElement;
+    const sendBtn       = document.getElementById("send-btn")!;
+    const chipsContainer= document.getElementById("dm-chips-container")!;
+
+    const toggleChat = (forceOpen = false) => {
+      const isHidden = win.style.display === "none" || win.style.display === "";
+      if (forceOpen || isHidden) {
+        win.style.display = "flex";
+        setTimeout(() => { win.style.opacity = "1"; win.style.transform = "translateY(0)"; }, 10);
+      } else {
+        win.style.opacity = "0"; win.style.transform = "translateY(20px)";
+        setTimeout(() => { win.style.display = "none"; }, 300);
+      }
+    };
+
+    const addMsg = (text: string, sender: "bot" | "user", id?: string) => {
+      const div = document.createElement("div");
+      div.className = `dm-msg ${sender}`;
+      if (id) div.id = id;
+      div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+      const box = document.getElementById("dm-messages")!;
+      box.appendChild(div);
+      box.scrollTo({ top: box.scrollHeight, behavior: "smooth" });
+    };
+
+    const sendMsg = async (textOverride?: string) => {
+      const text = textOverride || input.value.trim();
+      if (!text) return;
+      input.value = "";
+      chipsContainer.style.display = "none";
+      addMsg(text, "user");
+      const loadingId = "loading-" + Date.now();
+      addMsg('<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>', "bot", loadingId);
+      try {
+        const res  = await fetch(`${CHATBOT_WEBHOOK_URL}?message=${encodeURIComponent(text)}&sessionId=${chatSessionId}`, { method: "POST" });
+        const data = await res.json();
+        document.getElementById(loadingId)?.remove();
+        addMsg(data.response || "Scusami, riprova.", "bot");
+      } catch {
+        document.getElementById(loadingId)?.remove();
+        addMsg("Errore di connessione.", "bot");
+      }
+    };
+
+    document.querySelectorAll(".dm-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const msg = chip.getAttribute("data-msg");
+        if (msg) sendMsg(msg);
+      });
+    });
+
+    bubble.onclick   = () => toggleChat();
+    closeBtn.onclick = () => toggleChat();
+    sendBtn.onclick  = () => sendMsg();
+    input.onkeypress = (e) => { if (e.key === "Enter") sendMsg(); };
+
+    setTimeout(() => {
+      if (window.innerWidth > 900) {
+        toggleChat(true);
+      }
+    }, 1500);
+  }, []);
+
+  // ─── VERIFICA TOKEN ───
+  useEffect(() => {
+    const checkToken = async (attempt = 1) => {
+      const urlToken   = new URLSearchParams(window.location.search).get("token");
+      const savedToken = localStorage.getItem("ab_token");
+      const tokenToUse = urlToken || savedToken;
+      if (!tokenToUse) return;
+
+      try {
+        const res = await fetch(`${VERIFICA_TOKEN_URL}?token=${encodeURIComponent(tokenToUse)}&project=DriveMotion`);
+        const text = await res.text();
+        if (!text || text.trim() === "") throw new Error("Empty response");
+
+        let parsedData;
+        try { parsedData = JSON.parse(text); } catch { throw new Error("JSON Parsing failed"); }
+
+        if (parsedData.valido === true) {
+          setIsPro(true);
+          setToken(tokenToUse);
+          setVideoRimanenti(parsedData.video_rimanenti ?? 0);
+          if (parsedData.email) setEmail(parsedData.email);
+          if (parsedData.nome) setAgencyName(parsedData.nome);
+          if (parsedData.indirizzo) setAgencyAddress(parsedData.indirizzo);
+          if (parsedData.telefono) setAgencyPhone(parsedData.telefono);
+          localStorage.setItem("ab_token", tokenToUse);
+          if (urlToken) {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('token');
+            window.history.replaceState({}, document.title, url.toString());
+          }
+        } else {
+          if (urlToken && attempt < 4) {
+            setTimeout(() => checkToken(attempt + 1), 2500);
+          } else if (!urlToken) {
+            localStorage.removeItem("ab_token");
+          }
+        }
+      } catch (err) {
+        if (urlToken && attempt < 4) {
+          setTimeout(() => checkToken(attempt + 1), 2500);
+        }
+      }
+    };
+
+    checkToken();
+  }, []);
+
+  // ─── ANIMAZIONE DEMO PHONE ───
+  useEffect(() => {
+    const interval = setInterval(() => setDemoStep(p => (p + 1) % 3), 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ─── MEMORIA FORM ───
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const formData = { carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email };
+      localStorage.setItem("dm_form_memory", JSON.stringify(formData));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("dm_form_memory");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.carMake) setCarMake(parsed.carMake);
+        if (parsed.carPrice) setCarPrice(parsed.carPrice);
+        if (parsed.carYear) setCarYear(parsed.carYear);
+        if (parsed.carEngine) setCarEngine(parsed.carEngine);
+        if (parsed.agencyName) setAgencyName(parsed.agencyName);
+        if (parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
+        if (parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
+        if (!email && parsed.email) setEmail(parsed.email);
+      } catch (e) { console.warn("Errore lettura memoria form"); }
+    }
+  }, []);
+
+  // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ───
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlEmail = urlParams.get("email");
+      const urlNome = urlParams.get("nome");
+      const urlCitta = urlParams.get("citta");
+      const urlTelefono = urlParams.get("telefono");
+
+      const saved = localStorage.getItem("dm_form_memory");
+      const parsed = saved ? JSON.parse(saved) : {};
+
+      if (urlEmail && !parsed.email) setEmail(decodeURIComponent(urlEmail));
+      if (urlNome && !parsed.agencyName) setAgencyName(decodeURIComponent(urlNome));
+      if (urlCitta && !parsed.agencyAddress) setAgencyAddress(decodeURIComponent(urlCitta));
+      if (urlTelefono && !parsed.agencyPhone) setAgencyPhone(decodeURIComponent(urlTelefono));
       
-      {/* CSS ISOLATO E ANIMAZIONI DI NEUROSCIENZA (Visual Hook e Rotazioni Orbit) */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      if (urlEmail || urlNome || urlParams.get('token')) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('email');
+        url.searchParams.delete('nome');
+        url.searchParams.delete('citta');
+        url.searchParams.delete('telefono');
+        url.searchParams.delete('token');
+        window.history.replaceState({}, document.title, url.toString());
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+    setSelectedVoice(VOICES_CONFIG[lang as keyof typeof VOICES_CONFIG][0].id);
+  };
+
+  // ─── UPLOAD IMMAGINI ───
+  const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
+
+    const compressImage = (file: File): Promise<string> =>
+      new Promise(resolve => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = event => {
+          const img = new Image();
+          img.src = event.target?.result as string;
+          img.onload = () => {
+            const MAX_SIZE = 1080;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > MAX_SIZE || height > MAX_SIZE) {
+              const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
+              width = Math.round(width * ratio);
+              height = Math.round(height * ratio);
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d")!;
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", 0.95));
+          };
+        };
+      });
+
+    const compressed = await Promise.all(files.map(compressImage));
+    setImages(prev => [...prev, ...compressed]);
+  };
+
+  const removeImage = (index: number) => setImages(images.filter((_, i) => i !== index));
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => setLogo(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const processAndTrigger = async () => {
+    if (images.length === 0 || !email) return;
+    setLoadingImg(false);
+    setLoadingVideo(true);
+    setVideoCompleted(false);
+
+    const englishPrompt = selectedEnvId === "custom"
+      ? customEnv
+      : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
+
+    try {
+      const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
+
+      const res = await fetch(N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sector:      "auto",
+          descrizione: carMake + " " + carEngine + " " + carYear,
+          prezzo:      carPrice,
+          images:      images,
+          logo:        logoPayload,
+          email,
+          formato:     videoFormat,
+          lingua:      language,
+          voice:       selectedVoice,
+          token,
+          project:     "DriveMotion",
+          environment: englishPrompt,
+          car_details: { make: carMake, price: carPrice, year: carYear, engine: carEngine },
+          agency:      { name: agencyName, address: agencyAddress, phone: agencyPhone },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.error === "free_limit_reached") {
+          alert(data.message);
+          setShowProModal(true);
+        } else {
+          alert("Errore n8n: " + (data.message || "Riprova più tardi"));
+        }
+        setLoadingVideo(false);
+        return;
+      }
+
+      setLoadingVideo(false);
+      setVideoCompleted(true);
+      if (isPro) setVideoRimanenti(prev => Math.max(0, prev - 1));
+    } catch (err) {
+      alert("Errore durante la generazione. Controlla la connessione.");
+      setLoadingImg(false);
+      setLoadingVideo(false);
+    }
+  };
+
+  const handleSupportSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSupportLoading(true);
+    const formData = new FormData(e.currentTarget);
+    formData.append("access_key", "9013a8d5-0901-42a0-b9e6-4c45553f960d");
+    formData.append("subject", "Nuovo contatto da DriveMotion AI");
+    try {
+      const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData }).then(r => r.json());
+      if (res.success) {
+        setSupportSuccess(true);
+        setTimeout(() => { setShowSupportModal(false); setSupportSuccess(false); }, 3000);
+      }
+    } catch { alert("Errore nell'invio. Riprova."); }
+    finally  { setSupportLoading(false); }
+  };
+
+  const checkEmailUsed = async (emailToCheck: string) => {
+    if (!emailToCheck || !emailToCheck.includes("@") || isPro) return;
+    try {
+      const res = await fetch(`${CHECK_EMAIL_URL}?email=${encodeURIComponent(emailToCheck)}`);
+      const text = await res.text();
+      if (!text || text.trim() === "") return;
+      const data = JSON.parse(text);
+      if (data.gia_usato === true) {
+        localStorage.setItem("dm_free_used", "true");
+        setFreeUsed(true);
+        alert("Abbiamo visto che hai già provato il servizio gratuitamente.\nPer creare nuovi video, scegli uno dei nostri pacchetti!");
+        setShowProModal(true);
+      }
+    } catch (e) { console.error("Errore check email:", e); }
+  };
+
+  const btnLabel = () => {
+    if (loadingImg)                      return "Rielaborazione AI...";
+    if (loadingVideo)                    return "Rendering Video...";
+    if (!isPro && freeUsed)              return "Prova gratuita terminata 🔒";
+    if (isPro && videoRimanenti === 0)   return "Crediti esauriti — Rinnova il piano ⚠️";
+    if (isPro)                           return `Genera Video (${videoRimanenti} crediti rimasti)`;
+    return "Genera Video e Post Social";
+  };
+
+  const btnDisabled =
+    images.length === 0 ||
+    loadingImg ||
+    loadingVideo ||
+    !email.includes("@") ||
+    (isPro && videoRimanenti === 0) ||
+    (!isPro && freeUsed);
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden relative pt-20">
+
+      {/* CSS isolato per il widget orbitale simmetrico a 6 elementi */}
+      <style>{`
         @keyframes orbit-rotation {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
@@ -14,440 +565,583 @@ export default function LandingPage() {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(-360deg); }
         }
-        @keyframes netflix-glow {
-          0%, 100% { transform: scale(1); opacity: 0.45; filter: blur(80px); }
-          50% { transform: scale(1.15); opacity: 0.7; filter: blur(100px); }
-        }
-        @keyframes pulse-ring {
-          0% { transform: scale(0.95); opacity: 0.2; }
-          50% { transform: scale(1.08); opacity: 0.4; }
-          100% { transform: scale(0.95); opacity: 0.2; }
-        }
-        @keyframes gold-pulse {
-          0%, 100% { box-shadow: 0 0 12px rgba(234, 179, 8, 0.2), inset 0 0 12px rgba(234, 179, 8, 0.1); }
-          50% { box-shadow: 0 0 28px rgba(234, 179, 8, 0.6), inset 0 0 20px rgba(234, 179, 8, 0.3); border-color: rgba(234, 179, 8, 0.8); }
-        }
-        
-        .orbit-ring {
-          position: relative;
-          width: 320px;
-          height: 320px;
-          border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
+        .orbit-ring-container {
           animation: orbit-rotation 40s linear infinite;
         }
-        .orbit-area {
-          position: relative;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 440px;
-        }
-        .orbit-area:hover .orbit-ring,
-        .orbit-area:hover .orbit-item {
-          animation-play-state: paused;
-        }
-        .orbit-wrapper {
-          position: absolute;
-          width: 64px;
-          height: 64px;
-          transform: translate(-50%, -50%);
-        }
         .orbit-item {
-          position: relative;
-          width: 100%;
-          height: 100%;
           animation: counter-rotation 40s linear infinite;
           transform-origin: center;
         }
-        .orbit-link {
-          display: flex;
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.1);
-          box-sizing: border-box;
-          transition: 0.3s;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          text-decoration: none;
+        .orbit-area:hover .orbit-ring-container,
+        .orbit-area:hover .orbit-item {
+          animation-play-state: paused;
         }
-        .orbit-link:hover {
-          border-color: #06b6d4;
-          box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
-        }
-        .orbit-img {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-        .orbit-img.cover {
-          object-fit: cover;
-        }
-        .orbit-img.rounded {
-          border-radius: 50%;
-        }
-        .orbit-center-photo {
-          position: absolute;
-          width: 144px;
-          height: 144px;
-          border-radius: 50%;
-          border: 4px solid #f97316;
-          padding: 4px;
-          background: #000;
-          box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-          z-index: 15;
-          box-sizing: border-box;
-        }
-        .orbit-center-photo img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          border-radius: 50%;
-        }
-        .orbit-tooltip {
-          position: absolute;
-          bottom: 80px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 200px;
-          background: #0a0a0c;
-          border: 1px solid rgba(255,255,255,0.08);
-          color: #94a3b8;
-          font-size: 12px;
-          border-radius: 8px;
-          padding: 12px;
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.2s;
-          text-align: center;
-          z-index: 50;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-          line-height: 1.4;
-        }
-        .orbit-tooltip b {
-          color: white;
-          display: block;
-          margin-bottom: 4px;
-        }
-        .orbit-item:hover .orbit-tooltip {
-          opacity: 1;
-        }
-        
-        .visual-hook-glow {
-          animation: netflix-glow 6s ease-in-out infinite;
-        }
-        .pulse-ring-element {
-          animation: pulse-ring 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        .gold-decoy-card {
-          animation: gold-pulse 3s infinite ease-in-out;
-        }
-      ` }} />
+        html { scroll-behavior: smooth; }
+      `}</style>
 
-      {/* HEADER */}
-      <header className="border-b border-white/5 py-4 px-6 md:px-12 backdrop-blur-md bg-black/40 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-black text-sm">RM</div>
-            <span className="font-semibold tracking-wider text-sm text-slate-300">RM STUDIO</span>
+      {/* ── NAVBAR ── */}
+      <nav className="fixed top-0 inset-x-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="text-cyan-400" size={20} />
+            <span className="font-bold text-white tracking-wide text-lg">
+              DriveMotion <span className="text-cyan-500">AI</span>
+            </span>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm text-slate-400">
-            <a href="#ecosistema" className="hover:text-white transition">Ecosistema AI</a>
-            <a href="#authorities" className="hover:text-white transition">Standard Scientifici</a>
-            <a href="#pricing" className="hover:text-white transition">Piani</a>
-          </nav>
+          <div className="hidden md:flex items-center gap-8">
+            {isPro && (
+              <div className="bg-cyan-500/10 border border-cyan-500/30 px-4 py-1.5 rounded-full flex items-center gap-2">
+                <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{videoRimanenti} Crediti Residui</span>
+              </div>
+            )}
+            <a href="https://hometour.rmstudio.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">HomeTour</a>
+            <a href="https://omniastudio.rmstudio.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">OmniaStudio</a>
+            <a href="https://concierge24.rmstudio.app/"     target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Concierge24</a>
+          </div>
+          <button onClick={() => setShowSupportModal(true)} className="flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-white hover:bg-white/20 transition-colors">
+            <MessageSquare size={16} /> Contattaci
+          </button>
         </div>
-      </header>
+      </nav>
 
-      {/* HERO SECTION - Configurato con Layout a "F" per la familiarità */}
-      <section id="ecosistema" className="relative pt-12 pb-24 px-6 md:px-12 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        
-        {/* ELEMENTO DYNAMICO LUMINOSO - REGOLA 3: Il Visual Hook di 3 secondi (Effetto Netflix) */}
-        <div className="absolute top-1/4 right-1/4 w-[350px] h-[350px] bg-gradient-to-tr from-cyan-500/10 to-orange-500/15 rounded-full filter blur-3xl pointer-events-none visual-hook-glow z-0" />
-        
-        {/* PARTE SINISTRA: Testo e CTA - Struttura per Layout a "F" */}
-        <div className="lg:col-span-7 flex flex-col justify-center z-10">
-          
-          {/* Badge informativo */}
-          <div className="inline-flex items-center gap-2 bg-slate-900/80 border border-slate-800 rounded-full px-3 py-1 text-xs text-cyan-400 mb-6 w-fit">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-            Ecosistema AI Integrato
+      {/* ── SFONDO VIDEO ── */}
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[#050505]">
+        <video src="/bg.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-[#050505]/70 to-[#050505]" />
+      </div>
+
+      <div className="relative z-10">
+
+        {/* ── BANNER PRO ── */}
+        {isPro && (
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40 bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-full px-6 py-2 flex items-center gap-3 shadow-[0_0_20px_rgba(34,211,238,0.2)]">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">
+              PRO Attivo — {videoRimanenti} video rimanenti
+            </span>
+          </div>
+        )}
+
+        {/* ── HERO ── */}
+        <header className="max-w-7xl mx-auto px-6 pt-10 pb-16 flex flex-col lg:flex-row items-center gap-16 min-h-[80vh]">
+          <div className="flex-1 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-sm">
+              <Car size={14} className="text-cyan-400" /> Cinema AI per Autosaloni
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 text-white leading-[1.1] drop-shadow-lg">
+              Vendi più Auto. <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                Con l&apos;Intelligenza Artificiale.
+              </span>
+            </h1>
+            <p className="text-slate-300 text-lg md:text-xl max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-medium">
+              Carica da 3 a 8 foto dal parcheggio. La nostra AI rielabora la foto principale, cambia lo sfondo, crea un testo persuasivo e genera un video da 1 minuto in pochi minuti.
+            </p>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 justify-center lg:justify-start pt-2">
+              <a href="#creatore" className="bg-white text-black px-10 py-5 rounded-full font-bold flex items-center justify-center gap-2 hover:scale-105 transition-transform shadow-[0_0_25px_rgba(255,255,255,0.4)] text-lg sm:text-xl w-full sm:w-auto">
+                <Play size={22} fill="currentColor" /> Inizia a Creare
+              </a>
+              <a href="#prezzi" className="bg-black/50 text-white border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/20 backdrop-blur-md text-base text-center w-full sm:w-auto">
+                Vedi i Piani
+              </a>
+            </div>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
-            Automazione Intelligente per la Crescita del Tuo Business.
-          </h1>
+          <div className="flex-1 w-full max-w-[320px] relative">
+            <div className="absolute inset-0 bg-cyan-500/30 blur-3xl rounded-full animate-pulse" />
+            <div className="relative border-[6px] border-[#1a1a1a] bg-[#050505] rounded-[3rem] overflow-hidden aspect-[9/19] shadow-2xl">
+              <div className="absolute top-0 inset-x-0 h-7 bg-[#1a1a1a] rounded-b-3xl w-1/2 mx-auto z-50" />
 
-          {/* REGOLA 1: Riduzione della Frizione di Lettura (Testo >= 18px) */}
-          <p className="text-lg md:text-xl text-slate-400 leading-relaxed mb-8 max-w-2xl">
-            Semplifica la gestione dei tuoi canali operativi e riduci lo sforzo decisionale. L&apos;ecosistema sviluppato da Riccardo Modena impiega soluzioni AI avanzate per convertire le interazioni degli utenti in risultati misurabili.
-          </p>
+              <div className={`absolute inset-0 transition-opacity duration-1000 ${demoStep === 0 ? "opacity-100" : "opacity-0"}`}>
+                <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover filter brightness-75" alt="Parking" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center flex-col">
+                  <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-white text-sm font-medium mb-2 flex items-center gap-2 shadow-lg">
+                    <Camera size={16} /> 1. Scatto Parcheggio
+                  </div>
+                </div>
+              </div>
 
-          {/* REGOLA 7: Consolidamento Decisionale (CTA Ravvicinate) */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-10">
+              <div className={`absolute inset-0 transition-opacity duration-1000 bg-[#0a0a0c] flex items-center justify-center flex-col ${demoStep === 1 ? "opacity-100 z-10" : "opacity-0 z-0"}`}>
+                <Scan size={64} className="text-cyan-400 mb-6 animate-pulse" />
+                <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2 text-center">Rielaborazione AI...</h3>
+              </div>
+
+              <div className={`absolute inset-0 transition-opacity duration-1000 bg-black ${demoStep === 2 ? "opacity-100 z-20" : "opacity-0 z-0"}`}>
+                <img src="https://images.unsplash.com/photo-1605515298946-d062f2e9da53?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Showroom" />
+                <div className="absolute bottom-12 left-6 right-16 z-30">
+                  <div className="bg-red-600 text-white text-xs font-black italic px-3 py-1 inline-block uppercase -skew-x-12 mb-2 shadow-lg">Pronta Consegna</div>
+                  <h3 className="text-white font-black text-xl uppercase mb-1 drop-shadow-md">Audi RS6</h3>
+                </div>
+              </div>
+            </div>
+
+            <div id="chatbot-container"></div>
+          </div>
+        </header>
+
+        {/* ── TOOL PRINCIPALE ── */}
+        <section id="creatore" className="max-w-6xl mx-auto px-6 py-12">
+          <div className="bg-[#0a0a0c]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+
+            <div className="flex flex-wrap gap-4 mb-10 pb-8 border-b border-white/10 justify-between items-center relative z-10">
+              <div className="flex items-center gap-3">
+                <Globe className="text-slate-400" />
+                <select value={language} onChange={e => handleLanguageChange(e.target.value)} className="bg-black border border-white/20 text-white rounded-lg px-4 py-2 outline-none focus:border-cyan-500 cursor-pointer">
+                  {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.flag} {l.name}</option>)}
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <Video className="text-slate-400" />
+                <div className="flex bg-black rounded-lg p-1 border border-white/20">
+                  <button onClick={() => setVideoFormat("verticale")}   className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "verticale"   ? "bg-white text-black" : "text-slate-400 hover:text-white"}`}>Verticale 9:16</button>
+                  <button onClick={() => setVideoFormat("orizzontale")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "orizzontale" ? "bg-white text-black" : "text-slate-400 hover:text-white"}`}>Orizzontale 16:9</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
+
+              <div className="space-y-10">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <ImageIcon className="text-cyan-400" /> 1. Immagini (Max 8)
+                  </h3>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    {images.map((img, idx) => (
+                      <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-white/20 bg-black group shadow-lg">
+                        <img src={img} className="object-cover w-full h-full" />
+                        <button onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    {images.length < 8 && (
+                      <label className="aspect-[4/3] rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all group">
+                        <Plus size={24} className="text-slate-400 group-hover:text-cyan-400" />
+                        <input type="file" multiple className="hidden" onChange={handleMultipleFileUpload} accept="image/*" />
+                      </label>
+                    )}
+                  </div>
+
+                  <div
+                    onClick={!isPro ? () => setShowProModal(true) : undefined}
+                    className={`relative border-2 border-dashed rounded-2xl transition-all p-4 ${logo ? "border-cyan-500/50 bg-black/50" : "border-white/10 bg-black/40"} ${!isPro ? "opacity-50 cursor-pointer" : ""}`}
+                  >
+                    {!isPro && <div className="absolute top-2 right-2 text-red-400"><Lock size={14} /></div>}
+                    {!logo ? (
+                      <label className={`flex flex-col items-center justify-center ${isPro ? "cursor-pointer" : ""}`}>
+                        <Upload size={20} className="text-slate-500 mb-1" />
+                        <span className="text-sm font-medium">Logo Autosalone (PRO)</span>
+                        {isPro && <input type="file" className="hidden" onChange={handleLogoUpload} accept="image/png,image/jpeg,image/webp" />}
+                      </label>
+                    ) : (
+                      <div className="relative h-12 flex items-center justify-center">
+                        <img src={logo} className="max-h-full object-contain" alt="Logo preview" />
+                        <button onClick={() => setLogo(null)} className="absolute -top-2 -right-2 bg-black text-white rounded-full p-1 hover:bg-red-600">
+                          <X size={12} />
+                        </button>
+                      </div>
+                    )}
+                    {isPro && !logo && (
+                      <p className="text-center text-xs text-cyan-500/70 mt-2">
+                        Se non carichi un logo, verrà usato il logo DriveMotion AI
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <MapPin className="text-purple-400" /> 2. Sfondo Magico AI
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {PREDEFINED_ENVIRONMENTS.map(env => (
+                      <button key={env.id} onClick={() => setSelectedEnvId(env.id)} className={`p-3 rounded-xl border text-xs text-left transition-all ${selectedEnvId === env.id ? "border-cyan-400 bg-cyan-400/10 text-white shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "border-white/10 bg-black/50 text-slate-400 hover:border-white/30"}`}>
+                        {env.icon} {env.it}
+                      </button>
+                    ))}
+                    <button onClick={() => setSelectedEnvId("custom")} className={`p-3 rounded-xl border text-xs text-left transition-all col-span-2 md:col-span-3 ${selectedEnvId === "custom" ? "border-purple-500 bg-purple-500/10 text-white" : "border-white/10 bg-black/50 text-slate-400"}`}>
+                      ✍️ Scrivi tu lo sfondo...
+                    </button>
+                  </div>
+                  {selectedEnvId === "custom" && (
+                    <input type="text" placeholder="Es. Strada piovosa a Tokyo, luci neon..." value={customEnv} onChange={e => setCustomEnv(e.target.value)} className="w-full mt-3 bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500 transition-all" />
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-10">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Car className="text-blue-400" /> 3. Dati Veicolo
+                  </h3>
+                  <div className="space-y-3">
+                    <input type="text" value={carMake} onChange={e => setCarMake(e.target.value)} placeholder="Marca e Modello" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input type="text" value={carYear}  onChange={e => setCarYear(e.target.value)}  placeholder="Anno"   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                      <input type="text" value={carPrice} onChange={e => setCarPrice(e.target.value)} placeholder="Prezzo" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                    </div>
+                    <input type="text" value={carEngine} onChange={e => setCarEngine(e.target.value)} placeholder="Motore / Allestimento" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Building2 className="text-orange-400" /> 4. Autosalone & Voce
+                  </h3>
+                  <div className="space-y-3">
+                    <input type="text" value={agencyName}    onChange={e => setAgencyName(e.target.value)}    placeholder="Nome del Salone"    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input type="text" value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="Città / Indirizzo" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
+                      <input type="text" value={agencyPhone}   onChange={e => setAgencyPhone(e.target.value)}   placeholder="Telefono"          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
+                    </div>
+                    <div
+                      className="relative mt-2"
+                      onClick={(!isPro && language !== "it") ? () => setShowProModal(true) : undefined}
+                    >
+                      <select
+                        value={selectedVoice}
+                        onChange={e => setSelectedVoice(e.target.value)}
+                        className={`w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500 appearance-none ${(!isPro && language !== "it") ? "opacity-50 pointer-events-none" : "cursor-pointer"}`}
+                      >
+                        {VOICES_CONFIG[language as keyof typeof VOICES_CONFIG].map(v => (
+                          <option key={v.id} value={v.id} disabled={v.pro && !isPro}>
+                            {v.name} {v.pro && !isPro ? "🔒" : ""}
+                          </option>
+                        ))}
+                      </select>
+                      <Volume2 className="absolute right-4 top-3.5 text-slate-500 pointer-events-none" size={16} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 pt-8 border-t border-white/10 max-w-2xl mx-auto relative z-10">
+              <div className="mb-6 p-6 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl text-center">
+                <span className="inline-block px-3 py-1 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest rounded-full mb-3">
+                  ✨ REGIA AI INCLUSA
+                </span>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Oltre al cambio sfondo, la nostra Intelligenza Artificiale trasformerà <strong>fino a {isPro ? '4' : '2'} foto in veri video in movimento</strong> (l'auto che sfreccia sull'asfalto o carrellate cinematiche nel salone).
+                </p>
+              </div>
+
+              <div className="relative mb-4">
+                <Mail className="absolute left-4 top-4 text-slate-500" size={20} />
+                <input
+                  type="email"
+                  placeholder="La tua Email per ricevere i materiali..."
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onBlur={e => checkEmailUsed(e.target.value)}
+                  className="w-full bg-black border border-white/20 rounded-xl py-4 pl-12 pr-4 text-white focus:border-cyan-500 outline-none shadow-inner transition-all"
+                />
+              </div>
+              <button
+                onClick={(e) => {
+                  if ((!isPro && freeUsed) || (isPro && videoRimanenti === 0)) {
+                    e.preventDefault();
+                    setShowProModal(true);
+                  } else {
+                    processAndTrigger();
+                  }
+                }}
+                disabled={btnDisabled}
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-lg py-5 rounded-xl flex items-center justify-center gap-3 transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(34,211,238,0.25)] transform active:scale-95"
+              >
+                {loadingImg || loadingVideo
+                  ? <Loader2 className="animate-spin" size={24} />
+                  : <Video size={24} />
+                }
+                {btnLabel()}
+              </button>
+              {videoCompleted && (
+                <div className="mt-4 flex items-center justify-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 p-3 rounded-lg border border-green-400/20">
+                  <CheckCircle2 size={18} /> Inviato! Riceverai il video via email tra pochi minuti.
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ── PRICING NEURO-MARKETING ── */}
+        <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
+              🚀 Offerta Speciale di Lancio
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Investi sul tuo Marketing, <br/><span className="text-cyan-400">non sui costi fissi.</span></h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Sistema Pay-per-Result: acquisti i crediti una volta, li usi quando vuoi. <br className="hidden md:block"/> 
+              <strong>Senza abbonamenti. Senza scadenze.</strong>
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-slate-500 line-through text-lg">€29</span>
+                <div className="text-4xl font-black text-white">€ 14,90</div>
+              </div>
+              <p className="text-cyan-500/80 text-xs font-bold mb-6">Il prezzo di una pizza per vendere un&apos;auto.</p>
+              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video HD Professionale</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI Personalizzato</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Pronti all&apos;uso</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Inizia Ora</a>
+            </div>
+
+            <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.2)] transform md:-translate-y-4 z-10 scale-105">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.2 rounded-full shadow-lg">SCELTO DAL 74% DEI SALONI</div>
+              <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack (5 Video)</h3>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-slate-400 line-through text-lg">€99</span>
+                <div className="text-5xl font-black text-white">€ 59</div>
+              </div>
+              <p className="text-white text-xs font-bold mb-6">Solo 11,80€ per video cinematografico.</p>
+              <ul className="space-y-4 text-sm text-white flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>Il Tuo Logo nel Video</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Lingue Straniere Sbloccate</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25">ACQUISTA 5 VIDEO 🔥</a>
+            </div>
+
+            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Maxi Pack (15 Video)</h3>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-slate-500 line-through text-lg">€199</span>
+                <div className="text-4xl font-black text-white">€ 129</div>
+              </div>
+              <p className="text-cyan-500/80 text-xs font-bold mb-6">Il miglior rapporto qualità/prezzo.</p>
+              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits HD</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Inserimento Logo Salone</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Elaborazione Prioritaria</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Tutte le funzioni Pro</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Sblocca 15 Video</a>
+            </div>
+          </div>
+          <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
+        </section>
+
+        {/* ── SEZIONE FOUNDER & ECOSISTEMA ORBITALE (6 ELEMENTI SIMMETRICI) ── */}
+        <section id="ecosistema" className="border-t border-white/10 bg-[#020202]/80 py-24 px-6 relative">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
             
-            {/* REGOLA 2: Dominanza Visiva del Pulsante di Conversione (Dimensione x2) */}
-            <a 
-              href="#pricing" 
-              className="inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 text-black font-bold tracking-wide rounded-lg transition-transform hover:scale-[1.02] active:scale-[0.98] text-lg md:text-xl px-10 py-5 shadow-[0_0_30px_rgba(6,182,212,0.3)] min-w-[240px]"
-            >
-              Attiva Ora Gratis
-            </a>
-
-            {/* Pulsante secondario (fisicamente molto più piccolo per stabilire gerarchia) */}
-            <a 
-              href="#ecosistema" 
-              className="inline-flex items-center justify-center bg-transparent hover:bg-white/5 text-slate-400 hover:text-white border border-slate-800 hover:border-slate-700 font-medium rounded-lg text-sm px-4 py-2 transition"
-            >
-              Scopri i moduli
-            </a>
-          </div>
-
-          {/* REGOLA 5: Associazione Umana e Fiducia (Persone = Conversione) */}
-          <div className="flex items-center gap-3 border-t border-slate-900 pt-6">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs overflow-hidden">
-                {/* Avatar assistente virtuale */}
-                <span className="font-semibold text-cyan-400">AI</span>
-              </div>
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-black" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-300">Assistente Virtuale RM Studio</p>
-              <p className="text-xs text-slate-500">Sempre online per supportare le tue scelte configurative</p>
-            </div>
-          </div>
-
-        </div>
-
-        {/* PARTE DESTRA: Widget Orbitale RM Studio a 6 Elementi */}
-        <div className="lg:col-span-5 flex justify-center items-center z-10 relative">
-          
-          {/* Anelli concentrici pulsanti di background legati alla regola 3 */}
-          <div className="absolute w-[360px] h-[360px] border border-cyan-500/5 rounded-full pulse-ring-element pointer-events-none" />
-          <div className="absolute w-[440px] h-[440px] border border-orange-500/5 rounded-full pulse-ring-element pointer-events-none" style={{ animationDelay: '2s' }} />
-
-          {/* WIDGET ORBITALE INTEGRATO IN TSX */}
-          <div className="orbit-container-wrapper relative w-full max-w-[500px] mx-auto min-h-[440px]">
-            <div className="orbit-area">
-              <div className="orbit-ring">
+            {/* Widget Orbitale ad Esagono Regolare (60 gradi) */}
+            <div className="w-full lg:w-1/2 flex justify-center items-center relative min-h-[440px] orbit-area">
+              <div className="absolute w-72 h-72 bg-cyan-500/10 blur-3xl rounded-full"></div>
+              
+              <div className="orbit-ring-container relative w-80 h-80 rounded-full border border-white/5 flex items-center justify-center">
                 
-                {/* 1. Concierge24 (0° - Alto al centro) */}
-                <div className="orbit-wrapper" style={{ top: '0%', left: '50%' }}>
-                  <div className="orbit-item">
-                    <a href="https://concierge24.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: '#0a0a0c', padding: '10px' }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/concierge24pro/main/logo.png" alt="Concierge24" className="orbit-img" />
+                {/* 1. Concierge24 (0° - Alto al centro | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "0%", left: "50%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://concierge24.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-2.5 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/concierge24pro/main/logo.png" alt="Concierge24" className="w-full h-full object-contain" />
                     </a>
-                    <div className="orbit-tooltip">
-                      <b>Concierge24</b>
-                      Assistente vocale e testuale AI H24 per hotel e strutture extra-alberghiere.
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">Concierge24</b>
+                      Assistente vocale e testuale multilingua H24 per hotel e strutture ricettive.
                     </div>
                   </div>
                 </div>
 
-                {/* 2. DriveMotion (60° - Alto a destra) */}
-                <div className="orbit-wrapper" style={{ top: '25%', left: '93.3%' }}>
-                  <div className="orbit-item">
-                    <a href="https://drivemotion.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: '#fff', padding: '6px' }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_drivemotion_bg2.jpg" alt="DriveMotion" className="orbit-img cover rounded" />
+                {/* 2. DriveMotion (60° - Alto a destra | Sfondo Bianco) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "25%", left: "93.3%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://drivemotion.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-white border border-slate-200 rounded-full p-1.5 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_drivemotion_bg2.jpg" alt="DriveMotion" className="w-full h-full object-contain" />
                     </a>
-                    <div className="orbit-tooltip">
-                      <b>DriveMotion AI</b>
-                      Generazione automatica di sfondi e video cinematici per saloni auto.
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">DriveMotion</b>
+                      Video promozionali con rimozione dello sfondo per saloni auto.
                     </div>
                   </div>
                 </div>
 
-                {/* 3. Nexus AI (120° - Basso a destra) */}
-                <div className="orbit-wrapper" style={{ top: '75%', left: '93.3%' }}>
-                  <div className="orbit-item">
-                    <a href="https://nexus.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: '#0a0a0c', padding: '12px' }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/nexus/main/logo_nexus.png" alt="Nexus AI" className="orbit-img" />
+                {/* 3. Nexus AI (120° - Basso a destra | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "75%", left: "93.3%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://nexus.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-3 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/nexus/main/logo_nexus.png" alt="Nexus AI" className="w-full h-full object-contain" />
                     </a>
-                    <div className="orbit-tooltip">
-                      <b>Nexus AI</b>
-                      Widget chatbot intelligente per accoglienza e conversione automatica lead.
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b class="text-white block mb-1">Nexus AI</b>
+                      Inietta un assistente virtuale intelligente su qualsiasi sito esistente.
                     </div>
                   </div>
                 </div>
 
-                {/* 4. OmniaStudio (180° - Basso al centro) */}
-                <div className="orbit-wrapper" style={{ top: '100%', left: '50%' }}>
-                  <div className="orbit-item">
-                    <a href="https://omniastudio.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: '#fff', padding: '4px' }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_OmniaStudio.png" alt="OmniaStudio" className="orbit-img" />
+                {/* 4. OmniaStudio (180° - Basso al centro | Sfondo Bianco) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "100%", left: "50%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://omniastudio.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-white border border-slate-200 rounded-full p-1 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_OmniaStudio.png" alt="OmniaStudio" className="w-full h-full object-contain" />
                     </a>
-                    <div className="orbit-tooltip">
-                      <b>OmniaStudio</b>
-                      La potenza dell&apos;AI locale e protetta offline sul tuo PC, a vita.
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">OmniaStudio</b>
+                      AI locale e privata 100% offline per studi professionali.
                     </div>
                   </div>
                 </div>
 
-                {/* 5. FF Edizioni (240° - Basso a sinistra) */}
-                <div className="orbit-wrapper" style={{ top: '75%', left: '6.7%' }}>
-                  <div className="orbit-item">
-                    <a href="https://ff-edizioni.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: '#0a0a0c', padding: '2px' }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/fausto-fusetti-links/main/logo6.jpg" alt="FF Edizioni" className="orbit-img cover rounded" />
+                {/* 5. FF Edizioni (240° - Basso a sinistra | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "75%", left: "6.7%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://ff-edizioni.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-0.5 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/fausto-fusetti-links/main/logo6.jpg" alt="FF Edizioni" className="w-full h-full object-cover rounded-full" />
                     </a>
-                    <div className="orbit-tooltip">
-                      <b>FF Edizioni</b>
-                      Colonne sonore, jingle commerciali e sound design creati con l&apos;AI.
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">FF Edizioni</b>
+                      Canzoni, sigle commerciali e sound design creati su misura con l'AI.
                     </div>
                   </div>
                 </div>
 
-                {/* 6. HomeTour AI (300° - Alto a sinistra) */}
-                <div className="orbit-wrapper" style={{ top: '25%', left: '6.7%' }}>
-                  <div className="orbit-item">
-                    <a href="https://hometour.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: '#0a0a0c', padding: '4px' }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_hometour%2Bbg.jpg" alt="HomeTour" className="orbit-img cover rounded" />
+                {/* 6. HomeTour AI (300° - Alto a sinistra | Sfondo Nero) */}
+                <div className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: "25%", left: "6.7%" }}>
+                  <div className="orbit-item group relative">
+                    <a href="https://hometour.rmstudio.app/" target="_blank" rel="noopener noreferrer" className="block w-16 h-16 bg-[#0a0a0c] border border-white/10 rounded-full p-1 hover:border-cyan-500 transition-colors shadow-2xl flex items-center justify-center overflow-hidden">
+                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_hometour%2Bbg.jpg" alt="HomeTour AI" className="w-full h-full object-contain" />
                     </a>
-                    <div className="orbit-tooltip">
-                      <b>HomeTour AI</b>
-                      Reel immobiliari con voce narrante generati in automatico da foto.
+                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-48 bg-[#0a0a0c] border border-white/10 text-slate-300 text-xs rounded-lg p-3 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 shadow-xl text-center z-50">
+                      <b className="text-white block mb-1">HomeTour AI</b>
+                      Reel immobiliari cinematografici realizzati da semplici foto.
                     </div>
                   </div>
                 </div>
 
               </div>
 
-              {/* Foto del Fondatore fissa al centro - REGOLA 5 & E-E-A-T */}
-              <div className="orbit-center-photo">
-                <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/riccardo_founder.jpeg" alt="Riccardo Modena - Fondatore RM Studio" />
+              {/* Foto del Fondatore fissa al centro (Massimo fattore di fiducia e E-E-A-T) */}
+              <div className="absolute w-36 h-36 rounded-full border-4 border-cyan-500 p-1 bg-black overflow-hidden shadow-2xl z-10">
+                <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/riccardo_founder.jpeg" alt="Riccardo Modena - Fondatore RM Studio" className="w-full h-full object-cover rounded-full" />
               </div>
             </div>
-          </div>
 
-        </div>
-      </section>
-
-      {/* REGOLA 6: Autorevolezza Scientifica ed E-E-A-T */}
-      <section id="authorities" className="bg-slate-950/40 border-y border-white/5 py-10 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-slate-500 text-sm">
-          <p className="text-center md:text-left text-slate-400 font-medium">
-            Progettato in aderenza agli standard internazionali di settore e linee guida istituzionali:
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-6">
-            <a 
-              href="https://www.nar.realtor" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-cyan-400 transition underline decoration-dotted underline-offset-4"
-            >
-              National Association of Realtors
-            </a>
-            <span className="text-slate-800">|</span>
-            <a 
-              href="https://www.iso.org/standard/27001" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-cyan-400 transition underline decoration-dotted underline-offset-4"
-            >
-              ISO/IEC 27001 Security
-            </a>
-            <span className="text-slate-800">|</span>
-            <a 
-              href="https://www.health.harvard.edu" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-cyan-400 transition underline decoration-dotted underline-offset-4"
-            >
-              Harvard Health Publishing
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* REGOLA 8: Decoy Pricing (Ancoraggio del Prezzo) */}
-      <section id="pricing" className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-4">Tariffe Semplici e Trasparenti</h2>
-          <p className="text-lg text-slate-400 max-w-xl mx-auto">
-            Configura il piano ideale per le necessità operative della tua struttura o agenzia.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-          
-          {/* Opzione 1: Starter (Basso Costo) */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-8 flex flex-col justify-between transition-colors hover:border-slate-700">
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest block mb-4">Starter</span>
-              <div className="text-3xl font-bold text-white mb-4">€19<span className="text-sm font-normal text-slate-500">/mese</span></div>
-              <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                Strumenti essenziali per iniziare a ottimizzare i flussi e familiarizzare con le automazioni base.
+            {/* Informazioni Profilo ed E-E-A-T con link di citazione scientifica ad alta autorevolezza */}
+            <div className="w-full lg:w-1/2">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6">
+                Esperienza & Autorevolezza
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tighter">
+                Non ti vendo software.<br />
+                <span className="text-cyan-400">Ti costruisco un vantaggio.</span>
+              </h2>
+              <p className="text-white/60 mb-6 leading-relaxed text-lg font-light italic">
+                "Prendo i tuoi colli di bottiglia e li trasformo in ecosistemi autonomi che producono media,
+                gestiscono clienti e generano vendite H24."
               </p>
-              <ul className="space-y-3 text-slate-300 text-sm mb-8">
-                <li className="flex items-center gap-2">✔ Accesso a 1 modulo a scelta</li>
-                <li className="flex items-center gap-2">✔ Supporto asincrono via email</li>
-                <li className="flex items-center gap-2">✔ Aggiornamenti standard</li>
-              </ul>
-            </div>
-            <a href="#scelta" className="w-full py-2 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold text-center transition">
-              Scegli Starter
-            </a>
-          </div>
-
-          {/* Opzione 2: PRO - L&apos;Esca Decoy ad Alto Valore (Con bagliore pulsante dorato) */}
-          <div className="relative bg-slate-900 border border-yellow-500/30 rounded-xl p-8 flex flex-col justify-between gold-decoy-card transform md:-translate-y-4">
-            <div className="absolute top-0 right-6 -translate-y-1/2 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-extrabold text-[10px] tracking-wider uppercase px-3 py-1 rounded-full">
-              Consigliato
-            </div>
-            <div>
-              <span className="text-xs font-semibold text-yellow-500 uppercase tracking-widest block mb-4">Professional PRO</span>
-              <div className="text-4xl font-extrabold text-white mb-4">€49<span className="text-sm font-normal text-slate-500">/mese</span></div>
-              <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-                Il pacchetto completo con tutti i 6 moduli attivi e l&apos;assistente AI configurato sui tuoi dati aziendali.
+              <p className="text-white/40 mb-8 leading-relaxed text-base font-light">
+                Sono Riccardo Modena, founder di <b>RM Studio</b>. Ho fondato questo lab perché oggi l'AI non è più
+                un lusso, è l'unico modo per scalare senza un esercito di dipendenti. Come evidenziato nelle <a href="https://www.w3.org/community/tourism/" target="_blank" rel="noopener" className="text-cyan-400 underline hover:text-cyan-300">linee guida del consorzio internazionale W3C sull'IA applicata al turismo</a>, l'integrazione di sistemi conversazionali intelligenti abbatte la frizione operativa e ottimizza l'esperienza d'uso dell'utente finale.
               </p>
-              <ul className="space-y-3 text-slate-200 text-sm mb-8">
-                <li className="flex items-center gap-2 text-yellow-500/90 font-medium">★ Tutti i 6 moduli orbitali sbloccati</li>
-                <li className="flex items-center gap-2">✔ Integrazione API personalizzabile</li>
-                <li className="flex items-center gap-2">✔ Assistente virtuale prioritario</li>
-                <li className="flex items-center gap-2">✔ Supporto dedicato in 4 ore</li>
-              </ul>
+              <a
+                href="#progetti"
+                className="inline-flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 pb-1 font-black uppercase text-sm tracking-widest hover:text-white hover:border-white transition-all"
+              >
+                Esplora le Soluzioni ↓
+              </a>
             </div>
-            <a href="#scelta" className="w-full py-3 px-4 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black text-sm font-bold text-center transition shadow-lg shadow-yellow-500/20">
-              Sblocca Professional PRO
-            </a>
           </div>
+        </section>
 
-          {/* Opzione 3: Maxi (Alto Costo per generare ancoraggio) */}
-          <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-8 flex flex-col justify-between transition-colors hover:border-slate-700">
-            <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest block mb-4">Maxi Enterprise</span>
-              <div className="text-3xl font-bold text-white mb-4">€149<span className="text-sm font-normal text-slate-500">/mese</span></div>
-              <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                Per grandi strutture che necessitano di soluzioni isolate offline e accordi di livello di servizio su misura.
-              </p>
-              <ul className="space-y-3 text-slate-300 text-sm mb-8">
-                <li className="flex items-center gap-2">✔ Licenze OmniaStudio illimitate</li>
-                <li className="flex items-center gap-2">✔ Server e database dedicati</li>
-                <li className="flex items-center gap-2">✔ SLA contrattualizzati (99.9%)</li>
-              </ul>
+        {/* ── FOOTER ── */}
+        <footer className="border-t border-white/10 bg-black py-16 relative z-10">
+          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
+            <div className="max-w-xs">
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
+                <img src="/logo.png" alt="DriveMotion AI Logo" className="h-24 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
+              </div>
+              <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa.</p>
+              <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} RM Studio.</p>
             </div>
-            <a href="#scelta" className="w-full py-2 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold text-center transition">
-              Contatta Enterprise
-            </a>
+            <div className="flex flex-col items-center md:items-start gap-4">
+              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-2">Social Hub</h4>
+              <div className="flex gap-4">
+                <a href="https://www.instagram.com/riccardo_mode_/"             target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50  hover:bg-cyan-500/10  transition-all"><InstagramIcon size={20} /></a>
+                <a href="https://www.facebook.com/riccardo.modena.792"          target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50  hover:bg-blue-500/10  transition-all"><FacebookIcon  size={20} /></a>
+                <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50  hover:bg-blue-600/10  transition-all"><LinkedinIcon  size={20} /></a>
+                <a href="https://www.tiktok.com/@mr3d.riccardo"                 target="_blank" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-pink-500/50  hover:bg-pink-500/10  transition-all"><TiktokIcon    size={20} /></a>
+              </div>
+            </div>
+            <div className="flex flex-col items-center md:items-end gap-2">
+              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Contattaci</h4>
+              <button onClick={() => setShowSupportModal(true)} className="text-slate-400 text-sm hover:text-white transition-colors">Invia un messaggio</button>
+            </div>
           </div>
+        </footer>
+      </div>
 
+      {/* ── MODAL PRO ── */}
+      {showProModal && (
+        <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
+          <div className="bg-[#0a0a0c] border border-cyan-500/30 rounded-[2.5rem] p-10 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
+            <Lock className="text-cyan-400 mx-auto mb-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" size={48} />
+            <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L&apos;inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
+            <div className="space-y-3">
+              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Piani</a>
+              <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest">Chiudi</button>
+            </div>
+          </div>
         </div>
-      </section>
+      )}
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/5 bg-black py-12 px-6 text-slate-600 text-xs">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <p>© {new Date().getFullYear()} RM Studio. Tutti i diritti riservati.</p>
-          <p>Le informazioni descritte fanno riferimento all&apos;architettura di prodotto sviluppata da Riccardo Modena.</p>
+      {/* ── MODAL CONTATTI ── */}
+      {showSupportModal && (
+        <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
+          <div className="relative w-full max-w-xl">
+            <button onClick={() => setShowSupportModal(false)} className="absolute -top-12 right-0 text-slate-400 hover:text-white transition-colors z-10">
+              <X size={28} />
+            </button>
+            {supportSuccess ? (
+              <div className="bg-[#0a0a0c] border border-cyan-500/30 p-8 rounded-2xl text-center shadow-2xl">
+                <CheckCircle2 size={48} className="text-cyan-400 mx-auto mb-4 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
+                <h4 className="text-white font-bold text-xl mb-1">Messaggio Inviato!</h4>
+                <p className="text-slate-400 text-sm">Il nostro team ti risponderà il prima possibile.</p>
+              </div>
+            ) : (
+              <div className="bg-[#0a0a0c]/90 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-2xl">
+                <h3 className="text-white font-bold text-2xl mb-6 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.5)]"></span> Scrivici
+                </h3>
+                <form onSubmit={handleSupportSubmit} className="grid sm:grid-cols-2 gap-5 text-left">
+                  <div className="sm:col-span-1">
+                    <label className="block text-sm font-medium text-slate-400 mb-1">Il tuo Nome</label>
+                    <input type="text" name="name" required className="w-full bg-black border border-white/10 text-white rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors" placeholder="Mario Rossi" />
+                  </div>
+                  <div className="sm:col-span-1">
+                    <label className="block text-sm font-medium text-slate-400 mb-1">La tua Email</label>
+                    <input type="email" name="email" required className="w-full bg-black border border-white/10 text-white rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors" placeholder="mario@email.it" />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-slate-400 mb-1">Messaggio</label>
+                    <textarea name="message" required rows={4} className="w-full bg-black border border-white/10 text-white rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors resize-none" placeholder="Come possiamo aiutarti?"></textarea>
+                  </div>
+                  <div className="sm:col-span-2 mt-2">
+                    <button type="submit" disabled={supportLoading} className="w-full bg-white hover:bg-slate-200 text-black font-bold py-4 rounded-xl transition-transform active:scale-95 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70">
+                      {supportLoading ? <Loader2 className="animate-spin" size={20} /> : <Mail size={20} />}
+                      {supportLoading ? "Invio in corso..." : "Invia Messaggio"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
         </div>
-      </footer>
+      )}
 
+      <style dangerouslySetInnerHTML={{ __html: `html { scroll-behavior: smooth; }` }} />
     </div>
   );
 }
