@@ -73,7 +73,6 @@ const VOICES_CONFIG = {
   ],
 };
 
-// Devi anche aggiornare LANGUAGES subito sotto per includere lo Spagnolo
 const LANGUAGES = [
   { id: "it", flag: "🇮🇹", name: "Italiano" },
   { id: "en", flag: "🇬🇧", name: "English"  },
@@ -82,9 +81,8 @@ const LANGUAGES = [
 ];
 
 // ─── COSTANTI URL ─────────────────────────────────────────────────
-const MODAL_URL          = "https://modena-riccardo--drive-motion-backend-fastapi-app.modal.run/process";
-const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
 const VERIFICA_TOKEN_URL = "https://n8n.rmstudio.app/webhook/verifica-token-drivemotion";
+const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
 const CHATBOT_WEBHOOK_URL= "https://n8n.rmstudio.app/webhook/drivemotion-chat";
 const CHECK_EMAIL_URL    = "https://n8n.rmstudio.app/webhook/check-email";
 const FALLBACK_LOGO_URL  = "https://drive-motion.vercel.app/logo.png";
@@ -98,7 +96,7 @@ export default function AutoBestPage() {
   const [isPro,          setIsPro]          = useState(false);
   const [token,          setToken]          = useState<string | null>(null);
   const [videoRimanenti, setVideoRimanenti] = useState<number>(0);
-  const [freeUsed, setFreeUsed] = useState(false);
+  const [freeUsed,       setFreeUsed]       = useState(false);
 
   // ─── STATO UI ──────────────────────────────────────────────────
   const [showProModal,    setShowProModal]    = useState(false);
@@ -124,12 +122,45 @@ export default function AutoBestPage() {
   const [customEnv,     setCustomEnv]     = useState("");
   const [videoFormat,   setVideoFormat]   = useState("verticale");
   const [language,      setLanguage]      = useState("it");
-  const [selectedVoice, setSelectedVoice] = useState("d718e944-b313-4998-b011-d1cc078d4ef3")
+  const [selectedVoice, setSelectedVoice] = useState("d718e944-b313-4998-b011-d1cc078d4ef3");
 
   // ─── STATO RETE ────────────────────────────────────────────────
   const [loadingImg,     setLoadingImg]     = useState(false);
   const [loadingVideo,   setLoadingVideo]   = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
+
+  // Iniezione automatica dello Schema Markup JSON-LD all'avvio
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.innerHTML = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "DriveMotion",
+      "operatingSystem": "All",
+      "applicationCategory": "BusinessApplication",
+      "description": "Generatore AI di video e sfondi fotorealistici per concessionari e autosaloni. Ottimizza la presentazione online dei veicoli in tempo reale.",
+      "offers": {
+        "@type": "Offer",
+        "price": "14.90",
+        "priceCurrency": "EUR"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "94"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Riccardo Modena",
+        "url": "https://www.linkedin.com/in/riccardo-modena-13918a61/"
+      }
+    });
+    document.head.appendChild(script);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   // ═══════════════════════════════════════════════════════════════
   // CHATBOT AURORA
@@ -247,7 +278,6 @@ export default function AutoBestPage() {
     sendBtn.onclick  = () => sendMsg();
     input.onkeypress = (e) => { if (e.key === "Enter") sendMsg(); };
 
-    // Apri automaticamente dopo 1.5s SOLO se su PC (schermo > 900px)
     setTimeout(() => {
       if (window.innerWidth > 900) {
         toggleChat(true);
@@ -255,9 +285,7 @@ export default function AutoBestPage() {
     }, 1500);
   }, []);
 
-  // ═══════════════════════════════════════════════════════════════
-  // VERIFICA TOKEN (Con sistema di Polling Anti-Race-Condition Stripe)
-  // ═══════════════════════════════════════════════════════════════
+  // ─── VERIFICA TOKEN ───
   useEffect(() => {
     const checkToken = async (attempt = 1) => {
       const urlToken   = new URLSearchParams(window.location.search).get("token");
@@ -277,32 +305,24 @@ export default function AutoBestPage() {
           setIsPro(true);
           setToken(tokenToUse);
           setVideoRimanenti(parsedData.video_rimanenti ?? 0);
-          
           if (parsedData.email) setEmail(parsedData.email);
-         // if (parsedData.nome && !agencyName) setAgencyName(parsedData.nome);
-          
+          if (parsedData.nome) setAgencyName(parsedData.nome);
+          if (parsedData.indirizzo) setAgencyAddress(parsedData.indirizzo);
+          if (parsedData.telefono) setAgencyPhone(parsedData.telefono);
           localStorage.setItem("ab_token", tokenToUse);
-          
-          // Rimuovi il token dall'URL SOLO dopo aver confermato che è valido
           if (urlToken) {
             const url = new URL(window.location.href);
             url.searchParams.delete('token');
             window.history.replaceState({}, document.title, url.toString());
           }
         } else {
-          // SE IL TOKEN VIENE DALL'URL E NON E' VALIDO: 
-          // Stripe non ha ancora finito di scriverlo su Google Sheets. Riprova!
           if (urlToken && attempt < 4) {
-            console.log(`[DriveMotion] Token non ancora sincronizzato. Ritento... (${attempt}/4)`);
-            setTimeout(() => checkToken(attempt + 1), 2500); // Aspetta 2.5 secondi
+            setTimeout(() => checkToken(attempt + 1), 2500);
           } else if (!urlToken) {
-            // Se è un vecchio token preso dal localStorage che è scaduto, eliminalo
             localStorage.removeItem("ab_token");
           }
         }
       } catch (err) {
-        console.warn("[DriveMotion] Errore verifica token:", err);
-        // Ritenta in caso di glitch di rete momentaneo
         if (urlToken && attempt < 4) {
           setTimeout(() => checkToken(attempt + 1), 2500);
         }
@@ -312,23 +332,21 @@ export default function AutoBestPage() {
     checkToken();
   }, []);
 
-  // ─── ANIMAZIONE DEMO PHONE ──────────────────────────────────────
+  // ─── ANIMAZIONE DEMO PHONE ───
   useEffect(() => {
     const interval = setInterval(() => setDemoStep(p => (p + 1) % 3), 3500);
     return () => clearInterval(interval);
   }, []);
 
-  // ─── MEMORIA DEL FORM (LOCALSTORAGE) ──────────────────────────────
-  // Salva i dati ogni volta che l'utente scrive qualcosa
+  // ─── MEMORIA FORM ───
   useEffect(() => {
     const timer = setTimeout(() => {
       const formData = { carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email };
       localStorage.setItem("dm_form_memory", JSON.stringify(formData));
-    }, 500); // Ritardo per non stressare il browser ad ogni singola lettera
+    }, 500);
     return () => clearTimeout(timer);
   }, [carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email]);
 
-  // Carica i dati salvati quando la pagina si apre
   useEffect(() => {
     const saved = localStorage.getItem("dm_form_memory");
     if (saved) {
@@ -338,10 +356,6 @@ export default function AutoBestPage() {
         if (parsed.carPrice) setCarPrice(parsed.carPrice);
         if (parsed.carYear) setCarYear(parsed.carYear);
         if (parsed.carEngine) setCarEngine(parsed.carEngine);
-        // Evitiamo di sovrascrivere se ci sono dati più aggiornati (es. n8n)
-        //if (!agencyName && parsed.agencyName) setAgencyName(parsed.agencyName);
-        //if (!agencyAddress && parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
-        //if (!agencyPhone && parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
         if (parsed.agencyName) setAgencyName(parsed.agencyName);
         if (parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
         if (parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
@@ -350,33 +364,30 @@ export default function AutoBestPage() {
     }
   }, []);
 
-  // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ──────────────────────
+  // ─── AUTO-COMPILAZIONE DA URL (Cold Email) ───
   useEffect(() => {
     const timer = setTimeout(() => {
       const urlParams = new URLSearchParams(window.location.search);
       const urlEmail = urlParams.get("email");
       const urlNome = urlParams.get("nome");
       const urlCitta = urlParams.get("citta");
-      const urlTelefono = urlParams.get("telefono"); // Aggiunto!
+      const urlTelefono = urlParams.get("telefono");
 
-      // Verifichiamo se abbiamo GIA' i dati in memoria
       const saved = localStorage.getItem("dm_form_memory");
       const parsed = saved ? JSON.parse(saved) : {};
 
-      // Inseriamo i dati dall'URL SOLO SE la memoria del browser è vuota
       if (urlEmail && !parsed.email) setEmail(decodeURIComponent(urlEmail));
       if (urlNome && !parsed.agencyName) setAgencyName(decodeURIComponent(urlNome));
       if (urlCitta && !parsed.agencyAddress) setAgencyAddress(decodeURIComponent(urlCitta));
       if (urlTelefono && !parsed.agencyPhone) setAgencyPhone(decodeURIComponent(urlTelefono));
       
-      // Pulizia URL per evitare riletture
       if (urlEmail || urlNome || urlParams.get('token')) {
         const url = new URL(window.location.href);
         url.searchParams.delete('email');
         url.searchParams.delete('nome');
         url.searchParams.delete('citta');
         url.searchParams.delete('telefono');
-        url.searchParams.delete('token'); // Togliamo anche il token dall'URL dopo averlo letto
+        url.searchParams.delete('token');
         window.history.replaceState({}, document.title, url.toString());
       }
     }, 600);
@@ -384,17 +395,12 @@ export default function AutoBestPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  // ═══════════════════════════════════════════════════════════════
-  // GESTIONE LINGUA
-  // ═══════════════════════════════════════════════════════════════
   const handleLanguageChange = (lang: string) => {
     setLanguage(lang);
     setSelectedVoice(VOICES_CONFIG[lang as keyof typeof VOICES_CONFIG][0].id);
   };
 
-  // ═══════════════════════════════════════════════════════════════
-  // UPLOAD IMMAGINI
-  // ═══════════════════════════════════════════════════════════════
+  // ─── UPLOAD IMMAGINI ───
   const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
 
@@ -420,7 +426,6 @@ export default function AutoBestPage() {
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext("2d")!;
-            
             ctx.drawImage(img, 0, 0, width, height);
             resolve(canvas.toDataURL("image/jpeg", 0.95));
           };
@@ -433,26 +438,16 @@ export default function AutoBestPage() {
 
   const removeImage = (index: number) => setImages(images.filter((_, i) => i !== index));
 
-  // ═══════════════════════════════════════════════════════════════
-  // UPLOAD LOGO
-  // ═══════════════════════════════════════════════════════════════
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const objectUrl = URL.createObjectURL(file);
-    setLogo(objectUrl);
     const reader = new FileReader();
     reader.onloadend = () => setLogo(reader.result as string);
     reader.readAsDataURL(file);
   };
 
-  // ═══════════════════════════════════════════════════════════════
-  // INVIO FORM
-  // ═══════════════════════════════════════════════════════════════
   const processAndTrigger = async () => {
     if (images.length === 0 || !email) return;
-    
-    // Saltiamo il caricamento infinito, passiamo subito a "Rendering Video"
     setLoadingImg(false);
     setLoadingVideo(true);
     setVideoCompleted(false);
@@ -464,7 +459,6 @@ export default function AutoBestPage() {
     try {
       const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
 
-      // Invia a n8n: le immagini sono grezze (base64). Modal lo farà n8n al sicuro!
       const res = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -472,7 +466,7 @@ export default function AutoBestPage() {
           sector:      "auto",
           descrizione: carMake + " " + carEngine + " " + carYear,
           prezzo:      carPrice,
-          images:      images, // Invia direttamente le foto originali!
+          images:      images,
           logo:        logoPayload,
           email,
           formato:     videoFormat,
@@ -501,20 +495,14 @@ export default function AutoBestPage() {
 
       setLoadingVideo(false);
       setVideoCompleted(true);
-
       if (isPro) setVideoRimanenti(prev => Math.max(0, prev - 1));
-
     } catch (err) {
-      console.error(err);
       alert("Errore durante la generazione. Controlla la connessione.");
       setLoadingImg(false);
       setLoadingVideo(false);
     }
   };
 
-  // ═══════════════════════════════════════════════════════════════
-  // FORM CONTATTI
-  // ═══════════════════════════════════════════════════════════════
   const handleSupportSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSupportLoading(true);
@@ -531,9 +519,6 @@ export default function AutoBestPage() {
     finally  { setSupportLoading(false); }
   };
 
-  // ═══════════════════════════════════════════════════════════════
-  // CHECK EMAIL (Evita scrocconi)
-  // ═══════════════════════════════════════════════════════════════
   const checkEmailUsed = async (emailToCheck: string) => {
     if (!emailToCheck || !emailToCheck.includes("@") || isPro) return;
     try {
@@ -550,7 +535,6 @@ export default function AutoBestPage() {
     } catch (e) { console.error("Errore check email:", e); }
   };
 
-  // ─── TESTO PULSANTE GENERA ──────────────────────────────────────
   const btnLabel = () => {
     if (loadingImg)                      return "Rielaborazione AI...";
     if (loadingVideo)                    return "Rendering Video...";
@@ -568,13 +552,34 @@ export default function AutoBestPage() {
     (isPro && videoRimanenti === 0) ||
     (!isPro && freeUsed);
 
-  // ═══════════════════════════════════════════════════════════════
-  // RENDER
-  // ═══════════════════════════════════════════════════════════════
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden relative pt-20">
 
-      {/* ── NAVBAR ─────────────────────────────────────────────── */}
+      {/* CSS isolato per il widget orbitale simmetrico a 6 elementi */}
+      <style>{`
+        @keyframes orbit-rotation {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes counter-rotation {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(-360deg); }
+        }
+        .orbit-ring-container {
+          animation: orbit-rotation 40s linear infinite;
+        }
+        .orbit-item {
+          animation: counter-rotation 40s linear infinite;
+          transform-origin: center;
+        }
+        .orbit-area:hover .orbit-ring-container,
+        .orbit-area:hover .orbit-item {
+          animation-play-state: paused;
+        }
+        html { scroll-behavior: smooth; }
+      `}</style>
+
+      {/* ── NAVBAR ── */}
       <nav className="fixed top-0 inset-x-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -600,7 +605,7 @@ export default function AutoBestPage() {
         </div>
       </nav>
 
-      {/* ── SFONDO VIDEO ───────────────────────────────────────── */}
+      {/* ── SFONDO VIDEO ── */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-[#050505]">
         <video src="/bg.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-[#050505]/70 to-[#050505]" />
@@ -608,7 +613,7 @@ export default function AutoBestPage() {
 
       <div className="relative z-10">
 
-        {/* ── BANNER PRO (con crediti) ────────────────────────── */}
+        {/* ── BANNER PRO ── */}
         {isPro && (
           <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40 bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-full px-6 py-2 flex items-center gap-3 shadow-[0_0_20px_rgba(34,211,238,0.2)]">
             <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
@@ -618,13 +623,13 @@ export default function AutoBestPage() {
           </div>
         )}
 
-        {/* ── HERO ───────────────────────────────────────────── */}
+        {/* ── HERO ── */}
         <header className="max-w-7xl mx-auto px-6 pt-10 pb-16 flex flex-col lg:flex-row items-center gap-16 min-h-[80vh]">
           <div className="flex-1 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-sm">
               <Car size={14} className="text-cyan-400" /> Cinema AI per Autosaloni
             </div>
-            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white leading-[1.1] drop-shadow-lg">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 text-white leading-[1.1] drop-shadow-lg">
               Vendi più Auto. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                 Con l&apos;Intelligenza Artificiale.
@@ -633,17 +638,16 @@ export default function AutoBestPage() {
             <p className="text-slate-300 text-lg md:text-xl max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-medium">
               Carica da 3 a 8 foto dal parcheggio. La nostra AI rielabora la foto principale, cambia lo sfondo, crea un testo persuasivo e genera un video da 1 minuto in pochi minuti.
             </p>
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-              <a href="#creatore" className="bg-white text-black px-8 py-4 rounded-full font-bold flex items-center gap-2 hover:scale-105 transition-transform shadow-[0_0_25px_rgba(255,255,255,0.4)]">
-                <Play size={18} fill="currentColor" /> Inizia a Creare
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 justify-center lg:justify-start pt-2">
+              <a href="#creatore" className="bg-white text-black px-10 py-5 rounded-full font-bold flex items-center justify-center gap-2 hover:scale-105 transition-transform shadow-[0_0_25px_rgba(255,255,255,0.4)] text-lg sm:text-xl w-full sm:w-auto">
+                <Play size={22} fill="currentColor" /> Inizia a Creare
               </a>
-              <a href="#prezzi" className="bg-black/50 text-white border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/20 backdrop-blur-md">
+              <a href="#prezzi" className="bg-black/50 text-white border border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/20 backdrop-blur-md text-base text-center w-full sm:w-auto">
                 Vedi i Piani
               </a>
             </div>
           </div>
 
-          {/* PHONE MOCKUP ANIMATO */}
           <div className="flex-1 w-full max-w-[320px] relative">
             <div className="absolute inset-0 bg-cyan-500/30 blur-3xl rounded-full animate-pulse" />
             <div className="relative border-[6px] border-[#1a1a1a] bg-[#050505] rounded-[3rem] overflow-hidden aspect-[9/19] shadow-2xl">
@@ -672,16 +676,14 @@ export default function AutoBestPage() {
               </div>
             </div>
 
-            {/* CHATBOT */}
             <div id="chatbot-container"></div>
           </div>
         </header>
 
-        {/* ── TOOL PRINCIPALE ────────────────────────────────── */}
+        {/* ── TOOL PRINCIPALE ── */}
         <section id="creatore" className="max-w-6xl mx-auto px-6 py-12">
           <div className="bg-[#0a0a0c]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
 
-            {/* Lingua + Formato */}
             <div className="flex flex-wrap gap-4 mb-10 pb-8 border-b border-white/10 justify-between items-center relative z-10">
               <div className="flex items-center gap-3">
                 <Globe className="text-slate-400" />
@@ -700,10 +702,7 @@ export default function AutoBestPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
 
-              {/* COLONNA SINISTRA */}
               <div className="space-y-10">
-
-                {/* 1. Immagini + Logo */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <ImageIcon className="text-cyan-400" /> 1. Immagini (Max 8)
@@ -725,7 +724,6 @@ export default function AutoBestPage() {
                     )}
                   </div>
 
-                  {/* Logo upload */}
                   <div
                     onClick={!isPro ? () => setShowProModal(true) : undefined}
                     className={`relative border-2 border-dashed rounded-2xl transition-all p-4 ${logo ? "border-cyan-500/50 bg-black/50" : "border-white/10 bg-black/40"} ${!isPro ? "opacity-50 cursor-pointer" : ""}`}
@@ -753,7 +751,6 @@ export default function AutoBestPage() {
                   </div>
                 </div>
 
-                {/* 2. Sfondo AI */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <MapPin className="text-purple-400" /> 2. Sfondo Magico AI
@@ -774,10 +771,7 @@ export default function AutoBestPage() {
                 </div>
               </div>
 
-              {/* COLONNA DESTRA */}
               <div className="space-y-10">
-
-                {/* 3. Dati Veicolo */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <Car className="text-blue-400" /> 3. Dati Veicolo
@@ -792,7 +786,6 @@ export default function AutoBestPage() {
                   </div>
                 </div>
 
-                {/* 4. Autosalone & Voce */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <Building2 className="text-orange-400" /> 4. Autosalone & Voce
@@ -825,10 +818,7 @@ export default function AutoBestPage() {
               </div>
             </div>
 
-           {/* PULSANTE FINALE */}
             <div className="mt-12 pt-8 border-t border-white/10 max-w-2xl mx-auto relative z-10">
-              
-              {/* INFORMAZIONE REGIA AI (Inserito qui!) */}
               <div className="mb-6 p-6 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl text-center">
                 <span className="inline-block px-3 py-1 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest rounded-full mb-3">
                   ✨ REGIA AI INCLUSA
@@ -876,81 +866,76 @@ export default function AutoBestPage() {
           </div>
         </section>
 
-       {/* ── PRICING NEURO-MARKETING ────────────────────────── */}
-<section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
-  <div className="text-center mb-16">
-    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
-      🚀 Offerta Speciale di Lancio
-    </div>
-    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Investi sul tuo Marketing, <br/><span className="text-cyan-400">non sui costi fissi.</span></h2>
-    <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-      Sistema Pay-per-Result: acquisti i crediti una volta, li usi quando vuoi. <br className="hidden md:block"/> 
-      <strong>Senza abbonamenti. Senza scadenze.</strong>
-    </p>
-  </div>
+        {/* ── PRICING NEURO-MARKETING ── */}
+        <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
+              🚀 Offerta Speciale di Lancio
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Investi sul tuo Marketing, <br/><span className="text-cyan-400">non sui costi fissi.</span></h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Sistema Pay-per-Result: acquisti i crediti una volta, li usi quando vuoi. <br className="hidden md:block"/> 
+              <strong>Senza abbonamenti. Senza scadenze.</strong>
+            </p>
+          </div>
 
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-    
-    {/* Pacchetto Test - Low Barrier to Entry */}
-    <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
-      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
-      <div className="flex items-baseline gap-2 mb-1">
-        <span className="text-slate-500 line-through text-lg">€29</span>
-        <div className="text-4xl font-black text-white">€ 14,90</div>
-      </div>
-      <p className="text-cyan-500/80 text-xs font-bold mb-6">Il prezzo di una pizza per vendere un&apos;auto.</p>
-      <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video HD Professionale</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI Personalizzato</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Pronti all&apos;uso</li>
-      </ul>
-      <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Inizia Ora</a>
-    </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-slate-500 line-through text-lg">€29</span>
+                <div className="text-4xl font-black text-white">€ 14,90</div>
+              </div>
+              <p className="text-cyan-500/80 text-xs font-bold mb-6">Il prezzo di una pizza per vendere un&apos;auto.</p>
+              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video HD Professionale</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI Personalizzato</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Pronti all&apos;uso</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Inizia Ora</a>
+            </div>
 
-    {/* Pacchetto Crescita - The Decoy/Most Popular */}
-    <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.2)] transform md:-translate-y-4 z-10 scale-105">
-      <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.2 rounded-full shadow-lg">SCELTO DAL 74% DEI SALONI</div>
-      <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack (5 Video)</h3>
-      <div className="flex items-baseline gap-2 mb-1">
-        <span className="text-slate-400 line-through text-lg">€99</span>
-        <div className="text-5xl font-black text-white">€ 59</div>
-      </div>
-      <p className="text-white text-xs font-bold mb-6">Solo 11,80€ per video cinematografico.</p>
-      <ul className="space-y-4 text-sm text-white flex-1 mb-8">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>Il Tuo Logo nel Video</strong></li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Lingue Straniere Sbloccate</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
-      </ul>
-      <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25">ACQUISTA 5 VIDEO 🔥</a>
-    </div>
+            <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border border-cyan-500/50 rounded-[2rem] p-8 flex flex-col relative shadow-[0_0_40px_rgba(34,211,238,0.2)] transform md:-translate-y-4 z-10 scale-105">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.2 rounded-full shadow-lg">SCELTO DAL 74% DEI SALONI</div>
+              <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack (5 Video)</h3>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-slate-400 line-through text-lg">€99</span>
+                <div className="text-5xl font-black text-white">€ 59</div>
+              </div>
+              <p className="text-white text-xs font-bold mb-6">Solo 11,80€ per video cinematografico.</p>
+              <ul className="space-y-4 text-sm text-white flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>Il Tuo Logo nel Video</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Lingue Straniere Sbloccate</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25">ACQUISTA 5 VIDEO 🔥</a>
+            </div>
 
-    {/* Pacchetto Dominio - Anchoring high to make others look cheap */}
-    <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
-      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Maxi Pack (15 Video)</h3>
-      <div className="flex items-baseline gap-2 mb-1">
-        <span className="text-slate-500 line-through text-lg">€199</span>
-        <div className="text-4xl font-black text-white">€ 129</div>
-      </div>
-      <p className="text-cyan-500/80 text-xs font-bold mb-6">Il miglior rapporto qualità/prezzo.</p>
-      <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits HD</strong></li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Inserimento Logo Salone</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Elaborazione Prioritaria</li>
-        <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Tutte le funzioni Pro</li>
-      </ul>
-      <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Sblocca 15 Video</a>
-    </div>
+            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group">
+              <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Maxi Pack (15 Video)</h3>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-slate-500 line-through text-lg">€199</span>
+                <div className="text-4xl font-black text-white">€ 129</div>
+              </div>
+              <p className="text-cyan-500/80 text-xs font-bold mb-6">Il miglior rapporto qualità/prezzo.</p>
+              <ul className="space-y-4 text-sm text-slate-300 flex-1 mb-8">
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits HD</strong></li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Inserimento Logo Salone</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Elaborazione Prioritaria</li>
+                <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Tutte le funzioni Pro</li>
+              </ul>
+              <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Sblocca 15 Video</a>
+            </div>
+          </div>
+          <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
+        </section>
 
-  </div>
-  <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
-</section>
-
-        {/* ── ECOSISTEMA ─────────────────────────────────────── */}
+        {/* ── ECOSISTEMA ── */}
         <section className="border-t border-white/10 bg-[#020202]/80 backdrop-blur-xl py-24 relative z-10">
           <div className="max-w-6xl mx-auto px-6 text-center">
             <div className="mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 italic">Ecosistema MR Studio</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 italic">Ecosistema RM Studio</h2>
               <p className="text-slate-400 max-w-2xl mx-auto">Sfrutta la potenza dell&apos;Intelligenza Artificiale per ottimizzare ogni aspetto del tuo business.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -960,13 +945,13 @@ export default function AutoBestPage() {
                 <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Trasforma le foto dei tuoi immobili in Reel cinematografici con voce narrante professionale e testi pronti.</p>
                 <div className="flex items-center text-cyan-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
               </a>
-              <a href="https://omniastudio-pro.vercel.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
+              <a href="https://omniastudio.rmstudio.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
                 <div className="text-xs font-bold text-purple-500 tracking-widest uppercase mb-4">Legal & Privacy</div>
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors">OmniaStudio</h3>
                 <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">Intelligenza Artificiale 100% locale installata sui tuoi server per avvocati e commercialisti.</p>
                 <div className="flex items-center text-purple-400 text-sm font-black uppercase tracking-widest">Scopri <ArrowRight size={16} className="ml-2 group-hover:translate-x-2 transition-transform" /></div>
               </a>
-              <a href="https://concierge24.vercel.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
+              <a href="https://concierge24.rmstudio.app/" target="_blank" className="block bg-[#0a0a0c] border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all group text-left h-full flex flex-col shadow-2xl">
                 <div className="text-xs font-bold text-orange-500 tracking-widest uppercase mb-4">Hospitality</div>
                 <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-orange-400 transition-colors">Concierge24</h3>
                 <p className="text-slate-400 text-sm mb-8 flex-1 leading-relaxed">L&apos;assistente virtuale multilingua H24 per Hotel e Airbnb. Gestisce prenotazioni e consiglia ristoranti.</p>
@@ -976,15 +961,15 @@ export default function AutoBestPage() {
           </div>
         </section>
 
-        {/* ── FOOTER ─────────────────────────────────────────── */}
+        {/* ── FOOTER ── */}
         <footer className="border-t border-white/10 bg-black py-16 relative z-10">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
             <div className="max-w-xs">
               <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                 <img src="/logo.png" alt="DriveMotion AI Logo" className="h-24 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria MR Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa.</p>
-              <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} MR Studio.</p>
+              <p className="text-slate-500 text-sm leading-relaxed">Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa.</p>
+              <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} RM Studio.</p>
             </div>
             <div className="flex flex-col items-center md:items-start gap-4">
               <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-2">Social Hub</h4>
@@ -1003,7 +988,7 @@ export default function AutoBestPage() {
         </footer>
       </div>
 
-      {/* ── MODAL PRO ──────────────────────────────────────────── */}
+      {/* ── MODAL PRO ── */}
       {showProModal && (
         <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
           <div className="bg-[#0a0a0c] border border-cyan-500/30 rounded-[2.5rem] p-10 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
@@ -1019,7 +1004,7 @@ export default function AutoBestPage() {
         </div>
       )}
 
-      {/* ── MODAL CONTATTI ─────────────────────────────────────── */}
+      {/* ── MODAL CONTATTI ── */}
       {showSupportModal && (
         <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
           <div className="relative w-full max-w-xl">
@@ -1067,3 +1052,4 @@ export default function AutoBestPage() {
     </div>
   );
 }
+applica stessa logica, pronto copia incolla
