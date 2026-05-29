@@ -788,17 +788,6 @@ export default function AutoBestPage() {
                 Vedi i Piani
               </a>
             </div>
-
-            {/* REGOLA 5: Associazione Umana e Fiducia (Avatar Assistente Virtuale Aurora) */}
-            <div className="mt-8 flex items-center justify-center lg:justify-start gap-3 border-t border-white/5 pt-6 max-w-md">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-xs font-bold text-cyan-400">
-                  AU
-                </div>
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-black" />
-              </div>
-            </div>
-
           </div>
 
           {/* Parte destra visuale dell'asse a F */}
