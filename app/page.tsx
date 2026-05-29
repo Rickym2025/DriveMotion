@@ -797,10 +797,6 @@ export default function AutoBestPage() {
                 </div>
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border border-black" />
               </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-slate-200">Aurora AI — Assistente Digitale</p>
-                <p className="text-xs text-slate-500">Pronta a guidarti nella generazione dei tuoi video automatizzati</p>
-              </div>
             </div>
 
           </div>
