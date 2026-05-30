@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script"; // <-- 1. IMPORTA IL COMPONENTE SCRIPT
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,8 +28,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        {/* 2. INSERISCI IL TRACCIAMENTO GOOGLE ANALYTICS */}
+      <body className="min-h-full flex flex-col">
+        {children}
+
+        {/* 1. TRACCIAMENTO GOOGLE ANALYTICS */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-QJJHF2Q1P7"
           strategy="afterInteractive"
@@ -43,9 +45,10 @@ export default function RootLayout({
             gtag('config', 'G-QJJHF2Q1P7');
           `}
         </Script>
+
+        {/* 2. BANNER DEI COOKIE RM STUDIO */}
         <Script src="https://rmstudio.app/cookie-banner.js" strategy="afterInteractive" />
-      </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      </body>
     </html>
   );
 }
