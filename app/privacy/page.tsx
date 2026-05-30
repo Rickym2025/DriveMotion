@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft, ShieldCheck, Sparkles, Lock, Eye } from "lucide-react";
+import { ArrowLeft, Sparkles, Eye } from "lucide-react";
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 font-sans py-20 px-6 relative overflow-hidden">
       
-      {/* Glow background coerente */}
+      {/* Glow background */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none z-0" />
 
       <div className="relative z-10 max-w-4xl mx-auto bg-[#0a0a0c]/90 border border-white/10 p-8 md:p-12 rounded-[2.5rem] shadow-2xl">
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
           </div>
 
           <div>
-            <h2 class="text-xl font-bold text-white mb-2 flex items-center gap-2" className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full"></span> 2. Dati Raccolti all&apos;interno del Tool
             </h2>
             <p className="text-slate-400">
