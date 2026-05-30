@@ -1155,7 +1155,7 @@ export default function AutoBestPage() {
                 {/* 5. FF Edizioni (240° - Basso a sinistra | Sfondo Nero | Ritratto) */}
                 <div className="orbit-wrapper" style={{ top: "75%", left: "6.7%" }}>
                   <div className="orbit-item">
-                    <a href="https://ff-edizioni.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#0a0a0c", padding: "2px" }}>
+                    <a href="https://ff.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#0a0a0c", padding: "2px" }}>
                       <img src="https://raw.githubusercontent.com/Rickym2025/fausto-fusetti-links/main/logo6.jpg" alt="FF Edizioni" className="orbit-img cover rounded" />
                     </a>
                     <div className="orbit-tooltip">
