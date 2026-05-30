@@ -43,6 +43,7 @@ export default function RootLayout({
             gtag('config', 'G-QJJHF2Q1P7');
           `}
         </Script>
+        <Script src="https://rmstudio.app/cookie-banner.js" strategy="afterInteractive" />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
