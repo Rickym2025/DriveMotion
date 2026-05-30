@@ -1260,7 +1260,18 @@ export default function AutoBestPage() {
                 <img src="/logo.png" alt="DriveMotion AI Logo" className="h-24 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
               </div>
               <p className="text-slate-500 text-sm leading-relaxed text-center md:text-left">Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa.</p>
-              <p className="text-slate-600 text-xs mt-6">© {new Date().getFullYear()} RM Studio.</p>
+              <div className="text-slate-600 text-xs mt-6 flex flex-col sm:flex-row items-center gap-2 justify-center md:justify-start">
+              <span>© {new Date().getFullYear()} RM Studio. Tutti i diritti riservati.</span>
+              <span className="hidden sm:inline text-slate-800">|</span>
+              <a 
+                href="/privacy" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-slate-500 hover:text-cyan-400 transition-colors underline"
+              >
+                Privacy Policy
+              </a>
+            </div>
             </div>
             <div className="flex flex-col items-center md:items-start gap-4">
               <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-2">Social Hub</h4>
