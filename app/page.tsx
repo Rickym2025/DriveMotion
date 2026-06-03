@@ -91,6 +91,7 @@ const FALLBACK_LOGO_URL  = "https://drivemotion.rmstudio.app/logo.png";
 // COMPONENTE PRINCIPALE
 // ═════════════════════════════════════════════════════════════════
 export default function AutoBestPage() {
+  const orbitContainerRef = useRef<HTMLDivElement>(null);
 
   // ─── STATO UTENTE ──────────────────────────────────────────────
   const [isPro,          setIsPro]          = useState(false);
@@ -160,6 +161,21 @@ export default function AutoBestPage() {
     return () => {
       document.head.removeChild(script);
     };
+  }, []);
+
+  // ─── CARICAMENTO WIDGET ORBITALE CENTRALIZZATO ───
+  useEffect(() => {
+    fetch("https://www.rmstudio.app/orbit-template?v=1")
+      .then((res) => {
+        if (!res.ok) throw new Error("Errore caricamento widget");
+        return res.text();
+      })
+      .then((html) => {
+        if (orbitContainerRef.current) {
+          orbitContainerRef.current.innerHTML = html;
+        }
+      })
+      .catch((err) => console.error("Impossibile caricare l'ecosistema orbitale:", err));
   }, []);
 
   // ═══════════════════════════════════════════════════════════════
@@ -746,10 +762,10 @@ export default function AutoBestPage() {
           </div>
         )}
 
-        {/* ── REGOLA 3: Il Visual Hook di 3 secondi (Effetto Netflix) ── */}
+        {/* ── Il Visual Hook di 3 secondi (Effetto Netflix) ── */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-cyan-500/10 to-purple-500/15 rounded-full pointer-events-none visual-hook-glow z-0" />
 
-        {/* ── HERO CON LAYOUT A "F" PER LA FAMILIARITÀ (REGOLA 4) ── */}
+        {/* ── HERO CON LAYOUT A "F" PER LA FAMILIARITÀ ── */}
         <header className="max-w-7xl mx-auto px-6 pt-10 pb-16 flex flex-col lg:flex-row items-center gap-16 min-h-[80vh]">
           
           {/* Parte sinistra dell'asse di lettura a F */}
@@ -765,15 +781,11 @@ export default function AutoBestPage() {
               </span>
             </h1>
 
-            {/* REGOLA 1: Riduzione della Frizione di Lettura (Testo >= 18px) */}
             <p className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-medium">
               Carica da 3 a 8 foto dal parcheggio. La nostra AI rielabora la foto principale, cambia lo sfondo, crea un testo persuasivo e genera un video da 1 minuto in pochi minuti.
             </p>
 
-            {/* REGOLA 7: Consolidamento Decisionale (CTA Ravvicinate) */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 justify-center lg:justify-start pt-2">
-              
-              {/* REGOLA 2: Dominanza Visiva del Pulsante di Conversione (Dimensione x2) */}
               <a 
                 href="#creatore" 
                 className="bg-white text-black font-extrabold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_25px_rgba(255,255,255,0.4)] text-lg sm:text-xl px-12 py-6 w-full sm:w-auto"
@@ -967,7 +979,6 @@ export default function AutoBestPage() {
                   ✨ REGIA AI INCLUSA
                 </span>
                 
-                {/* REGOLA 1: Riduzione della Frizione di Lettura (Testo >= 18px) */}
                 <p className="text-lg text-slate-300 leading-relaxed">
                   Oltre al cambio sfondo, la nostra Intelligenza Artificiale trasformerà <strong>fino a {isPro ? '4' : '2'} foto in veri video in movimento</strong> (l&apos;auto che sfreccia sull&apos;asfalto o carrellate cinematiche nel salone).
                 </p>
@@ -985,7 +996,6 @@ export default function AutoBestPage() {
                 />
               </div>
 
-              {/* REGOLA 2: Dominanza Visiva del Pulsante di Conversione (Dimensione x2) */}
               <button
                 onClick={(e) => {
                   if ((!isPro && freeUsed) || (isPro && videoRimanenti === 0)) {
@@ -1013,7 +1023,7 @@ export default function AutoBestPage() {
           </div>
         </section>
 
-        {/* ── SEZIONE TARIFFE CON DECOY PRICING (REGOLA 8) ── */}
+        {/* ── SEZIONE TARIFFE CON DECOY PRICING ── */}
         <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
@@ -1021,7 +1031,6 @@ export default function AutoBestPage() {
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Investi sul tuo Marketing, <br/><span className="text-cyan-400">non sui costi fissi.</span></h2>
             
-            {/* REGOLA 1: Riduzione della Frizione di Lettura (Testo >= 18px) */}
             <p className="text-lg text-slate-400 max-w-2xl mx-auto">
               Sistema Pay-per-Result: acquisti i crediti una volta, li usi quando vuoi. <br className="hidden md:block"/> 
               <strong>Senza abbonamenti. Senza scadenze.</strong>
@@ -1030,7 +1039,7 @@ export default function AutoBestPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
             
-            {/* Starter Pack (Basso Costo) */}
+            {/* Starter Pack */}
             <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group justify-between">
               <div>
                 <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Starter Pack</h3>
@@ -1048,7 +1057,7 @@ export default function AutoBestPage() {
               <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Inizia Ora</a>
             </div>
 
-            {/* Pro Pack - DECOY HIGHLIGHT (Ancoraggio con bagliore pulsante dorato) */}
+            {/* Pro Pack - DECOY HIGHLIGHT */}
             <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border-2 rounded-[2rem] p-8 flex flex-col relative transform md:-translate-y-4 z-10 scale-105 justify-between gold-decoy-card">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">SCELTO DAL 74% DEI SALONI</div>
               <div>
@@ -1068,7 +1077,7 @@ export default function AutoBestPage() {
               <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25">ACQUISTA 5 VIDEO 🔥</a>
             </div>
 
-            {/* Maxi Pack (Alto Costo) */}
+            {/* Maxi Pack */}
             <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group justify-between">
               <div>
                 <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2 group-hover:text-cyan-400">Maxi Pack (15 Video)</h3>
@@ -1090,100 +1099,17 @@ export default function AutoBestPage() {
           <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
         </section>
 
-        {/* ── SEZIONE TRUST & ECOSISTEMA ORBITALE (REGOLA 5 & 6) ── */}
+        {/* ── SEZIONE TRUST & ECOSISTEMA ORBITALE (CARICATO ESTERNAMENTE) ── */}
         <section id="ecosistema" className="border-t border-white/10 bg-[#020202]/80 py-24 px-6 relative">
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
             
-            {/* WIDGET ORBITALE RM STUDIO (6 ELEMENTI SIMMETRICI TRASPOSTI IN REACT) */}
-            <div className="w-full lg:w-1/2 flex justify-center items-center relative min-h-[440px] orbit-area">
-              <div className="absolute w-[360px] h-[360px] border border-cyan-500/5 rounded-full pulse-ring-element pointer-events-none" />
-              
-              <div className="orbit-ring">
-                
-                {/* 1. Concierge24 (0° - Alto al centro | Sfondo Nero) */}
-                <div className="orbit-wrapper" style={{ top: "0%", left: "50%" }}>
-                  <div className="orbit-item">
-                    <a href="https://concierge24.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#0a0a0c", padding: "10px" }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/concierge24pro/main/logo.png" alt="Concierge24" className="orbit-img" />
-                    </a>
-                    <div className="orbit-tooltip">
-                      <b>Concierge24</b>
-                      Assistente vocale e testuale AI H24 per hotel e strutture extra-alberghiere.
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. DriveMotion (60° - Alto a destra | Sfondo Bianco) */}
-                <div className="orbit-wrapper" style={{ top: "25%", left: "93.3%" }}>
-                  <div className="orbit-item">
-                    <a href="https://drivemotion.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#fff", padding: "6px" }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_drivemotion_bg2.jpg" alt="DriveMotion" className="orbit-img cover rounded" />
-                    </a>
-                    <div className="orbit-tooltip">
-                      <b>DriveMotion AI</b>
-                      Generazione automatica di sfondi e video cinematici per saloni auto.
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Nexus AI (120° - Basso a destra | Sfondo Nero) */}
-                <div className="orbit-wrapper" style={{ top: "75%", left: "93.3%" }}>
-                  <div className="orbit-item">
-                    <a href="https://nexus.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#0a0a0c", padding: "12px" }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/nexus/main/logo_nexus.png" alt="Nexus AI" className="orbit-img" />
-                    </a>
-                    <div className="orbit-tooltip">
-                      <b>Nexus AI</b>
-                      Widget chatbot intelligente per accoglienza e conversione automatica lead.
-                    </div>
-                  </div>
-                </div>
-
-                {/* 4. OmniaStudio (180° - Basso al centro | Sfondo Bianco) */}
-                <div className="orbit-wrapper" style={{ top: "100%", left: "50%" }}>
-                  <div className="orbit-item">
-                    <a href="https://omniastudio.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#fff", padding: "4px" }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_OmniaStudio.png" alt="OmniaStudio" className="orbit-img" />
-                    </a>
-                    <div className="orbit-tooltip">
-                      <b>OmniaStudio</b>
-                      La potenza dell&apos;AI locale e protetta offline sul tuo PC, a vita.
-                    </div>
-                  </div>
-                </div>
-
-                {/* 5. FF Edizioni (240° - Basso a sinistra | Sfondo Nero | Ritratto) */}
-                <div className="orbit-wrapper" style={{ top: "75%", left: "6.7%" }}>
-                  <div className="orbit-item">
-                    <a href="https://ff.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#0a0a0c", padding: "2px" }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/fausto-fusetti-links/main/logo6.jpg" alt="FF Edizioni" className="orbit-img cover rounded" />
-                    </a>
-                    <div className="orbit-tooltip">
-                      <b>FF Edizioni</b>
-                      Colonne sonore, jingle commerciali e sound design creati con l&apos;AI.
-                    </div>
-                  </div>
-                </div>
-
-                {/* 6. HomeTour AI (300° - Alto a sinistra | Sfondo Nero) */}
-                <div className="orbit-wrapper" style={{ top: "25%", left: "6.7%" }}>
-                  <div className="orbit-item">
-                    <a href="https://hometour.rmstudio.app" target="_blank" rel="noopener noreferrer" className="orbit-link" style={{ background: "#0a0a0c", padding: "4px" }}>
-                      <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/logo_hometour%2Bbg.jpg" alt="HomeTour" className="orbit-img cover rounded" />
-                    </a>
-                    <div className="orbit-tooltip">
-                      <b>HomeTour AI</b>
-                      Reel immobiliari con voce narrante generati in automatico da foto.
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Foto del Fondatore fissa al centro - REGOLA 5 (Fattore Fiducia) */}
-              <div className="orbit-center-photo">
-                <img src="https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/riccardo_founder.jpeg" alt="Riccardo Modena - Fondatore RM Studio" />
-              </div>
+            {/* WIDGET ORBITALE RM STUDIO (Caricato esternamente da rmstudio.app) */}
+            <div 
+              ref={orbitContainerRef}
+              className="w-full lg:w-1/2 flex justify-center items-center relative min-h-[440px] orbit-area"
+              id="orbit-template-container"
+            >
+              {/* Iniettato dinamicamente via JS fetch */}
             </div>
 
             {/* Profilo E-E-A-T con riferimenti istituzionali scientifici */}
@@ -1200,7 +1126,6 @@ export default function AutoBestPage() {
                 gestiscono clienti e generano vendite H24.&rdquo;
               </p>
 
-              {/* REGOLA 1: Riduzione della Frizione di Lettura (Testo >= 18px) */}
               <p className="text-lg text-white/40 mb-8 leading-relaxed font-light">
                 Sono Riccardo Modena, founder di <b>RM Studio</b>. Ho fondato questo lab perché oggi l&apos;AI non è più
                 un lusso, è l&apos;unico modo per scalare senza un esercito di dipendenti. Come evidenziato nelle <a href="https://www.w3.org/community/tourism/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline hover:text-cyan-300">linee guida del consorzio internazionale W3C sull&apos;IA applicata al turismo</a>, l&apos;integrazione di sistemi conversazionali intelligenti abbatte la frizione operativa e ottimizza l&apos;esperienza d&apos;uso dell&apos;utente finale.
@@ -1215,7 +1140,7 @@ export default function AutoBestPage() {
           </div>
         </section>
 
-        {/* REGOLA 6: Autorevolezza Scientifica ed E-E-A-T */}
+        {/* Autorevolezza Scientifica ed E-E-A-T */}
         <section className="bg-slate-950/60 border-y border-white/5 py-12 px-6">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-slate-500 text-sm">
             <p className="text-center md:text-left text-slate-400 font-medium max-w-xl">
