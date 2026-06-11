@@ -130,7 +130,7 @@ export default function AutoBestPage() {
   const [loadingVideo,   setLoadingVideo]   = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
-  // Iniezione automatica dello Schema Markup JSON-LD all'avvio per Google SEO
+  // Iniezione automatica dello Schema Markup JSON-LD all'avvio per Google SEO & AP2
   useEffect(() => {
     const script = document.createElement("script");
     script.type = "application/ld+json";
@@ -140,12 +140,71 @@ export default function AutoBestPage() {
       "name": "DriveMotion",
       "operatingSystem": "All",
       "applicationCategory": "BusinessApplication",
-      "description": "Generatore AI di video e sfondi fotorealistici per concessionari e autosaloni. Ottimizza la presentazione online dei veicoli in tempo reale.",
+      "description": "Generatore AI di video e sfondi fotorealistici per concessionari e autosaloni. Ottimizza la presentazione online dei veicoli in tempo reale sostituendo gli sfondi amatoriali con ambienti fotorealistici.",
       "offers": {
-        "@type": "Offer",
-        "price": "14.90",
-        "priceCurrency": "EUR"
+        "@type": "AggregateOffer",
+        "priceCurrency": "EUR",
+        "lowPrice": "14.90",
+        "highPrice": "129.00",
+        "offerCount": "3",
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Starter Pack",
+            "price": "14.90",
+            "priceCurrency": "EUR",
+            "description": "Sblocca 1 credito video HD professionale con Sfondo AI Personalizzato e post social pronti all'uso.",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "priceType": "One-time purchase"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro Pack (Più scelto)",
+            "price": "59.00",
+            "priceCurrency": "EUR",
+            "description": "Sblocca 5 crediti video HD, inserimento logo dell'autosalone nel video, sblocco di tutte le lingue straniere (EN, DE, ES) e crediti senza scadenza.",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "priceType": "One-time purchase"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": "Maxi Pack",
+            "price": "129.00",
+            "priceCurrency": "EUR",
+            "description": "Sblocca 15 crediti video HD ad elaborazione e rendering prioritario nei server.",
+            "priceSpecification": {
+              "@type": "UnitPriceSpecification",
+              "priceType": "One-time purchase"
+            }
+          }
+        ]
       },
+      "additionalProperty": [
+        {
+          "@type": "PropertyValue",
+          "name": "pricingModel",
+          "value": "Pay-As-You-Go"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "creditsExpiration",
+          "value": "Never"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "environmentsAvailable",
+          "value": "10 Predefined + Custom Prompt"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "renderingPipeline",
+          "value": "Next.js, FastAPI, n8n, Wan2GP, LTX-VAE 2.3, Sana 1.5, OpenAI TTS"
+        }
+      ],
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "4.9",
