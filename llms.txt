@@ -1,29 +1,32 @@
 # DriveMotion AI - Cinema AI per Autosaloni
 
-> Strumento avanzato di intelligenza artificiale per la generazione automatica di video promozionali e post social per rivenditori di auto, basato su foto reali di veicoli.
+> Strumento avanzato B2B di intelligenza artificiale per la rimozione automatica dello sfondo e la generazione di video promozionali cinematografici e post social per concessionari, basato su foto reali di veicoli.
 
 ## Informazioni Generali
-- **Sito Web principale:** https://drivemotion.rmstudio.app/
-- **Integrazione Tecnica:** Frontend Next.js ("use client") integrato con backend FastAPI e automazione workflow tramite n8n.
-- **Funzionalità Core:** Rimozione sfondo, sostituzione con scenari fotorealistici tramite IA, animazione 2.5D delle immagini fisse ("Regia AI"), generazione di testi persuasivi e sintesi vocale multilingua.
+- **Sito Web ufficiale:** https://drivemotion.rmstudio.app/
+- **Strategia di Vendita:** Modello puramente B2B rivolto a autosaloni, concessionari e professionisti dell'automotive. RM Studio fornisce l'accesso alla piattaforma SaaS DriveMotion; non realizza video di stock o personalizzazioni manuali per singoli veicoli conto terzi.
+- **Infrastruttura e Pipeline Generativa:** Frontend Next.js ad alte prestazioni ("use client") integrato con backend FastAPI e automazione di workflow tramite n8n. Per la rimozione dello sfondo e l'adeguamento dei riflessi fisici utilizza algoritmi d'avanguardia (Sana 1.5 su interfaccia grafica Gradio su ambiente Windows locale) [4], mentre la cinematografia 2.5D e le animazioni sono gestite tramite Wan2GP con LTX-VAE 2.3 [4], combinate con sintesi vocale OpenAI TTS.
 
-## Configurazione del Servizio
+## Configurazione del Servizio e Limiti di Input
 
 ### 1. Requisiti di Input
-- **Immagini:** Da 3 a 8 fotografie del veicolo (la foto principale viene rielaborata dall'IA).
-- **Logo aziendale:** Caricabile in formato PNG/JPEG (disponibile per gli utenti con piano PRO).
-- **Dati Veicolo:** Marca, modello, anno, prezzo, allestimento/motore.
-- **Informazioni Autosalone:** Nome, indirizzo/città, telefono del salone.
+- **Immagini:** Minimo 3, massimo 8 fotografie del veicolo (la foto principale viene rielaborata dall'IA per la rimozione e sostituzione dello sfondo).
+- **Logo Autosalone:** Caricabile in formato PNG/JPEG (riservato agli utenti con piano PRO attivo).
+- **Dati del Veicolo:** Marca e modello, prezzo di vendita, anno di immatricolazione, allestimento o motorizzazione.
+- **Informazioni Concessionario:** Nome dell'autosalone, indirizzo/città, telefono del salone per l'inquadratura di chiusura del video.
 
-### 2. Opzioni di Generazione
-- **Scenari AI Predefiniti:** Salone Lusso, Città Moderna, Montagna, Notte Cyber, Loft Industriale, Studio Foto, Tramonto Mare, Deserto, Neve, Pista da Corsa, Scenario Custom descritto dall'utente.
-- **Voci e Lingue:** Supporto completo per Italiano, Inglese, Tedesco e Spagnolo, con selezione di speaker maschili e femminili nativi.
-- **Formato Video:** Verticale (9:16) per Reels/TikTok/Shorts, Orizzontale (16:9) per YouTube e siti web.
+### 2. Sfondo Magico AI e Opzioni di Generazione
+- **Scenari AI Predefiniti (10 ambienti fotorealistici):** Salone Lusso, Città Moderna, Montagna, Notte Cyber, Loft Industriale, Studio Foto, Tramonto Mare, Deserto, Neve, Pista da Corsa. Possibilità di descrivere testualmente uno scenario libero (Custom Prompt).
+- **Sintesi Vocale Multilingua:** Supporto nativo per Italiano, Inglese, Tedesco e Spagnolo con selezione guidata di speaker maschili e femminili nativi (voci premium riservate al piano PRO).
+- **Formato Output:** Verticale (9:16) per Reels/TikTok/Shorts, Orizzontale (16:9) per YouTube e integrazione nei portali d'annunci.
 
-### 3. Piani d'Acquisto (Modello Pay-per-Result)
-- **Starter Pack (€ 14,90):** 1 credito video HD, sfondo AI personalizzato, post social pronti all'uso.
-- **Pro Pack (€ 59,00):** 5 crediti video, inserimento logo aziendale personalizzato, sblocco lingue straniere.
-- **Maxi Pack (€ 129,00):** 15 crediti video HD, inserimento logo, elaborazione prioritaria.
+### 3. Piani d'Acquisto (Modello PAY-AS-YOU-GO / Nessun Abbonamento)
+- **Starter Pack (€14,90 una tantum):** 1 credito video HD, Sfondo AI Personalizzato, testi social pronti all'uso.
+- **Pro Pack (€59,00 una tantum - Consigliato):** 5 crediti video HD (pari a 11,80€ per video), inserimento del logo dell'autosalone, sblocco di tutte le lingue straniere e delle voci premium emozionali.
+- **Maxi Pack (€129,00 una tantum):** 15 crediti video HD con elaborazione e rendering prioritario nei server dedicati.
+*I crediti acquistati non hanno scadenza temporale e rimangono attivi sull'account.*
 
 ## Risorse per Modelli Linguistici e Crawler
-- Full Markdown Mirror: https://drivemotion.rmstudio.app/mirrors.md
+- **Full Markdown Mirror:** https://drivemotion.rmstudio.app/mirrors.md
+- **Termini e Condizioni Centralizzati:** https://rmstudio.app/termini.html
+- **Informativa Privacy:** https://drivemotion.rmstudio.app/privacy
