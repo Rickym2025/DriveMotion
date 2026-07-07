@@ -1113,7 +1113,7 @@ export default function AutoBestPage() {
                   <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Pronti all&apos;uso</li>
                 </ul>
               </div>
-              <a href="https://buy.stripe.com/test_6oU00k0wK2su1hw9Fpdwc06" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Inizia Ora</a>
+              <a href="https://buy.stripe.com/9B614ogvIc34bWa9Fpdwc0e" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Inizia Ora</a>
             </div>
 
             {/* Pro Pack - DECOY HIGHLIGHT */}
@@ -1133,7 +1133,7 @@ export default function AutoBestPage() {
                   <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
                 </ul>
               </div>
-              <a href="https://buy.stripe.com/test_28EcN66V8gjk0ds18Tdwc07" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25">ACQUISTA 5 VIDEO 🔥</a>
+              <a href="https://buy.stripe.com/fZu28s5R4c343pEg3Ndwc0f" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25">ACQUISTA 5 VIDEO 🔥</a>
             </div>
 
             {/* Maxi Pack */}
@@ -1152,7 +1152,7 @@ export default function AutoBestPage() {
                   <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Tutte le funzioni Pro</li>
                 </ul>
               </div>
-              <a href="https://buy.stripe.com/test_aFa28s7Zc1oq8JYg3Ndwc08" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Sblocca 15 Video</a>
+              <a href="https://buy.stripe.com/9B6dRaenAebc4tI9Fpdwc0g" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Sblocca 15 Video</a>
             </div>
           </div>
           <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
