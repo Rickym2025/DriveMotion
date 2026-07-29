@@ -224,7 +224,7 @@ export default function AutoBestPage() {
 
   // ─── CARICAMENTO WIDGET ORBITALE CENTRALIZZATO ───
   useEffect(() => {
-    fetch("https://www.rmstudio.app/orbit-template?v=1")
+    fetch("https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/orbit-template.html")
       .then((res) => {
         if (!res.ok) throw new Error("Errore caricamento widget");
         return res.text();
