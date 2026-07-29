@@ -50,27 +50,20 @@ const PREDEFINED_ENVIRONMENTS = [
 
 const VOICES_CONFIG = {
   it: [
-    { id: "d718e944-b313-4998-b011-d1cc078d4ef3", name: "Liv (F) — Naturale", pro: false },
-    { id: "d609f27f-f1a4-410f-85bb-10037b4fba99", name: "Francesca (F) — Elegante", pro: true },
-    { id: "0e21713a-5e9a-428a-bed4-90d410b87f13", name: "Alessandra (F) — Melodica", pro: true },
-    { id: "90c7d657-9599-4cd0-9ed2-2568359e4d1a", name: "Sofia (F) — Professionale", pro: true },
-    { id: "36d94908-c5b9-4014-b521-e69aee5bead0", name: "Giulia (F) — Autorevole", pro: true },
-    { id: "ee16f140-f6dc-490e-a1ed-c1d537ea0086", name: "Lorenzo (M) — Ospitale", pro: true },
+    { id: "nova", name: "Nova (F) — Naturale & Solare", pro: false },
+    { id: "shimmer", name: "Shimmer (F) — Elegante & Lusso", pro: true },
+    { id: "coral", name: "Coral (F) — Vibrante & Emozionale", pro: true },
+    { id: "onyx", name: "Onyx (M) — Profonda & Autorevole", pro: true },
+    { id: "echo", name: "Echo (M) — Calda & Rassicurante", pro: true },
+    { id: "fable", name: "Fable (M) — Narrativa & Coinvolgente", pro: true },
+    { id: "ash", name: "Ash (M) — Chiara & Professionale", pro: true },
+    { id: "alloy", name: "Alloy (M/F) — Bilanciata", pro: true }
   ],
   en: [
-    { id: "dc30854e-e398-4579-9dc8-16f6cb2c19b9", name: "Victoria (F) — UK Elegante", pro: true },
-    { id: "2f251ac3-89a9-4a77-a452-704b474ccd01", name: "Lucy (F) — UK Rassicurante", pro: true },
-    { id: "4f7f1324-1853-48a6-b294-4e78e8036a83", name: "Casper (M) — Emozionale", pro: true },
-    { id: "0ad65e7f-006c-47cf-bd31-52279d487913", name: "Rupert (M) — Maturo e Caldo", pro: true },
-  ],
-  de: [
-    { id: "b9de4a89-2257-424b-94c2-db18ba68c81a", name: "Viktoria (F) — Conversazionale", pro: true },
-    { id: "d1cbea67-e4d3-47cd-be2a-2bd4e646b002", name: "Henrik (M) — Business", pro: true },
-  ],
-  es: [
-    { id: "9d8c6b2e-0a23-4a15-ae1b-121d5b5af417", name: "Nuria (F) — Professionale", pro: true },
-    { id: "13ff5deb-2591-42ad-a356-63a04e524411", name: "Marcos (M) — Calmo e Sicuro", pro: true },
-  ],
+    { id: "nova", name: "Nova (F) — Bright & Clear", pro: true },
+    { id: "shimmer", name: "Shimmer (F) — Soft & Elegant", pro: true },
+    { id: "onyx", name: "Onyx (M) — Deep & Bold", pro: true }
+  ]
 };
 
 const LANGUAGES = [
