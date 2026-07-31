@@ -789,6 +789,7 @@ export default function AutoBestPage() {
             <a href="https://hometour.rmstudio.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">HomeTour</a>
             <a href="https://omniastudio.rmstudio.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">OmniaStudio</a>
             <a href="https://concierge24.rmstudio.app/"     target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Concierge24</a>
+            <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-cyan-400 hover:text-white transition-colors">Blog</a>
           </div>
           <button onClick={() => setShowSupportModal(true)} className="flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-white hover:bg-white/20 transition-colors">
             <MessageSquare size={16} /> Contattaci
@@ -1242,6 +1243,7 @@ export default function AutoBestPage() {
                 <span className="hidden sm:inline text-slate-800">|</span>
                 <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
                   Privacy Policy
+                  <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors underline font-bold">Blog DriveMotion</a>
                 </a>
                 <span className="hidden sm:inline text-slate-800">|</span>
                 <a href="https://rmstudio.app/termini.html" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
