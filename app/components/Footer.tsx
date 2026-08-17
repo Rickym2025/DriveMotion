@@ -32,45 +32,49 @@ interface FooterProps {
 export default function Footer({ onOpenSupport }: FooterProps) {
   return (
     <footer className="border-t border-white/10 bg-black py-16 relative z-10">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
-        <div className="max-w-xs flex flex-col items-center md:items-start">
-          <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-            <img src="/logo.png" alt="DriveMotion AI Logo" className="h-24 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
+        <div className="md:col-span-2">
+          <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+            <img src="/logo.png" alt="DriveMotion AI Logo" className="h-10 w-auto object-contain" />
+            <span className="font-extrabold text-white text-lg">DriveMotion AI</span>
           </div>
-          <p className="text-slate-500 text-sm leading-relaxed text-center md:text-left">
-            Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa.
+          <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
+            Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa e la Computer Vision 3D.
           </p>
-          <div className="text-slate-600 text-xs mt-6 flex flex-col sm:flex-row items-center gap-2 justify-center md:justify-start">
+          <div className="text-slate-600 text-xs mt-6 flex flex-wrap items-center gap-3 justify-center md:justify-start">
             <span>© {new Date().getFullYear()} RM Studio. Tutti i diritti riservati.</span>
-            <span className="hidden sm:inline text-slate-800">|</span>
+            <span>|</span>
             <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
               Privacy Policy
             </a>
-            <span className="hidden sm:inline text-slate-800">|</span>
-            <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors underline font-bold">
-              Blog DriveMotion
-            </a>
-            <span className="hidden sm:inline text-slate-800">|</span>
+            <span>|</span>
             <a href="https://rmstudio.app/termini.html" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
-              Termini e Condizioni
+              Termini
             </a>
           </div>
         </div>
 
-        <div className="flex flex-col items-center md:items-start gap-4">
-          <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-2">Social Hub</h4>
-          <div className="flex gap-4">
-            <a href="https://www.instagram.com/riccardo_mode_/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all"><InstagramIcon size={20} /></a>
-            <a href="https://www.facebook.com/riccardo.modena.792" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all"><FacebookIcon size={20} /></a>
-            <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50 hover:bg-blue-600/10 transition-all"><LinkedinIcon size={20} /></a>
-            <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-pink-500/50 hover:bg-pink-500/10 transition-all"><TiktokIcon size={20} /></a>
-          </div>
+        <div>
+          <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Piattaforme RM</h4>
+          <ul className="space-y-2 text-sm text-slate-400">
+            <li><a href="https://hometour.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">HomeTour AI (Immobiliare)</a></li>
+            <li><a href="https://concierge24.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Concierge24 (Hospitality)</a></li>
+            <li><a href="https://dentis.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Dentis AI (Dentisti)</a></li>
+            <li><a href="https://lexis.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Lexis AI (Studi Legali)</a></li>
+            <li><a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" className="hover:text-cyan-400 transition-colors font-bold text-cyan-400">Blog DriveMotion</a></li>
+          </ul>
         </div>
 
-        <div className="flex flex-col items-center md:items-end gap-2">
-          <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Contattaci</h4>
-          <button onClick={onOpenSupport} className="text-slate-400 text-sm hover:text-white transition-colors cursor-pointer">
-            Invia un messaggio
+        <div>
+          <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Social Hub</h4>
+          <div className="flex justify-center md:justify-start gap-3 mb-6">
+            <a href="https://www.instagram.com/riccardo_mode_/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all"><InstagramIcon size={18} /></a>
+            <a href="https://www.facebook.com/riccardo.modena.792" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all"><FacebookIcon size={18} /></a>
+            <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50 hover:bg-blue-600/10 transition-all"><LinkedinIcon size={18} /></a>
+            <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-pink-500/50 hover:bg-pink-500/10 transition-all"><TiktokIcon size={18} /></a>
+          </div>
+          <button onClick={onOpenSupport} className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-full border border-white/15 transition-all cursor-pointer">
+            Scrivi all&apos;Assistenza
           </button>
         </div>
       </div>
