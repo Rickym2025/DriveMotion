@@ -73,6 +73,12 @@ const LANGUAGES = [
   { id: "es", flag: "🇪🇸", name: "Español"  },
 ];
 
+const DRIVEMOTION_PRICES = {
+  starter: { id: "starter", name: "Starter Pack (1 Video HD)", price: 14.90 },
+  pro:     { id: "pro",     name: "Pro Pack (5 Video HD)",     price: 59.00 },
+  max:     { id: "max",     name: "Maxi Pack (15 Video HD)",   price: 129.00 }
+};
+
 // ─── COSTANTI URL ─────────────────────────────────────────────────
 const VERIFICA_TOKEN_URL = "https://n8n.rmstudio.app/webhook/verifica-token-drivemotion";
 const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
@@ -98,6 +104,7 @@ export default function AutoBestPage() {
   const [showSupportModal,setShowSupportModal]= useState(false);
   const [supportLoading,  setSupportLoading]  = useState(false);
   const [supportSuccess,  setSupportSuccess]  = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
 
   // ─── STATO FORM VIDEO ──────────────────────────────────────────
   const [images,       setImages]       = useState<string[]>([]);
@@ -122,6 +129,50 @@ export default function AutoBestPage() {
   const [loadingImg,     setLoadingImg]     = useState(false);
   const [loadingVideo,   setLoadingVideo]   = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
+
+  // ─── FUNZIONE CHECKOUT ON-THE-FLY STRIPE ───
+  const avviaCheckoutDriveMotion = async (planKey: "starter" | "pro" | "max") => {
+    const plan = DRIVEMOTION_PRICES[planKey];
+    if (!plan) return;
+
+    setCheckoutLoading(planKey);
+    const payload = {
+      progetto: "DriveMotion",
+      portal_type: "drivemotion",
+      title: `DriveMotion AI • ${plan.name}`,
+      price: plan.price,
+      ricarica_tipo: planKey,
+      email: email || undefined,
+      agency_id: email ? `lead_${email}` : "checkout_diretto",
+      project_id: email ? `lead_${email}` : "checkout_diretto",
+      origin: typeof window !== "undefined" ? window.location.origin : "https://drivemotion.rmstudio.app",
+      success_url: `${typeof window !== "undefined" ? window.location.origin : "https://drivemotion.rmstudio.app"}/?success=true&plan=${planKey}`,
+      cancel_url: `${typeof window !== "undefined" ? window.location.origin : "https://drivemotion.rmstudio.app"}/#prezzi`
+    };
+
+    try {
+      const res = await fetch("https://n8n.rmstudio.app/webhook/crea-sessione-stripe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("Errore creazione sessione");
+      const data = await res.json();
+      const redirectUrl = data.url || data.checkout_url || data.session_url;
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        throw new Error("URL Stripe non ricevuto");
+      }
+    } catch (err) {
+      console.error("Errore checkout DriveMotion:", err);
+      window.location.hash = "#prezzi";
+    } finally {
+      setCheckoutLoading(null);
+    }
+  };
 
   // Iniezione automatica dello Schema Markup JSON-LD all'avvio per Google SEO & AP2
   useEffect(() => {
@@ -476,7 +527,7 @@ export default function AutoBestPage() {
       new Promise(resolve => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = event => {
+        reader.onload event => {
           const img = new Image();
           img.src = event.target?.result as string;
           img.onload = () => {
@@ -623,7 +674,7 @@ export default function AutoBestPage() {
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden relative pt-20">
 
-      {/* ── STILI CSS ISOLATI (REGOLE DI NEUROSCIENZA COGNITIVA ED ECOISTEMA ORBITANTE) ── */}
+      {/* ── STILI CSS ISOLATI ── */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes orbit-rotation {
           0% { transform: rotate(0deg); }
@@ -815,13 +866,12 @@ export default function AutoBestPage() {
           </div>
         )}
 
-        {/* ── Il Visual Hook di 3 secondi (Effetto Netflix) ── */}
+        {/* ── Visual Hook ── */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-cyan-500/10 to-purple-500/15 rounded-full pointer-events-none visual-hook-glow z-0" />
 
-        {/* ── HERO CON LAYOUT A "F" PER LA FAMILIARITÀ ── */}
+        {/* ── HERO ── */}
         <header className="max-w-7xl mx-auto px-6 pt-10 pb-16 flex flex-col lg:flex-row items-center gap-16 min-h-[80vh]">
           
-          {/* Parte sinistra dell'asse di lettura a F */}
           <div className="flex-1 text-center lg:text-left z-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-sm">
               <Car size={14} className="text-cyan-400" /> Cinema AI per Autosaloni
@@ -855,7 +905,6 @@ export default function AutoBestPage() {
             </div>
           </div>
 
-          {/* Parte destra visuale dell'asse a F */}
           <div className="flex-1 w-full max-w-[320px] relative">
             <div className="absolute inset-0 bg-cyan-500/30 blur-3xl rounded-full animate-pulse" />
             <div className="relative border-[6px] border-[#1a1a1a] bg-[#050505] rounded-[3rem] overflow-hidden aspect-[9/19] shadow-2xl">
@@ -1076,7 +1125,7 @@ export default function AutoBestPage() {
           </div>
         </section>
 
-        {/* ── SEZIONE TARIFFE CON DECOY PRICING ── */}
+        {/* ── SEZIONE TARIFFE CON STRIPE ON-THE-FLY ── */}
         <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
@@ -1107,7 +1156,13 @@ export default function AutoBestPage() {
                   <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Pronti all&apos;uso</li>
                 </ul>
               </div>
-              <a href="https://buy.stripe.com/9B614ogvIc34bWa9Fpdwc0e" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Inizia Ora</a>
+              <button 
+                onClick={() => avviaCheckoutDriveMotion("starter")} 
+                disabled={checkoutLoading === "starter"}
+                className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm cursor-pointer disabled:opacity-50"
+              >
+                {checkoutLoading === "starter" ? "Apertura Checkout..." : "Inizia Ora"}
+              </button>
             </div>
 
             {/* Pro Pack - DECOY HIGHLIGHT */}
@@ -1127,7 +1182,13 @@ export default function AutoBestPage() {
                   <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
                 </ul>
               </div>
-              <a href="https://buy.stripe.com/fZu28s5R4c343pEg3Ndwc0f" className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25">ACQUISTA 5 VIDEO 🔥</a>
+              <button 
+                onClick={() => avviaCheckoutDriveMotion("pro")} 
+                disabled={checkoutLoading === "pro"}
+                className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25 cursor-pointer disabled:opacity-50"
+              >
+                {checkoutLoading === "pro" ? "Apertura Checkout..." : "ACQUISTA 5 VIDEO 🔥"}
+              </button>
             </div>
 
             {/* Maxi Pack */}
@@ -1146,17 +1207,22 @@ export default function AutoBestPage() {
                   <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Tutte le funzioni Pro</li>
                 </ul>
               </div>
-              <a href="https://buy.stripe.com/9B6dRaenAebc4tI9Fpdwc0g" className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm">Sblocca 15 Video</a>
+              <button 
+                onClick={() => avviaCheckoutDriveMotion("max")} 
+                disabled={checkoutLoading === "max"}
+                className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm cursor-pointer disabled:opacity-50"
+              >
+                {checkoutLoading === "max" ? "Apertura Checkout..." : "Sblocca 15 Video"}
+              </button>
             </div>
           </div>
           <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
         </section>
 
-        {/* ── SEZIONE TRUST & ECOSISTEMA ORBITALE (CARICATO ESTERNAMENTE) ── */}
+        {/* ── SEZIONE TRUST & ECOSISTEMA ORBITALE ── */}
         <section id="ecosistema" className="border-t border-white/10 bg-[#020202]/80 py-24 px-6 relative">
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
             
-            {/* WIDGET ORBITALE RM STUDIO (Caricato esternamente da rmstudio.app) */}
             <div 
               ref={orbitContainerRef}
               className="w-full lg:w-1/2 flex justify-center items-center relative min-h-[440px] orbit-area"
@@ -1165,7 +1231,6 @@ export default function AutoBestPage() {
               {/* Iniettato dinamicamente via JS fetch */}
             </div>
 
-            {/* Profilo E-E-A-T con riferimenti istituzionali scientifici */}
             <div className="w-full lg:w-1/2">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6">
                 Esperienza & Autorevolezza
@@ -1243,7 +1308,10 @@ export default function AutoBestPage() {
                 <span className="hidden sm:inline text-slate-800">|</span>
                 <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
                   Privacy Policy
-                  <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors underline font-bold">Blog DriveMotion</a>
+                </a>
+                <span className="hidden sm:inline text-slate-800">|</span>
+                <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors underline font-bold">
+                  Blog DriveMotion
                 </a>
                 <span className="hidden sm:inline text-slate-800">|</span>
                 <a href="https://rmstudio.app/termini.html" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
@@ -1262,7 +1330,7 @@ export default function AutoBestPage() {
             </div>
             <div className="flex flex-col items-center md:items-end gap-2">
               <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Contattaci</h4>
-              <button onClick={() => setShowSupportModal(true)} className="text-slate-400 text-sm hover:text-white transition-colors">Invia un messaggio</button>
+              <button onClick={() => setShowSupportModal(true)} className="text-slate-400 text-sm hover:text-white transition-colors cursor-pointer">Invia un messaggio</button>
             </div>
           </div>
         </footer>
@@ -1277,8 +1345,8 @@ export default function AutoBestPage() {
             <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
             <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L&apos;inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
             <div className="space-y-3">
-              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20">Vedi i Piani</a>
-              <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest">Chiudi</button>
+              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 text-center">Vedi i Piani</a>
+              <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest cursor-pointer">Chiudi</button>
             </div>
           </div>
         </div>
@@ -1288,7 +1356,7 @@ export default function AutoBestPage() {
       {showSupportModal && (
         <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
           <div className="relative w-full max-w-xl">
-            <button onClick={() => setShowSupportModal(false)} className="absolute -top-12 right-0 text-slate-400 hover:text-white transition-colors z-10">
+            <button onClick={() => setShowSupportModal(false)} className="absolute -top-12 right-0 text-slate-400 hover:text-white transition-colors z-10 cursor-pointer">
               <X size={28} />
             </button>
             {supportSuccess ? (
@@ -1316,7 +1384,7 @@ export default function AutoBestPage() {
                     <textarea name="message" required rows={4} className="w-full bg-black border border-white/10 text-white rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors resize-none" placeholder="Come possiamo aiutarti?"></textarea>
                   </div>
                   <div className="sm:col-span-2 mt-2">
-                    <button type="submit" disabled={supportLoading} className="w-full bg-white hover:bg-slate-200 text-black font-bold py-4 rounded-xl transition-transform active:scale-95 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70">
+                    <button type="submit" disabled={supportLoading} className="w-full bg-white hover:bg-slate-200 text-black font-bold py-4 rounded-xl transition-transform active:scale-95 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer">
                       {supportLoading ? <Loader2 className="animate-spin" size={20} /> : <Mail size={20} />}
                       {supportLoading ? "Invio in corso..." : "Invia Messaggio"}
                     </button>
