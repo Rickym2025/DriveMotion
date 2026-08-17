@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Upload, Camera, Sparkles, Loader2, CheckCircle2,
+  Upload, Camera, Loader2, CheckCircle2,
   MapPin, Video, Mail, Car, Building2, Volume2,
   ImageIcon, Lock, Globe, Play, Scan,
-  X, Plus, MessageSquare
+  X, Plus, MessageSquare, ChevronDown, HelpCircle,
+  TrendingUp, Eye, Sparkles
 } from "lucide-react";
 
 // ─── ICONE SOCIAL ────────────────────────────────────────────────
@@ -79,6 +80,49 @@ const DRIVEMOTION_PRICES = {
   max:     { id: "max",     name: "Maxi Pack (15 Video HD)",   price: 129.00 }
 };
 
+const FAQS = [
+  {
+    q: "Come trasforma DriveMotion le normali foto del piazzale in video cinematografici?",
+    a: "La nostra pipeline di visione artificiale identifica la sagoma dell'auto, isola la carrozzeria e rimuove gli sfondi disordinati. Successivamente genera un set fotorealistico 3D (showroom, tornanti di montagna o pista) e anima la vettura con movimenti di camera dinamici ed effetti di velocità sull'asfalto."
+  },
+  {
+    q: "Quanto tempo ci vuole per ricevere il video completato?",
+    a: "Una volta inviato il form con le foto, i nostri server di rendering ad alta potenza elaborano il video in circa 3-5 minuti. Il link definitivo per scaricare il file MP4 in Full HD viene inviato istantaneamente all'indirizzo email indicato."
+  },
+  {
+    q: "Che tipo di foto devo caricare per ottenere la massima resa?",
+    a: "Bastano da 3 a 8 scatti eseguiti con un comune smartphone. Consigliamo almeno una foto frontale a 3/4 (la preferita per l'animazione di testa), una laterale, una del retro e qualche dettaglio degli interni o del cruscotto."
+  },
+  {
+    q: "L'AI rielabora anche le foto degli interni o solo gli esterni?",
+    a: "La sostituzione dello sfondo fotorealistico 3D viene applicata con massima precisione sulla carrozzeria esterna. Per gli interni, l'AI applica correzione colore cinematografica, stabilizzazione e zoom dinamici mantenendo inalterata la fedeltà del veicolo."
+  },
+  {
+    q: "I crediti video acquistati hanno una data di scadenza?",
+    a: "Assolutamente no. Non applichiamo alcun abbonamento mensile vincolante. I crediti acquistati (1, 5 o 15 video) rimangono per sempre nel tuo saldo finché non decidi di utilizzarli."
+  },
+  {
+    q: "Posso inserire il logo del mio autosalone e i miei contatti nel video?",
+    a: "Sì, a partire dal piano PRO puoi caricare il logo trasparente (PNG/SVG) della tua concessionaria, che verrà integrato in sovrimpressione con animazione d'ingresso professionale, insieme a indirizzo, telefono e prezzo del veicolo."
+  },
+  {
+    q: "In quali formati vengono esportati i video e dove posso pubblicarli?",
+    a: "Puoi selezionare sia il formato Verticale (9:16), ottimizzato per Instagram Reels, TikTok, YouTube Shorts e Facebook Ads, sia il formato Orizzontale (16:9), ideale per le schede del tuo sito web e i portali di annunci (AutoScout24, Subito)."
+  },
+  {
+    q: "Come funziona la voce narrante e in quali lingue parla?",
+    a: "La nostra voce sintetica avanzata legge una sceneggiatura persuasiva generata sull'allestimento dell'auto. È disponibile in Italiano, Inglese, Tedesco e Spagnolo, perfetta per intercettare anche acquirenti esteri."
+  },
+  {
+    q: "Cosa succede se un'auto viene venduta mentre sto usando il servizio?",
+    a: "I crediti vengono scalati solo al momento del rendering effettivo. Se decidi di non promuovere un veicolo, il credito rimane intatto sul tuo profilo per la prossima vettura in arrivo nel salone."
+  },
+  {
+    q: "Come funziona la prima generazione gratuita?",
+    a: "Ti permettiamo di testare l'intera potenza della nostra regia AI su una prima vettura senza carta di credito. Carica le foto, inserisci l'email e guarda tu stesso il risultato prima di scegliere il tuo pacchetto."
+  }
+];
+
 // ─── COSTANTI URL ─────────────────────────────────────────────────
 const VERIFICA_TOKEN_URL = "https://n8n.rmstudio.app/webhook/verifica-token-drivemotion";
 const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
@@ -102,6 +146,7 @@ export default function AutoBestPage() {
   const [supportLoading,  setSupportLoading]  = useState(false);
   const [supportSuccess,  setSupportSuccess]  = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [openFaq,         setOpenFaq]         = useState<number | null>(null);
 
   // ─── STATO FORM VIDEO ──────────────────────────────────────────
   const [images,       setImages]       = useState<string[]>([]);
@@ -123,7 +168,6 @@ export default function AutoBestPage() {
   const [selectedVoice, setSelectedVoice] = useState("d718e944-b313-4998-b011-d1cc078d4ef3");
 
   // ─── STATO RETE ────────────────────────────────────────────────
-  const [loadingImg,     setLoadingImg]     = useState(false);
   const [loadingVideo,   setLoadingVideo]   = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
@@ -213,7 +257,7 @@ export default function AutoBestPage() {
       .catch((err) => console.error("Impossibile caricare widget:", err));
   }, []);
 
-  // ─── CHATBOT AURORA AI ─────────────────────────────────────────
+  // ─── CHATBOT AURORA AI (AD APERTURA AUTOMATICA) ────────────────
   useEffect(() => {
     let chatSessionId = localStorage.getItem("dm_chat_session") ||
       "dm_" + Math.random().toString(36).substring(7);
@@ -242,7 +286,7 @@ export default function AutoBestPage() {
         @keyframes typing { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
       </style>
 
-      <div id="dm-bubble">
+      <div id="dm-bubble" title="Parla con Aurora">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
         </svg>
@@ -250,19 +294,22 @@ export default function AutoBestPage() {
 
       <div id="dm-window">
         <div class="dm-header">
-          <span>Aurora AI</span>
-          <button id="close-chat" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;">&times;</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;"></div>
+            <span>Aurora AI • Receptionist</span>
+          </div>
+          <button id="close-chat" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;line-height:1;">&times;</button>
         </div>
         <div id="dm-messages" class="dm-messages">
-          <div class="dm-msg bot">Ciao! Sono <b>Aurora</b>. 🏎️<br><br>Sapevi che i video con <b>cambio sfondo AI</b> aumentano i click del 200%? Come posso aiutarti oggi?</div>
+          <div class="dm-msg bot">Ciao! Sono <b>Aurora</b>. 🏎️<br><br>Sapevi che i video con <b>cambio sfondo AI</b> e movimento 3D aumentano le richieste di contatto del <b>200%</b>?<br><br>Come posso aiutarti a valorizzare il tuo parco auto?</div>
         </div>
         <div id="dm-chips-container" class="dm-chips">
-          <div class="dm-chip" data-msg="Come funziona il cambio sfondo?">Cambio Sfondo?</div>
+          <div class="dm-chip" data-msg="Come funziona il cambio sfondo?">Come funziona lo sfondo?</div>
           <div class="dm-chip" data-msg="Quali sono i prezzi dei pacchetti?">Prezzi pacchetti</div>
-          <div class="dm-chip" data-msg="Funziona anche per gli interni?">Foto interni?</div>
+          <div class="dm-chip" data-msg="Come si attiva la prova gratis?">Prova Gratuita</div>
         </div>
         <div class="dm-input-area">
-          <input type="text" id="dm-input" placeholder="Scrivi qui...">
+          <input type="text" id="dm-input" placeholder="Chiedi pure ad Aurora...">
           <button id="send-btn">Invia</button>
         </div>
       </div>
@@ -311,7 +358,7 @@ export default function AutoBestPage() {
         addMsg(data.response || "Scusami, riprova.", "bot");
       } catch {
         document.getElementById(loadingId)?.remove();
-        addMsg("Errore di connessione.", "bot");
+        addMsg("Errore di connessione con il server.", "bot");
       }
     };
 
@@ -326,6 +373,13 @@ export default function AutoBestPage() {
     closeBtn.onclick = () => toggleChat();
     sendBtn.onclick  = () => sendMsg();
     input.onkeypress = (e) => { if (e.key === "Enter") sendMsg(); };
+
+    // ⚡ CHATBOT CHE PARTE APERTO AUTOMATICAMENTE SU DESKTOP
+    setTimeout(() => {
+      if (window.innerWidth > 900) {
+        toggleChat(true);
+      }
+    }, 1500);
   }, []);
 
   // ─── VERIFICA TOKEN & PRO ──────────────────────────────────────
@@ -394,7 +448,7 @@ export default function AutoBestPage() {
     setSelectedVoice(VOICES_CONFIG[lang as keyof typeof VOICES_CONFIG][0].id);
   };
 
-  // ─── UPLOAD IMMAGINI (CORRETTO SENZA ERRORI) ───────────────────
+  // ─── UPLOAD IMMAGINI (SINTASSI RIGOROSA NEXT.JS) ───────────────
   const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
 
@@ -525,17 +579,15 @@ export default function AutoBestPage() {
   };
 
   const btnLabel = () => {
-    if (loadingImg)                      return "Rielaborazione AI...";
-    if (loadingVideo)                    return "Rendering Video...";
+    if (loadingVideo)                    return "Rendering Video in corso...";
     if (!isPro && freeUsed)              return "Prova gratuita terminata 🔒";
     if (isPro && videoRimanenti === 0)   return "Crediti esauriti — Rinnova il piano ⚠️";
     if (isPro)                           return `Genera Video (${videoRimanenti} crediti rimasti)`;
-    return "Genera Video e Post Social";
+    return "Genera Video e Post Social GRATIS 🔥";
   };
 
   const btnDisabled =
     images.length === 0 ||
-    loadingImg ||
     loadingVideo ||
     !email.includes("@") ||
     (isPro && videoRimanenti === 0) ||
@@ -567,53 +619,53 @@ export default function AutoBestPage() {
         .gold-decoy-card { animation: gold-pulse 3.5s infinite ease-in-out; }
       ` }} />
 
-      {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
+      {/* ── NAVBAR ELEGANTE CON LOGO UFFICIALE ── */}
+      <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-6 py-3.5">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="text-cyan-400" size={20} />
-            <span className="font-bold text-white tracking-wide text-lg">
-              DriveMotion <span className="text-cyan-500">AI</span>
+          <a href="#" className="flex items-center gap-3 group">
+            <img 
+              src="/logo.png" 
+              alt="DriveMotion Logo" 
+              className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
+            />
+            <span className="font-extrabold text-white tracking-tight text-lg hidden sm:inline">
+              DriveMotion <span className="text-cyan-400 font-serif italic text-sm">AI</span>
             </span>
+          </a>
+
+          {/* Ecosistema SaaS in pillole eleganti */}
+          <div className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs">
+            <span className="text-slate-500 font-semibold px-2">Ecosistema RM Studio:</span>
+            <a href="https://hometour.rmstudio.app/" target="_blank" className="text-slate-400 hover:text-cyan-400 px-2.5 py-1 rounded-full hover:bg-white/5 transition-all">HomeTour AI</a>
+            <a href="https://concierge24.rmstudio.app/" target="_blank" className="text-slate-400 hover:text-cyan-400 px-2.5 py-1 rounded-full hover:bg-white/5 transition-all">Concierge24</a>
+            <a href="https://omniastudio.rmstudio.app/" target="_blank" className="text-slate-400 hover:text-cyan-400 px-2.5 py-1 rounded-full hover:bg-white/5 transition-all">OmniaStudio</a>
           </div>
-          <div className="hidden md:flex items-center gap-8">
+
+          <div className="flex items-center gap-4">
             {isPro && (
-              <div className="bg-cyan-500/10 border border-cyan-500/30 px-4 py-1.5 rounded-full flex items-center gap-2">
+              <div className="bg-cyan-500/10 border border-cyan-500/30 px-3.5 py-1 rounded-full flex items-center gap-2">
                 <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
-                <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{videoRimanenti} Crediti Residui</span>
+                <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{videoRimanenti} Crediti</span>
               </div>
             )}
-            <a href="https://hometour.rmstudio.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">HomeTour</a>
-            <a href="https://omniastudio.rmstudio.app/" target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">OmniaStudio</a>
-            <a href="https://concierge24.rmstudio.app/"     target="_blank" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Concierge24</a>
-            <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-cyan-400 hover:text-white transition-colors">Blog</a>
+            <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">Blog</a>
+            <button onClick={() => setShowSupportModal(true)} className="flex items-center gap-2 bg-white/10 border border-white/15 px-4 py-1.5 rounded-full text-xs font-bold text-white hover:bg-white/20 transition-all">
+              <MessageSquare size={14} /> Contatti
+            </button>
           </div>
-          <button onClick={() => setShowSupportModal(true)} className="flex items-center gap-2 bg-white/10 border border-white/10 px-4 py-2 rounded-full text-sm font-bold text-white hover:bg-white/20 transition-colors">
-            <MessageSquare size={16} /> Contattaci
-          </button>
         </div>
       </nav>
 
       {/* ── SFONDO VIDEO ── */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-[#050505]">
-        <video src="/bg.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-[#050505]/70 to-[#050505]" />
+        <video src="/bg.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-35" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-[#050505]/75 to-[#050505]" />
       </div>
 
       <div className="relative z-10">
 
-        {/* ── BANNER PRO ── */}
-        {isPro && (
-          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40 bg-black/80 backdrop-blur-md border border-cyan-500/50 rounded-full px-6 py-2 flex items-center gap-3 shadow-[0_0_20px_rgba(34,211,238,0.2)]">
-            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-widest text-cyan-400">
-              PRO Attivo — {videoRimanenti} video rimanenti
-            </span>
-          </div>
-        )}
-
         {/* ── HERO ── */}
-        <header className="max-w-7xl mx-auto px-6 pt-10 pb-16 flex flex-col lg:flex-row items-center gap-16 min-h-[80vh]">
+        <header className="max-w-7xl mx-auto px-6 pt-12 pb-16 flex flex-col lg:flex-row items-center gap-16 min-h-[85vh]">
           <div className="flex-1 text-center lg:text-left z-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-sm">
               <Car size={14} className="text-cyan-400" /> Cinema AI per Autosaloni
@@ -627,27 +679,27 @@ export default function AutoBestPage() {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-medium">
-              Carica da 3 a 8 foto dal parcheggio. La nostra AI rielabora la foto principale, cambia lo sfondo, crea un testo persuasivo e genera un video da 1 minuto in pochi minuti.
+              Carica da 3 a 8 foto dal piazzale. La nostra AI elimina lo sfondo amatoriale, posiziona l&apos;auto in showroom da sogno e crea un Reel d&apos;impatto con regia dinamica e voce persuasiva.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 justify-center lg:justify-start pt-2">
               <a 
                 href="#creatore" 
-                className="bg-white text-black font-extrabold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_25px_rgba(255,255,255,0.4)] text-lg sm:text-xl px-12 py-6 w-full sm:w-auto"
+                className="bg-white text-black font-extrabold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_25px_rgba(255,255,255,0.4)] text-lg px-10 py-5 w-full sm:w-auto"
               >
-                <Play size={22} fill="currentColor" /> Inizia a Creare
+                <Play size={20} fill="currentColor" /> Genera 1° Video Gratis
               </a>
               
               <a 
                 href="#prezzi" 
-                className="bg-black/50 text-white border border-white/20 px-6 py-3 rounded-full font-bold hover:bg-white/20 backdrop-blur-md text-sm text-center w-full sm:w-auto self-center"
+                className="bg-black/50 text-white border border-white/20 px-6 py-3.5 rounded-full font-bold hover:bg-white/20 backdrop-blur-md text-sm text-center w-full sm:w-auto self-center"
               >
-                Vedi i Piani
+                Vedi i Pacchetti
               </a>
             </div>
           </div>
 
-          {/* PHONE MOCKUP ANIMATO */}
+          {/* PHONE MOCKUP ANIMATO (3 FASI) */}
           <div className="flex-1 w-full max-w-[320px] relative">
             <div className="absolute inset-0 bg-cyan-500/30 blur-3xl rounded-full animate-pulse" />
             <div className="relative border-[6px] border-[#1a1a1a] bg-[#050505] rounded-[3rem] overflow-hidden aspect-[9/19] shadow-2xl">
@@ -657,20 +709,20 @@ export default function AutoBestPage() {
                 <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover filter brightness-75" alt="Parking" />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center flex-col">
                   <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-white text-sm font-medium mb-2 flex items-center gap-2 shadow-lg">
-                    <Camera size={16} /> 1. Scatto Parcheggio
+                    <Camera size={16} /> 1. Scatto Piazzale
                   </div>
                 </div>
               </div>
 
               <div className={`absolute inset-0 transition-opacity duration-1000 bg-[#0a0a0c] flex items-center justify-center flex-col ${demoStep === 1 ? "opacity-100 z-10" : "opacity-0 z-0"}`}>
                 <Scan size={64} className="text-cyan-400 mb-6 animate-pulse" />
-                <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2 text-center">Rielaborazione AI...</h3>
+                <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2 text-center">Rielaborazione AI 3D...</h3>
               </div>
 
               <div className={`absolute inset-0 transition-opacity duration-1000 bg-black ${demoStep === 2 ? "opacity-100 z-20" : "opacity-0 z-0"}`}>
                 <img src="https://images.unsplash.com/photo-1605515298946-d062f2e9da53?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Showroom" />
                 <div className="absolute bottom-12 left-6 right-16 z-30">
-                  <div className="bg-red-600 text-white text-xs font-black italic px-3 py-1 inline-block uppercase -skew-x-12 mb-2 shadow-lg">Pronta Consegna</div>
+                  <div className="bg-cyan-500 text-black text-xs font-black px-3 py-1 inline-block uppercase -skew-x-12 mb-2 shadow-lg">Pronta Consegna</div>
                   <h3 className="text-white font-black text-xl uppercase mb-1 drop-shadow-md">Audi RS6</h3>
                 </div>
               </div>
@@ -679,8 +731,57 @@ export default function AutoBestPage() {
           </div>
         </header>
 
+        {/* ── SEZIONE: COSA FACCIAMO & PERCHÉ È VANTAGGIOSO ── */}
+        <section className="py-20 px-6 border-y border-white/5 bg-black/40">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-4">
+                La Rivoluzione del Marketing Automotive
+              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
+                Addio foto piatte. <span className="text-cyan-400">Entra nel cinema 3D.</span>
+              </h2>
+              <p className="text-slate-400 max-w-2xl mx-auto mt-4 text-base sm:text-lg">
+                Il 90% degli acquirenti decide nei primi 3 secondi di un Reel. Ecco perché DriveMotion trasforma i tuoi annunci in calamite per clienti pronti all&apos;acquisto.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-[#0a0a0c]/90 border border-white/10 rounded-3xl p-8 hover:border-cyan-500/40 transition-all group">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 text-2xl group-hover:scale-110 transition-transform">
+                  <TrendingUp size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">+200% di Click e Contatti</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  I video dinamici con movimenti di camera battono qualsiasi carosello statico su Instagram, TikTok e Subito, abbattendo il costo di acquisizione contatto.
+                </p>
+              </div>
+
+              <div className="bg-[#0a0a0c]/90 border border-white/10 rounded-3xl p-8 hover:border-cyan-500/40 transition-all group">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 text-2xl group-hover:scale-110 transition-transform">
+                  <Sparkles size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Showroom di Lusso Virtuale</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Cancella asfalto rovinato, bidoni o riflessi antiestetici del piazzale. L&apos;AI colloca le auto in saloni illuminati da studio, incrementando il valore percepito.
+                </p>
+              </div>
+
+              <div className="bg-[#0a0a0c]/90 border border-white/10 rounded-3xl p-8 hover:border-cyan-500/40 transition-all group">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 text-2xl group-hover:scale-110 transition-transform">
+                  <Eye size={28} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Zero Tempo di Montaggio</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Nessun videomaker da pagare né software complicati da imparare. Carichi le foto da smartphone e ricevi il file video montato con voce narrante in 4 minuti.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── TOOL GENERATORE COMPLETO ── */}
-        <section id="creatore" className="max-w-6xl mx-auto px-6 py-12">
+        <section id="creatore" className="max-w-6xl mx-auto px-6 py-16">
           <div className="bg-[#0a0a0c]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
 
             <div className="flex flex-wrap gap-4 mb-10 pb-8 border-b border-white/10 justify-between items-center relative z-10">
@@ -693,8 +794,8 @@ export default function AutoBestPage() {
               <div className="flex items-center gap-3">
                 <Video className="text-slate-400" />
                 <div className="flex bg-black rounded-lg p-1 border border-white/20">
-                  <button onClick={() => setVideoFormat("verticale")}   className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "verticale"   ? "bg-white text-black" : "text-slate-400 hover:text-white"}`}>Verticale 9:16</button>
-                  <button onClick={() => setVideoFormat("orizzontale")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "orizzontale" ? "bg-white text-black" : "text-slate-400 hover:text-white"}`}>Orizzontale 16:9</button>
+                  <button onClick={() => setVideoFormat("verticale")}   className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "verticale"   ? "bg-white text-black font-bold" : "text-slate-400 hover:text-white"}`}>Verticale 9:16 (Reel)</button>
+                  <button onClick={() => setVideoFormat("orizzontale")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "orizzontale" ? "bg-white text-black font-bold" : "text-slate-400 hover:text-white"}`}>Orizzontale 16:9</button>
                 </div>
               </div>
             </div>
@@ -705,7 +806,7 @@ export default function AutoBestPage() {
                 {/* 1. Immagini */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <ImageIcon className="text-cyan-400" /> 1. Immagini (Max 8)
+                    <ImageIcon className="text-cyan-400" /> 1. Immagini Veicolo (Max 8)
                   </h3>
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     {images.map((img, idx) => (
@@ -732,7 +833,7 @@ export default function AutoBestPage() {
                     {!logo ? (
                       <label className={`flex flex-col items-center justify-center ${isPro ? "cursor-pointer" : ""}`}>
                         <Upload size={20} className="text-slate-500 mb-1" />
-                        <span className="text-sm font-medium">Logo Autosalone (PRO)</span>
+                        <span className="text-sm font-medium">Logo Autosalone (Incluso nel PRO)</span>
                         {isPro && <input type="file" className="hidden" onChange={handleLogoUpload} accept="image/png,image/jpeg,image/webp" />}
                       </label>
                     ) : (
@@ -762,7 +863,7 @@ export default function AutoBestPage() {
                     </button>
                   </div>
                   {selectedEnvId === "custom" && (
-                    <input type="text" placeholder="Es. Strada piovosa a Tokyo, luci neon..." value={customEnv} onChange={e => setCustomEnv(e.target.value)} className="w-full mt-3 bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500 transition-all" />
+                    <input type="text" placeholder="Es. Salone marmo bianco illuminato a giorno..." value={customEnv} onChange={e => setCustomEnv(e.target.value)} className="w-full mt-3 bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500 transition-all" />
                   )}
                 </div>
               </div>
@@ -774,12 +875,12 @@ export default function AutoBestPage() {
                     <Car className="text-blue-400" /> 3. Dati Veicolo
                   </h3>
                   <div className="space-y-3">
-                    <input type="text" value={carMake} onChange={e => setCarMake(e.target.value)} placeholder="Marca e Modello" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                    <input type="text" value={carMake} onChange={e => setCarMake(e.target.value)} placeholder="Marca e Modello (es. BMW Serie 3 M Sport)" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={carYear}  onChange={e => setCarYear(e.target.value)}  placeholder="Anno"   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
-                      <input type="text" value={carPrice} onChange={e => setCarPrice(e.target.value)} placeholder="Prezzo" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                      <input type="text" value={carYear}  onChange={e => setCarYear(e.target.value)}  placeholder="Anno (es. 2023)"   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                      <input type="text" value={carPrice} onChange={e => setCarPrice(e.target.value)} placeholder="Prezzo (es. 34.900 €)" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
                     </div>
-                    <input type="text" value={carEngine} onChange={e => setCarEngine(e.target.value)} placeholder="Motore / Allestimento" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
+                    <input type="text" value={carEngine} onChange={e => setCarEngine(e.target.value)} placeholder="Motore / Alimentazione (es. 2.0d 190CV Mild-Hybrid)" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
                   </div>
                 </div>
 
@@ -789,10 +890,10 @@ export default function AutoBestPage() {
                     <Building2 className="text-orange-400" /> 4. Autosalone & Voce
                   </h3>
                   <div className="space-y-3">
-                    <input type="text" value={agencyName}    onChange={e => setAgencyName(e.target.value)}    placeholder="Nome del Salone"    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
+                    <input type="text" value={agencyName}    onChange={e => setAgencyName(e.target.value)}    placeholder="Nome dell'Autosalone"    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="Città / Indirizzo" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
-                      <input type="text" value={agencyPhone}   onChange={e => setAgencyPhone(e.target.value)}   placeholder="Telefono"          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
+                      <input type="text" value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="Città / Sede" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
+                      <input type="text" value={agencyPhone}   onChange={e => setAgencyPhone(e.target.value)}   placeholder="Telefono / WhatsApp"    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
                     </div>
                     <div className="relative mt-2">
                       <select
@@ -828,7 +929,7 @@ export default function AutoBestPage() {
                 <Mail className="absolute left-4 top-4 text-slate-500" size={20} />
                 <input
                   type="email"
-                  placeholder="La tua Email per ricevere i materiali..."
+                  placeholder="La tua Email per ricevere il video..."
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   onBlur={e => checkEmailUsed(e.target.value)}
@@ -853,7 +954,7 @@ export default function AutoBestPage() {
               </button>
               {videoCompleted && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 p-3 rounded-lg border border-green-400/20">
-                  <CheckCircle2 size={18} /> Inviato! Riceverai il video via email tra pochi minuti.
+                  <CheckCircle2 size={18} /> Inviato! Riceverai il video via email tra circa 3-5 minuti.
                 </div>
               )}
             </div>
@@ -925,7 +1026,7 @@ export default function AutoBestPage() {
             </div>
 
             {/* Maxi */}
-            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all justify-between">
+            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group justify-between">
               <div>
                 <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Maxi Pack (15 Video)</h3>
                 <div className="flex items-baseline gap-2 mb-1">
@@ -950,6 +1051,44 @@ export default function AutoBestPage() {
             </div>
           </div>
           <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
+        </section>
+
+        {/* ── SEZIONE FAQ: 10 DOMANDE & RISPOSTE ── */}
+        <section className="max-w-4xl mx-auto px-6 py-20 border-t border-white/5">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-4">
+              <HelpCircle size={14} /> Dubbi Frequenti
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
+              Tutto quello che c&apos;è da sapere
+            </h2>
+            <p className="text-slate-400 mt-3 text-base">Risposte chiare e trasparenti prima di iniziare.</p>
+          </div>
+
+          <div className="space-y-4">
+            {FAQS.map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div 
+                  key={idx} 
+                  className="bg-[#0a0a0c]/90 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-cyan-500/30"
+                >
+                  <button
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    className="w-full p-6 text-left flex justify-between items-center gap-4 cursor-pointer"
+                  >
+                    <span className="font-bold text-white text-base sm:text-lg">{faq.q}</span>
+                    <ChevronDown className={`text-cyan-400 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} size={20} />
+                  </button>
+                  {isOpen && (
+                    <div className="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-white/5 pt-4">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </section>
 
         {/* ── SEZIONE TRUST & ECOSISTEMA ORBITALE ── */}
@@ -1005,42 +1144,54 @@ export default function AutoBestPage() {
           </div>
         </section>
 
-        {/* ── FOOTER ── */}
+        {/* ── FOOTER RIFINITO CON ECOSISTEMA STRUTTURATO ── */}
         <footer className="border-t border-white/10 bg-black py-16 relative z-10">
-          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-12 text-center md:text-left">
-            <div className="max-w-xs flex flex-col items-center md:items-start">
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                <img src="/logo.png" alt="DriveMotion AI Logo" className="h-24 w-auto object-contain bg-white rounded-lg px-3 py-1.5 shadow-sm" />
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                <img src="/logo.png" alt="DriveMotion AI Logo" className="h-10 w-auto object-contain" />
+                <span className="font-extrabold text-white text-lg">DriveMotion AI</span>
               </div>
-              <p className="text-slate-500 text-sm leading-relaxed text-center md:text-left">Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa.</p>
-              <div className="text-slate-600 text-xs mt-6 flex flex-col sm:flex-row items-center gap-2 justify-center md:justify-start">
+              <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
+                Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa e la Computer Vision 3D.
+              </p>
+              <div className="text-slate-600 text-xs mt-6 flex flex-wrap items-center gap-3 justify-center md:justify-start">
                 <span>© {new Date().getFullYear()} RM Studio. Tutti i diritti riservati.</span>
-                <span className="hidden sm:inline text-slate-800">|</span>
+                <span>|</span>
                 <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
                   Privacy Policy
                 </a>
-                <span className="hidden sm:inline text-slate-800">|</span>
-                <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-cyan-400 transition-colors underline font-bold">
-                  Blog DriveMotion
-                </a>
-                <span className="hidden sm:inline text-slate-800">|</span>
+                <span>|</span>
                 <a href="https://rmstudio.app/termini.html" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
-                  Termini e Condizioni
+                  Termini
                 </a>
               </div>
             </div>
-            <div className="flex flex-col items-center md:items-start gap-4">
-              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-2">Social Hub</h4>
-              <div className="flex gap-4">
-                <a href="https://www.instagram.com/riccardo_mode_/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all"><InstagramIcon size={20} /></a>
-                <a href="https://www.facebook.com/riccardo.modena.792" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all"><FacebookIcon size={20} /></a>
-                <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50 hover:bg-blue-600/10 transition-all"><LinkedinIcon size={20} /></a>
-                <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-pink-500/50 hover:bg-pink-500/10 transition-all"><TiktokIcon size={20} /></a>
-              </div>
+
+            {/* Soluzioni Ecosistema RM */}
+            <div>
+              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Piattaforme RM</h4>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="https://hometour.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">HomeTour AI (Immobiliare)</a></li>
+                <li><a href="https://concierge24.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Concierge24 (Hospitality)</a></li>
+                <li><a href="https://dentis.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Dentis AI (Dentisti)</a></li>
+                <li><a href="https://lexis.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Lexis AI (Studi Legali)</a></li>
+                <li><a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" className="hover:text-cyan-400 transition-colors font-bold text-cyan-400">Blog DriveMotion</a></li>
+              </ul>
             </div>
-            <div className="flex flex-col items-center md:items-end gap-2">
-              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Contattaci</h4>
-              <button onClick={() => setShowSupportModal(true)} className="text-slate-400 text-sm hover:text-white transition-colors cursor-pointer">Invia un messaggio</button>
+
+            {/* Social & Supporto */}
+            <div>
+              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Social Hub</h4>
+              <div className="flex justify-center md:justify-start gap-3 mb-6">
+                <a href="https://www.instagram.com/riccardo_mode_/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all"><InstagramIcon size={18} /></a>
+                <a href="https://www.facebook.com/riccardo.modena.792" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all"><FacebookIcon size={18} /></a>
+                <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50 hover:bg-blue-600/10 transition-all"><LinkedinIcon size={18} /></a>
+                <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-pink-500/50 hover:bg-pink-500/10 transition-all"><TiktokIcon size={18} /></a>
+              </div>
+              <button onClick={() => setShowSupportModal(true)} className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-full border border-white/15 transition-all">
+                Scrivi all&apos;Assistenza
+              </button>
             </div>
           </div>
         </footer>
