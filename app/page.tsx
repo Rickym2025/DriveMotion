@@ -1,41 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Upload, Camera, Loader2, CheckCircle2,
-  MapPin, Video, Mail, Car, Building2, Volume2,
-  ImageIcon, Lock, Globe, Play, Scan,
-  X, Plus, MessageSquare, ChevronDown, HelpCircle,
-  TrendingUp, Eye, Sparkles
-} from "lucide-react";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import Features from "./components/Features";
+import VideoGeneratorForm from "./components/VideoGeneratorForm";
+import PricingSection from "./components/PricingSection";
+import FaqSection from "./components/FaqSection";
+import EcosystemSection from "./components/EcosystemSection";
+import Footer from "./components/Footer";
+import Modals from "./components/Modals";
+import Chatbot from "./components/Chatbot";
 
-// ─── ICONE SOCIAL ────────────────────────────────────────────────
-const FacebookIcon = ({ size = 24, className = "" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-  </svg>
-);
-const InstagramIcon = ({ size = 24, className = "" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-  </svg>
-);
-const LinkedinIcon = ({ size = 24, className = "" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-    <rect width="4" height="12" x="2" y="9" />
-    <circle cx="4" cy="4" r="2" />
-  </svg>
-);
-const TiktokIcon = ({ size = 24, className = "" }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-  </svg>
-);
-
-// ─── CONFIGURAZIONI SFONDI & VOCI ─────────────────────────────────
 const PREDEFINED_ENVIRONMENTS = [
   { id: "luxury",  icon: "✨", it: "Salone Lusso",      en: "Luxury car showroom, bright studio lighting, floor reflections" },
   { id: "city",    icon: "🏙️", it: "Città Moderna",     en: "Modern city street downtown, daylight, realistic urban setting" },
@@ -74,318 +50,69 @@ const LANGUAGES = [
   { id: "es", flag: "🇪🇸", name: "Español"  },
 ];
 
-const DRIVEMOTION_PRICES = {
-  starter: { id: "starter", name: "Starter Pack (1 Video HD)", price: 14.90 },
-  pro:     { id: "pro",     name: "Pro Pack (5 Video HD)",     price: 59.00 },
-  max:     { id: "max",     name: "Maxi Pack (15 Video HD)",   price: 129.00 }
-};
-
 const FAQS = [
-  {
-    q: "Come trasforma DriveMotion le normali foto del piazzale in video cinematografici?",
-    a: "La nostra pipeline di visione artificiale identifica la sagoma dell'auto, isola la carrozzeria e rimuove gli sfondi disordinati. Successivamente genera un set fotorealistico 3D (showroom, tornanti di montagna o pista) e anima la vettura con movimenti di camera dinamici ed effetti di velocità sull'asfalto."
-  },
-  {
-    q: "Quanto tempo ci vuole per ricevere il video completato?",
-    a: "Una volta inviato il form con le foto, i nostri server di rendering ad alta potenza elaborano il video in circa 3-5 minuti. Il link definitivo per scaricare il file MP4 in Full HD viene inviato istantaneamente all'indirizzo email indicato."
-  },
-  {
-    q: "Che tipo di foto devo caricare per ottenere la massima resa?",
-    a: "Bastano da 3 a 8 scatti eseguiti con un comune smartphone. Consigliamo almeno una foto frontale a 3/4 (la preferita per l'animazione di testa), una laterale, una del retro e qualche dettaglio degli interni o del cruscotto."
-  },
-  {
-    q: "L'AI rielabora anche le foto degli interni o solo gli esterni?",
-    a: "La sostituzione dello sfondo fotorealistico 3D viene applicata con massima precisione sulla carrozzeria esterna. Per gli interni, l'AI applica correzione colore cinematografica, stabilizzazione e zoom dinamici mantenendo inalterata la fedeltà del veicolo."
-  },
-  {
-    q: "I crediti video acquistati hanno una data di scadenza?",
-    a: "Assolutamente no. Non applichiamo alcun abbonamento mensile vincolante. I crediti acquistati (1, 5 o 15 video) rimangono per sempre nel tuo saldo finché non decidi di utilizzarli."
-  },
-  {
-    q: "Posso inserire il logo del mio autosalone e i miei contatti nel video?",
-    a: "Sì, a partire dal piano PRO puoi caricare il logo trasparente (PNG/SVG) della tua concessionaria, che verrà integrato in sovrimpressione con animazione d'ingresso professionale, insieme a indirizzo, telefono e prezzo del veicolo."
-  },
-  {
-    q: "In quali formati vengono esportati i video e dove posso pubblicarli?",
-    a: "Puoi selezionare sia il formato Verticale (9:16), ottimizzato per Instagram Reels, TikTok, YouTube Shorts e Facebook Ads, sia il formato Orizzontale (16:9), ideale per le schede del tuo sito web e i portali di annunci (AutoScout24, Subito)."
-  },
-  {
-    q: "Come funziona la voce narrante e in quali lingue parla?",
-    a: "La nostra voce sintetica avanzata legge una sceneggiatura persuasiva generata sull'allestimento dell'auto. È disponibile in Italiano, Inglese, Tedesco e Spagnolo, perfetta per intercettare anche acquirenti esteri."
-  },
-  {
-    q: "Cosa succede se un'auto viene venduta mentre sto usando il servizio?",
-    a: "I crediti vengono scalati solo al momento del rendering effettivo. Se decidi di non promuovere un veicolo, il credito rimane intatto sul tuo profilo per la prossima vettura in arrivo nel salone."
-  },
-  {
-    q: "Come funziona la prima generazione gratuita?",
-    a: "Ti permettiamo di testare l'intera potenza della nostra regia AI su una prima vettura senza carta di credito. Carica le foto, inserisci l'email e guarda tu stesso il risultato prima di scegliere il tuo pacchetto."
-  }
+  { q: "Come trasforma DriveMotion le normali foto del piazzale in video cinematografici?", a: "La nostra pipeline di visione artificiale identifica la sagoma dell'auto, isola la carrozzeria e rimuove gli sfondi disordinati. Successivamente genera un set fotorealistico 3D (showroom, tornanti di montagna o pista) e anima la vettura con movimenti di camera dinamici ed effetti di velocità sull'asfalto." },
+  { q: "Quanto tempo ci vuole per ricevere il video completato?", a: "Una volta inviato il form con le foto, i nostri server di rendering ad alta potenza elaborano il video in circa 3-5 minuti. Il link definitivo per scaricare il file MP4 in Full HD viene inviato istantaneamente all'indirizzo email indicato." },
+  { q: "Che tipo di foto devo caricare per ottenere la massima resa?", a: "Bastano da 3 a 8 scatti eseguiti con un comune smartphone. Consigliamo almeno una foto frontale a 3/4 (la preferita per l'animazione di testa), una laterale, una del retro e qualche dettaglio degli interni o del cruscotto." },
+  { q: "L'AI rielabora anche le foto degli interni o solo gli esterni?", a: "La sostituzione dello sfondo fotorealistico 3D viene applicata con massima precisione sulla carrozzeria esterna. Per gli interni, l'AI applica correzione colore cinematografica, stabilizzazione e zoom dinamici mantenendo inalterata la fedeltà del veicolo." },
+  { q: "I crediti video acquistati hanno una data di scadenza?", a: "Assolutamente no. Non applichiamo alcun abbonamento mensile vincolante. I crediti acquistati (1, 5 o 15 video) rimangono per sempre nel tuo saldo finché non decidi di utilizzarli." },
+  { q: "Posso inserire il logo del mio autosalone e i miei contatti nel video?", a: "Sì, a partire dal piano PRO puoi caricare il logo trasparente (PNG/SVG) della tua concessionaria, che verrà integrato in sovrimpressione con animazione d'ingresso professionale, insieme a indirizzo, telefono e prezzo del veicolo." },
+  { q: "In quali formati vengono esportati i video e dove posso pubblicarli?", a: "Puoi selezionare sia il formato Verticale (9:16), ottimizzato per Instagram Reels, TikTok, YouTube Shorts e Facebook Ads, sia il formato Orizzontale (16:9), ideale per le schede del tuo sito web e i portali di annunci (AutoScout24, Subito)." },
+  { q: "Come funziona la voce narrante e in quali lingue parla?", a: "La nostra voce sintetica avanzata legge una sceneggiatura persuasiva generata sull'allestimento dell'auto. È disponibile in Italiano, Inglese, Tedesco e Spagnolo, perfetta per intercettare anche acquirenti esteri." },
+  { q: "Cosa succede se un'auto viene venduta mentre sto usando il servizio?", a: "I crediti vengono scalati solo al momento del rendering effettivo. Se decidi di non promuovere un veicolo, il credito rimane intatto sul tuo profilo per la prossima vettura in arrivo nel salone." },
+  { q: "Come funziona la prima generazione gratuita?", a: "Ti permettiamo di testare l'intera potenza della nostra regia AI su una prima vettura senza carta di credito. Carica le foto, inserisci l'email e guarda tu stesso il risultato prima di scegliere il tuo pacchetto." }
 ];
 
-// ─── COSTANTI URL ─────────────────────────────────────────────────
 const VERIFICA_TOKEN_URL = "https://n8n.rmstudio.app/webhook/verifica-token-drivemotion";
 const N8N_WEBHOOK_URL    = "https://n8n.rmstudio.app/webhook/crea-video";
-const CHATBOT_WEBHOOK_URL= "https://n8n.rmstudio.app/webhook/drivemotion-chat";
 const CHECK_EMAIL_URL    = "https://n8n.rmstudio.app/webhook/check-email";
 const FALLBACK_LOGO_URL  = "https://drivemotion.rmstudio.app/logo.png";
 
 export default function AutoBestPage() {
   const orbitContainerRef = useRef<HTMLDivElement>(null);
 
-  // ─── STATO UTENTE ──────────────────────────────────────────────
-  const [isPro,          setIsPro]          = useState(false);
-  const [token,          setToken]          = useState<string | null>(null);
+  const [isPro, setIsPro] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
   const [videoRimanenti, setVideoRimanenti] = useState<number>(0);
-  const [freeUsed,       setFreeUsed]       = useState(false);
+  const [freeUsed, setFreeUsed] = useState(false);
 
-  // ─── STATO UI ──────────────────────────────────────────────────
-  const [showProModal,    setShowProModal]    = useState(false);
-  const [demoStep,        setDemoStep]        = useState(0);
-  const [showSupportModal,setShowSupportModal]= useState(false);
-  const [supportLoading,  setSupportLoading]  = useState(false);
-  const [supportSuccess,  setSupportSuccess]  = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
-  const [openFaq,         setOpenFaq]         = useState<number | null>(null);
+  const [showProModal, setShowProModal] = useState(false);
+  const [demoStep, setDemoStep] = useState(0);
+  const [showSupportModal, setShowSupportModal] = useState(false);
 
-  // ─── STATO FORM VIDEO ──────────────────────────────────────────
-  const [images,       setImages]       = useState<string[]>([]);
-  const [logo,         setLogo]         = useState<string | null>(null);
-  const [email,        setEmail]        = useState("");
-  const [carMake,      setCarMake]      = useState("");
-  const [carPrice,     setCarPrice]     = useState("");
-  const [carYear,      setCarYear]      = useState("");
-  const [carEngine,    setCarEngine]    = useState("");
-  const [agencyName,   setAgencyName]   = useState("");
-  const [agencyAddress,setAgencyAddress]= useState("");
-  const [agencyPhone,  setAgencyPhone]  = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [logo, setLogo] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [carMake, setCarMake] = useState("");
+  const [carPrice, setCarPrice] = useState("");
+  const [carYear, setCarYear] = useState("");
+  const [carEngine, setCarEngine] = useState("");
+  const [agencyName, setAgencyName] = useState("");
+  const [agencyAddress, setAgencyAddress] = useState("");
+  const [agencyPhone, setAgencyPhone] = useState("");
 
-  // ─── IMPOSTAZIONI VIDEO ────────────────────────────────────────
   const [selectedEnvId, setSelectedEnvId] = useState(PREDEFINED_ENVIRONMENTS[0].id);
-  const [customEnv,     setCustomEnv]     = useState("");
-  const [videoFormat,   setVideoFormat]   = useState("verticale");
-  const [language,      setLanguage]      = useState("it");
+  const [customEnv, setCustomEnv] = useState("");
+  const [videoFormat, setVideoFormat] = useState("verticale");
+  const [language, setLanguage] = useState("it");
   const [selectedVoice, setSelectedVoice] = useState("d718e944-b313-4998-b011-d1cc078d4ef3");
 
-  // ─── STATO RETE ────────────────────────────────────────────────
-  const [loadingVideo,   setLoadingVideo]   = useState(false);
+  const [loadingVideo, setLoadingVideo] = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
-  // ─── CHECKOUT STRIPE ON-THE-FLY VIA N8N ────────────────────────
-  const avviaCheckoutDriveMotion = async (planKey: "starter" | "pro" | "max") => {
-    const plan = DRIVEMOTION_PRICES[planKey];
-    if (!plan) return;
-
-    setCheckoutLoading(planKey);
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://drivemotion.rmstudio.app";
-
-    const payload = {
-      progetto: "DriveMotion",
-      portal_type: "drivemotion",
-      title: `DriveMotion AI • ${plan.name}`,
-      price: plan.price,
-      ricarica_tipo: planKey,
-      email: email || undefined,
-      agency_id: email ? `lead_${email}` : "checkout_diretto",
-      project_id: email ? `lead_${email}` : "checkout_diretto",
-      origin: origin,
-      success_url: `${origin}/?success=true&plan=${planKey}`,
-      cancel_url: `${origin}/#prezzi`
-    };
-
-    try {
-      const res = await fetch("https://n8n.rmstudio.app/webhook/crea-sessione-stripe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error("Errore creazione sessione");
-      const data = await res.json();
-      const redirectUrl = data.url || data.checkout_url || data.session_url;
-
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        throw new Error("URL Stripe mancante");
-      }
-    } catch (err) {
-      console.error("Errore checkout DriveMotion:", err);
-      window.location.hash = "#prezzi";
-    } finally {
-      setCheckoutLoading(null);
-    }
-  };
-
-  // ─── SCHEMA MARKUP SEO & AP2 ──────────────────────────────────
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.innerHTML = JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "DriveMotion",
-      "operatingSystem": "All",
-      "applicationCategory": "BusinessApplication",
-      "description": "Generatore AI di video e sfondi fotorealistici per concessionari e autosaloni.",
-      "offers": {
-        "@type": "AggregateOffer",
-        "priceCurrency": "EUR",
-        "lowPrice": "14.90",
-        "highPrice": "129.00",
-        "offerCount": "3"
-      }
-    });
-    document.head.appendChild(script);
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
-
-  // ─── CARICAMENTO WIDGET ORBITALE ──────────────────────────────
   useEffect(() => {
     fetch("https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/orbit-template.html")
-      .then((res) => {
-        if (!res.ok) throw new Error("Errore caricamento widget");
-        return res.text();
-      })
-      .then((html) => {
-        if (orbitContainerRef.current) {
-          orbitContainerRef.current.innerHTML = html;
-        }
-      })
-      .catch((err) => console.error("Impossibile caricare widget:", err));
+      .then((res) => res.text())
+      .then((html) => { if (orbitContainerRef.current) orbitContainerRef.current.innerHTML = html; })
+      .catch((err) => console.error("Errore orbit:", err));
+
+    const interval = setInterval(() => setDemoStep(p => (p + 1) % 3), 3500);
+    return () => clearInterval(interval);
   }, []);
 
-  // ─── CHATBOT AURORA AI (AD APERTURA AUTOMATICA) ────────────────
-  useEffect(() => {
-    let chatSessionId = localStorage.getItem("dm_chat_session") ||
-      "dm_" + Math.random().toString(36).substring(7);
-    localStorage.setItem("dm_chat_session", chatSessionId);
-
-    const container = document.getElementById("chatbot-container");
-    if (!container) return;
-
-    container.innerHTML = `
-      <style>
-        #dm-bubble { position:fixed; bottom:30px; left:30px; width:65px; height:65px; border-radius:50%; background:#06b6d4; box-shadow:0 10px 25px rgba(6,182,212,0.4); cursor:pointer; z-index:9999; display:flex; align-items:center; justify-content:center; border:2px solid #161616; transition:transform 0.3s; }
-        #dm-bubble:hover { transform:scale(1.1); }
-        #dm-window { position:fixed; bottom:110px; left:30px; width:380px; height:580px; min-width:300px; min-height:400px; max-width:90vw; max-height:80vh; background:#0a0a0c; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,0.8); z-index:9999; display:none; flex-direction:column; overflow:hidden; font-family:sans-serif; border:1px solid rgba(6,182,212,0.2); transition:opacity 0.3s ease,transform 0.3s ease; opacity:0; transform:translateY(20px); resize:both; }
-        .dm-header { background:#161616; border-bottom:1px solid rgba(6,182,212,0.2); color:#fff; padding:16px 20px; font-weight:700; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
-        .dm-messages { flex:1; padding:20px; overflow-y:auto; background:#050505; display:flex; flex-direction:column; gap:14px; }
-        .dm-chips { display:flex; flex-wrap:wrap; gap:8px; padding:10px 20px; background:#050505; border-top:1px solid rgba(255,255,255,0.05); flex-shrink:0; }
-        .dm-chip { background:#161616; border:1px solid rgba(6,182,212,0.3); color:#22d3ee; padding:8px 12px; border-radius:15px; font-size:12px; cursor:pointer; transition:0.2s; white-space:nowrap; }
-        .dm-chip:hover { background:#06b6d4; color:#000; }
-        .dm-msg { padding:12px 16px; border-radius:15px; font-size:14px; max-width:85%; line-height:1.5; }
-        .dm-msg.bot { background:#161616; color:#f0f0f0; align-self:flex-start; border-bottom-left-radius:2px; border:1px solid rgba(255,255,255,0.05); }
-        .dm-msg.user { background:#06b6d4; color:#000; align-self:flex-end; border-bottom-right-radius:2px; font-weight:500; }
-        .dm-input-area { padding:15px; border-top:1px solid rgba(6,182,212,0.2); display:flex; gap:8px; background:#161616; flex-shrink:0; }
-        .dm-input-area input { flex:1; border:1px solid #333; border-radius:8px; padding:8px 12px; background:#000; color:#fff; outline:none; font-size:14px; }
-        .dm-input-area button { background:#06b6d4; border:none; border-radius:8px; color:#000; font-weight:bold; padding:0 15px; cursor:pointer; }
-        .typing-dot { width:4px; height:4px; background:#06b6d4; border-radius:50%; display:inline-block; animation:typing 1.4s infinite; margin-right:2px; }
-        @keyframes typing { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
-      </style>
-
-      <div id="dm-bubble" title="Parla con Aurora">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-      </div>
-
-      <div id="dm-window">
-        <div class="dm-header">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;"></div>
-            <span>Aurora AI • Receptionist</span>
-          </div>
-          <button id="close-chat" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;line-height:1;">&times;</button>
-        </div>
-        <div id="dm-messages" class="dm-messages">
-          <div class="dm-msg bot">Ciao! Sono <b>Aurora</b>. 🏎️<br><br>Sapevi che i video con <b>cambio sfondo AI</b> e movimento 3D aumentano le richieste di contatto del <b>200%</b>?<br><br>Come posso aiutarti a valorizzare il tuo parco auto?</div>
-        </div>
-        <div id="dm-chips-container" class="dm-chips">
-          <div class="dm-chip" data-msg="Come funziona il cambio sfondo?">Come funziona lo sfondo?</div>
-          <div class="dm-chip" data-msg="Quali sono i prezzi dei pacchetti?">Prezzi pacchetti</div>
-          <div class="dm-chip" data-msg="Come si attiva la prova gratis?">Prova Gratuita</div>
-        </div>
-        <div class="dm-input-area">
-          <input type="text" id="dm-input" placeholder="Chiedi pure ad Aurora...">
-          <button id="send-btn">Invia</button>
-        </div>
-      </div>
-    `;
-
-    const bubble        = document.getElementById("dm-bubble")!;
-    const win           = document.getElementById("dm-window")!;
-    const closeBtn      = document.getElementById("close-chat")!;
-    const input         = document.getElementById("dm-input") as HTMLInputElement;
-    const sendBtn       = document.getElementById("send-btn")!;
-    const chipsContainer= document.getElementById("dm-chips-container")!;
-
-    const toggleChat = (forceOpen = false) => {
-      const isHidden = win.style.display === "none" || win.style.display === "";
-      if (forceOpen || isHidden) {
-        win.style.display = "flex";
-        setTimeout(() => { win.style.opacity = "1"; win.style.transform = "translateY(0)"; }, 10);
-      } else {
-        win.style.opacity = "0"; win.style.transform = "translateY(20px)";
-        setTimeout(() => { win.style.display = "none"; }, 300);
-      }
-    };
-
-    const addMsg = (text: string, sender: "bot" | "user", id?: string) => {
-      const div = document.createElement("div");
-      div.className = `dm-msg ${sender}`;
-      if (id) div.id = id;
-      div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
-      const box = document.getElementById("dm-messages")!;
-      box.appendChild(div);
-      box.scrollTo({ top: box.scrollHeight, behavior: "smooth" });
-    };
-
-    const sendMsg = async (textOverride?: string) => {
-      const text = textOverride || input.value.trim();
-      if (!text) return;
-      input.value = "";
-      chipsContainer.style.display = "none";
-      addMsg(text, "user");
-      const loadingId = "loading-" + Date.now();
-      addMsg('<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>', "bot", loadingId);
-      try {
-        const res  = await fetch(`${CHATBOT_WEBHOOK_URL}?message=${encodeURIComponent(text)}&sessionId=${chatSessionId}`, { method: "POST" });
-        const data = await res.json();
-        document.getElementById(loadingId)?.remove();
-        addMsg(data.response || "Scusami, riprova.", "bot");
-      } catch {
-        document.getElementById(loadingId)?.remove();
-        addMsg("Errore di connessione con il server.", "bot");
-      }
-    };
-
-    document.querySelectorAll(".dm-chip").forEach(chip => {
-      chip.addEventListener("click", () => {
-        const msg = chip.getAttribute("data-msg");
-        if (msg) sendMsg(msg);
-      });
-    });
-
-    bubble.onclick   = () => toggleChat();
-    closeBtn.onclick = () => toggleChat();
-    sendBtn.onclick  = () => sendMsg();
-    input.onkeypress = (e) => { if (e.key === "Enter") sendMsg(); };
-
-    // ⚡ CHATBOT CHE PARTE APERTO AUTOMATICAMENTE SU DESKTOP
-    setTimeout(() => {
-      if (window.innerWidth > 900) {
-        toggleChat(true);
-      }
-    }, 1500);
-  }, []);
-
-  // ─── VERIFICA TOKEN & PRO ──────────────────────────────────────
   useEffect(() => {
     const checkToken = async () => {
-      const urlToken   = new URLSearchParams(window.location.search).get("token");
+      const urlToken = new URLSearchParams(window.location.search).get("token");
       const savedToken = localStorage.getItem("ab_token");
       const tokenToUse = urlToken || savedToken;
       if (!tokenToUse) return;
@@ -393,7 +120,6 @@ export default function AutoBestPage() {
       try {
         const res = await fetch(`${VERIFICA_TOKEN_URL}?token=${encodeURIComponent(tokenToUse)}&project=DriveMotion`);
         const parsedData = await res.json();
-
         if (parsedData.valido === true) {
           setIsPro(true);
           setToken(tokenToUse);
@@ -404,43 +130,9 @@ export default function AutoBestPage() {
           if (parsedData.telefono) setAgencyPhone(parsedData.telefono);
           localStorage.setItem("ab_token", tokenToUse);
         }
-      } catch (err) {
-        console.error("Errore verifica token:", err);
-      }
+      } catch (err) { console.error("Verifica token:", err); }
     };
     checkToken();
-  }, []);
-
-  // ─── ANIMAZIONE DEMO PHONE ─────────────────────────────────────
-  useEffect(() => {
-    const interval = setInterval(() => setDemoStep(p => (p + 1) % 3), 3500);
-    return () => clearInterval(interval);
-  }, []);
-
-  // ─── MEMORIA FORM ──────────────────────────────────────────────
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const formData = { carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email };
-      localStorage.setItem("dm_form_memory", JSON.stringify(formData));
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [carMake, carPrice, carYear, carEngine, agencyName, agencyAddress, agencyPhone, email]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("dm_form_memory");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.carMake) setCarMake(parsed.carMake);
-        if (parsed.carPrice) setCarPrice(parsed.carPrice);
-        if (parsed.carYear) setCarYear(parsed.carYear);
-        if (parsed.carEngine) setCarEngine(parsed.carEngine);
-        if (parsed.agencyName) setAgencyName(parsed.agencyName);
-        if (parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
-        if (parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
-        if (!email && parsed.email) setEmail(parsed.email);
-      } catch (e) { console.warn("Errore lettura form memory"); }
-    }
   }, []);
 
   const handleLanguageChange = (lang: string) => {
@@ -448,10 +140,8 @@ export default function AutoBestPage() {
     setSelectedVoice(VOICES_CONFIG[lang as keyof typeof VOICES_CONFIG][0].id);
   };
 
-  // ─── UPLOAD IMMAGINI (SINTASSI RIGOROSA NEXT.JS) ───────────────
   const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 8 - images.length);
-
     const compressImage = (file: File): Promise<string> =>
       new Promise(resolve => {
         const reader = new FileReader();
@@ -463,13 +153,11 @@ export default function AutoBestPage() {
             const MAX_SIZE = 1080;
             let width = img.width;
             let height = img.height;
-
             if (width > MAX_SIZE || height > MAX_SIZE) {
               const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
               width = Math.round(width * ratio);
               height = Math.round(height * ratio);
             }
-
             const canvas = document.createElement("canvas");
             canvas.width = width;
             canvas.height = height;
@@ -499,36 +187,32 @@ export default function AutoBestPage() {
     setLoadingVideo(true);
     setVideoCompleted(false);
 
-    const englishPrompt = selectedEnvId === "custom"
-      ? customEnv
-      : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
+    const englishPrompt = selectedEnvId === "custom" ? customEnv : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
 
     try {
       const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
-
       const res = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sector:      "auto",
-          descrizione: carMake + " " + carEngine + " " + carYear,
-          prezzo:      carPrice,
-          images:      images,
-          logo:        logoPayload,
+          sector: "auto",
+          descrizione: `${carMake} ${carEngine} ${carYear}`,
+          prezzo: carPrice,
+          images,
+          logo: logoPayload,
           email,
-          formato:     videoFormat,
-          lingua:      language,
-          voice:       selectedVoice,
+          formato: videoFormat,
+          lingua: language,
+          voice: selectedVoice,
           token,
-          project:     "DriveMotion",
+          project: "DriveMotion",
           environment: englishPrompt,
           car_details: { make: carMake, price: carPrice, year: carYear, engine: carEngine },
-          agency:      { name: agencyName, address: agencyAddress, phone: agencyPhone },
+          agency: { name: agencyName, address: agencyAddress, phone: agencyPhone },
         }),
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         if (data.error === "free_limit_reached") {
           alert(data.message);
@@ -543,26 +227,10 @@ export default function AutoBestPage() {
       setLoadingVideo(false);
       setVideoCompleted(true);
       if (isPro) setVideoRimanenti(prev => Math.max(0, prev - 1));
-    } catch (err) {
-      alert("Errore durante la generazione. Controlla la connessione.");
+    } catch {
+      alert("Errore durante la generazione video.");
       setLoadingVideo(false);
     }
-  };
-
-  const handleSupportSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSupportLoading(true);
-    const formData = new FormData(e.currentTarget);
-    formData.append("access_key", "9013a8d5-0901-42a0-b9e6-4c45553f960d");
-    formData.append("subject", "Nuovo contatto da DriveMotion AI");
-    try {
-      const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData }).then(r => r.json());
-      if (res.success) {
-        setSupportSuccess(true);
-        setTimeout(() => { setShowSupportModal(false); setSupportSuccess(false); }, 3000);
-      }
-    } catch { alert("Errore nell'invio. Riprova."); }
-    finally  { setSupportLoading(false); }
   };
 
   const checkEmailUsed = async (emailToCheck: string) => {
@@ -575,687 +243,43 @@ export default function AutoBestPage() {
         alert("Hai già provato il servizio gratuitamente.\nScegli un pacchetto per continuare a creare video!");
         setShowProModal(true);
       }
-    } catch (e) { console.error("Errore check email:", e); }
+    } catch (e) { console.error("Check email:", e); }
   };
-
-  const btnLabel = () => {
-    if (loadingVideo)                    return "Rendering Video in corso...";
-    if (!isPro && freeUsed)              return "Prova gratuita terminata 🔒";
-    if (isPro && videoRimanenti === 0)   return "Crediti esauriti — Rinnova il piano ⚠️";
-    if (isPro)                           return `Genera Video (${videoRimanenti} crediti rimasti)`;
-    return "Genera Video e Post Social GRATIS 🔥";
-  };
-
-  const btnDisabled =
-    images.length === 0 ||
-    loadingVideo ||
-    !email.includes("@") ||
-    (isPro && videoRimanenti === 0) ||
-    (!isPro && freeUsed);
 
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-cyan-500/30 overflow-x-hidden relative pt-20">
-
-      {/* ── STILI CSS GLOBALI ── */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes orbit-rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes counter-rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
-        @keyframes netflix-glow {
-          0%, 100% { transform: scale(1); opacity: 0.35; filter: blur(75px); }
-          50% { transform: scale(1.15); opacity: 0.6; filter: blur(100px); }
-        }
-        @keyframes gold-pulse {
-          0%, 100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.25); border-color: rgba(6, 182, 212, 0.3); }
-          50% { box-shadow: 0 0 32px rgba(6, 182, 212, 0.65); border-color: rgba(6, 182, 212, 0.85); }
-        }
-        .orbit-ring {
-          position: relative; width: 320px; height: 320px; border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center;
-          animation: orbit-rotation 40s linear infinite;
-        }
-        .orbit-area { position: relative; display: flex; justify-content: center; align-items: center; min-height: 440px; }
-        .orbit-area:hover .orbit-ring { animation-play-state: paused; }
-        .visual-hook-glow { animation: netflix-glow 6s ease-in-out infinite; }
-        .gold-decoy-card { animation: gold-pulse 3.5s infinite ease-in-out; }
-      ` }} />
-
-      {/* ── NAVBAR ELEGANTE CON LOGO UFFICIALE ── */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10 px-6 py-3.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <a href="#" className="flex items-center gap-3 group">
-            <img 
-              src="/logo.png" 
-              alt="DriveMotion Logo" 
-              className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
-            />
-            <span className="font-extrabold text-white tracking-tight text-lg hidden sm:inline">
-              DriveMotion <span className="text-cyan-400 font-serif italic text-sm">AI</span>
-            </span>
-          </a>
-
-          {/* Ecosistema SaaS in pillole eleganti */}
-          <div className="hidden lg:flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs">
-            <span className="text-slate-500 font-semibold px-2">Ecosistema RM Studio:</span>
-            <a href="https://hometour.rmstudio.app/" target="_blank" className="text-slate-400 hover:text-cyan-400 px-2.5 py-1 rounded-full hover:bg-white/5 transition-all">HomeTour AI</a>
-            <a href="https://concierge24.rmstudio.app/" target="_blank" className="text-slate-400 hover:text-cyan-400 px-2.5 py-1 rounded-full hover:bg-white/5 transition-all">Concierge24</a>
-            <a href="https://omniastudio.rmstudio.app/" target="_blank" className="text-slate-400 hover:text-cyan-400 px-2.5 py-1 rounded-full hover:bg-white/5 transition-all">OmniaStudio</a>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {isPro && (
-              <div className="bg-cyan-500/10 border border-cyan-500/30 px-3.5 py-1 rounded-full flex items-center gap-2">
-                <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
-                <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">{videoRimanenti} Crediti</span>
-              </div>
-            )}
-            <a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-slate-400 hover:text-white transition-colors hidden sm:block">Blog</a>
-            <button onClick={() => setShowSupportModal(true)} className="flex items-center gap-2 bg-white/10 border border-white/15 px-4 py-1.5 rounded-full text-xs font-bold text-white hover:bg-white/20 transition-all">
-              <MessageSquare size={14} /> Contatti
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* ── SFONDO VIDEO ── */}
+      
+      {/* SFONDO VIDEO */}
       <div className="fixed inset-0 z-0 pointer-events-none bg-[#050505]">
         <video src="/bg.mp4" autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-35" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-[#050505]/75 to-[#050505]" />
       </div>
 
       <div className="relative z-10">
-
-        {/* ── HERO ── */}
-        <header className="max-w-7xl mx-auto px-6 pt-12 pb-16 flex flex-col lg:flex-row items-center gap-16 min-h-[85vh]">
-          <div className="flex-1 text-center lg:text-left z-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-sm">
-              <Car size={14} className="text-cyan-400" /> Cinema AI per Autosaloni
-            </div>
-            
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 text-white leading-[1.1] drop-shadow-lg">
-              Vendi più Auto. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                Con l&apos;Intelligenza Artificiale.
-              </span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto lg:mx-0 mb-10 leading-relaxed font-medium">
-              Carica da 3 a 8 foto dal piazzale. La nostra AI elimina lo sfondo amatoriale, posiziona l&apos;auto in showroom da sogno e crea un Reel d&apos;impatto con regia dinamica e voce persuasiva.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 justify-center lg:justify-start pt-2">
-              <a 
-                href="#creatore" 
-                className="bg-white text-black font-extrabold rounded-full flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_25px_rgba(255,255,255,0.4)] text-lg px-10 py-5 w-full sm:w-auto"
-              >
-                <Play size={20} fill="currentColor" /> Genera 1° Video Gratis
-              </a>
-              
-              <a 
-                href="#prezzi" 
-                className="bg-black/50 text-white border border-white/20 px-6 py-3.5 rounded-full font-bold hover:bg-white/20 backdrop-blur-md text-sm text-center w-full sm:w-auto self-center"
-              >
-                Vedi i Pacchetti
-              </a>
-            </div>
-          </div>
-
-          {/* PHONE MOCKUP ANIMATO (3 FASI) */}
-          <div className="flex-1 w-full max-w-[320px] relative">
-            <div className="absolute inset-0 bg-cyan-500/30 blur-3xl rounded-full animate-pulse" />
-            <div className="relative border-[6px] border-[#1a1a1a] bg-[#050505] rounded-[3rem] overflow-hidden aspect-[9/19] shadow-2xl">
-              <div className="absolute top-0 inset-x-0 h-7 bg-[#1a1a1a] rounded-b-3xl w-1/2 mx-auto z-50" />
-
-              <div className={`absolute inset-0 transition-opacity duration-1000 ${demoStep === 0 ? "opacity-100" : "opacity-0"}`}>
-                <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover filter brightness-75" alt="Parking" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center flex-col">
-                  <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-white text-sm font-medium mb-2 flex items-center gap-2 shadow-lg">
-                    <Camera size={16} /> 1. Scatto Piazzale
-                  </div>
-                </div>
-              </div>
-
-              <div className={`absolute inset-0 transition-opacity duration-1000 bg-[#0a0a0c] flex items-center justify-center flex-col ${demoStep === 1 ? "opacity-100 z-10" : "opacity-0 z-0"}`}>
-                <Scan size={64} className="text-cyan-400 mb-6 animate-pulse" />
-                <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2 text-center">Rielaborazione AI 3D...</h3>
-              </div>
-
-              <div className={`absolute inset-0 transition-opacity duration-1000 bg-black ${demoStep === 2 ? "opacity-100 z-20" : "opacity-0 z-0"}`}>
-                <img src="https://images.unsplash.com/photo-1605515298946-d062f2e9da53?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Showroom" />
-                <div className="absolute bottom-12 left-6 right-16 z-30">
-                  <div className="bg-cyan-500 text-black text-xs font-black px-3 py-1 inline-block uppercase -skew-x-12 mb-2 shadow-lg">Pronta Consegna</div>
-                  <h3 className="text-white font-black text-xl uppercase mb-1 drop-shadow-md">Audi RS6</h3>
-                </div>
-              </div>
-            </div>
-            <div id="chatbot-container"></div>
-          </div>
-        </header>
-
-        {/* ── SEZIONE: COSA FACCIAMO & PERCHÉ È VANTAGGIOSO ── */}
-        <section className="py-20 px-6 border-y border-white/5 bg-black/40">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-4">
-                La Rivoluzione del Marketing Automotive
-              </div>
-              <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
-                Addio foto piatte. <span className="text-cyan-400">Entra nel cinema 3D.</span>
-              </h2>
-              <p className="text-slate-400 max-w-2xl mx-auto mt-4 text-base sm:text-lg">
-                Il 90% degli acquirenti decide nei primi 3 secondi di un Reel. Ecco perché DriveMotion trasforma i tuoi annunci in calamite per clienti pronti all&apos;acquisto.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-[#0a0a0c]/90 border border-white/10 rounded-3xl p-8 hover:border-cyan-500/40 transition-all group">
-                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 text-2xl group-hover:scale-110 transition-transform">
-                  <TrendingUp size={28} />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">+200% di Click e Contatti</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  I video dinamici con movimenti di camera battono qualsiasi carosello statico su Instagram, TikTok e Subito, abbattendo il costo di acquisizione contatto.
-                </p>
-              </div>
-
-              <div className="bg-[#0a0a0c]/90 border border-white/10 rounded-3xl p-8 hover:border-cyan-500/40 transition-all group">
-                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 text-2xl group-hover:scale-110 transition-transform">
-                  <Sparkles size={28} />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">Showroom di Lusso Virtuale</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  Cancella asfalto rovinato, bidoni o riflessi antiestetici del piazzale. L&apos;AI colloca le auto in saloni illuminati da studio, incrementando il valore percepito.
-                </p>
-              </div>
-
-              <div className="bg-[#0a0a0c]/90 border border-white/10 rounded-3xl p-8 hover:border-cyan-500/40 transition-all group">
-                <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6 text-2xl group-hover:scale-110 transition-transform">
-                  <Eye size={28} />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">Zero Tempo di Montaggio</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  Nessun videomaker da pagare né software complicati da imparare. Carichi le foto da smartphone e ricevi il file video montato con voce narrante in 4 minuti.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── TOOL GENERATORE COMPLETO ── */}
-        <section id="creatore" className="max-w-6xl mx-auto px-6 py-16">
-          <div className="bg-[#0a0a0c]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
-
-            <div className="flex flex-wrap gap-4 mb-10 pb-8 border-b border-white/10 justify-between items-center relative z-10">
-              <div className="flex items-center gap-3">
-                <Globe className="text-slate-400" />
-                <select value={language} onChange={e => handleLanguageChange(e.target.value)} className="bg-black border border-white/20 text-white rounded-lg px-4 py-2 outline-none focus:border-cyan-500 cursor-pointer">
-                  {LANGUAGES.map(l => <option key={l.id} value={l.id}>{l.flag} {l.name}</option>)}
-                </select>
-              </div>
-              <div className="flex items-center gap-3">
-                <Video className="text-slate-400" />
-                <div className="flex bg-black rounded-lg p-1 border border-white/20">
-                  <button onClick={() => setVideoFormat("verticale")}   className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "verticale"   ? "bg-white text-black font-bold" : "text-slate-400 hover:text-white"}`}>Verticale 9:16 (Reel)</button>
-                  <button onClick={() => setVideoFormat("orizzontale")} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${videoFormat === "orizzontale" ? "bg-white text-black font-bold" : "text-slate-400 hover:text-white"}`}>Orizzontale 16:9</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
-
-              <div className="space-y-10">
-                {/* 1. Immagini */}
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <ImageIcon className="text-cyan-400" /> 1. Immagini Veicolo (Max 8)
-                  </h3>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    {images.map((img, idx) => (
-                      <div key={idx} className="relative aspect-[4/3] rounded-xl overflow-hidden border border-white/20 bg-black group shadow-lg">
-                        <img src={img} className="object-cover w-full h-full" alt="Uploaded car" />
-                        <button onClick={() => removeImage(idx)} className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600">
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ))}
-                    {images.length < 8 && (
-                      <label className="aspect-[4/3] rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/5 transition-all group">
-                        <Plus size={24} className="text-slate-400 group-hover:text-cyan-400" />
-                        <input type="file" multiple className="hidden" onChange={handleMultipleFileUpload} accept="image/*" />
-                      </label>
-                    )}
-                  </div>
-
-                  <div
-                    onClick={!isPro ? () => setShowProModal(true) : undefined}
-                    className={`relative border-2 border-dashed rounded-2xl transition-all p-4 ${logo ? "border-cyan-500/50 bg-black/50" : "border-white/10 bg-black/40"} ${!isPro ? "opacity-50 cursor-pointer" : ""}`}
-                  >
-                    {!isPro && <div className="absolute top-2 right-2 text-red-400"><Lock size={14} /></div>}
-                    {!logo ? (
-                      <label className={`flex flex-col items-center justify-center ${isPro ? "cursor-pointer" : ""}`}>
-                        <Upload size={20} className="text-slate-500 mb-1" />
-                        <span className="text-sm font-medium">Logo Autosalone (Incluso nel PRO)</span>
-                        {isPro && <input type="file" className="hidden" onChange={handleLogoUpload} accept="image/png,image/jpeg,image/webp" />}
-                      </label>
-                    ) : (
-                      <div className="relative h-12 flex items-center justify-center">
-                        <img src={logo} className="max-h-full object-contain" alt="Logo preview" />
-                        <button onClick={() => setLogo(null)} className="absolute -top-2 -right-2 bg-black text-white rounded-full p-1 hover:bg-red-600">
-                          <X size={12} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* 2. Sfondo */}
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <MapPin className="text-purple-400" /> 2. Sfondo Magico AI
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {PREDEFINED_ENVIRONMENTS.map(env => (
-                      <button key={env.id} onClick={() => setSelectedEnvId(env.id)} className={`p-3 rounded-xl border text-xs text-left transition-all ${selectedEnvId === env.id ? "border-cyan-400 bg-cyan-400/10 text-white shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "border-white/10 bg-black/50 text-slate-400 hover:border-white/30"}`}>
-                        {env.icon} {env.it}
-                      </button>
-                    ))}
-                    <button onClick={() => setSelectedEnvId("custom")} className={`p-3 rounded-xl border text-xs text-left transition-all col-span-2 md:col-span-3 ${selectedEnvId === "custom" ? "border-purple-500 bg-purple-500/10 text-white" : "border-white/10 bg-black/50 text-slate-400"}`}>
-                      ✍️ Scrivi tu lo sfondo...
-                    </button>
-                  </div>
-                  {selectedEnvId === "custom" && (
-                    <input type="text" placeholder="Es. Salone marmo bianco illuminato a giorno..." value={customEnv} onChange={e => setCustomEnv(e.target.value)} className="w-full mt-3 bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500 transition-all" />
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-10">
-                {/* 3. Dati Veicolo */}
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <Car className="text-blue-400" /> 3. Dati Veicolo
-                  </h3>
-                  <div className="space-y-3">
-                    <input type="text" value={carMake} onChange={e => setCarMake(e.target.value)} placeholder="Marca e Modello (es. BMW Serie 3 M Sport)" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
-                    <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={carYear}  onChange={e => setCarYear(e.target.value)}  placeholder="Anno (es. 2023)"   className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
-                      <input type="text" value={carPrice} onChange={e => setCarPrice(e.target.value)} placeholder="Prezzo (es. 34.900 €)" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
-                    </div>
-                    <input type="text" value={carEngine} onChange={e => setCarEngine(e.target.value)} placeholder="Motore / Alimentazione (es. 2.0d 190CV Mild-Hybrid)" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-cyan-500 transition-all" />
-                  </div>
-                </div>
-
-                {/* 4. Autosalone & Voce */}
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <Building2 className="text-orange-400" /> 4. Autosalone & Voce
-                  </h3>
-                  <div className="space-y-3">
-                    <input type="text" value={agencyName}    onChange={e => setAgencyName(e.target.value)}    placeholder="Nome dell'Autosalone"    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
-                    <div className="grid grid-cols-2 gap-3">
-                      <input type="text" value={agencyAddress} onChange={e => setAgencyAddress(e.target.value)} placeholder="Città / Sede" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
-                      <input type="text" value={agencyPhone}   onChange={e => setAgencyPhone(e.target.value)}   placeholder="Telefono / WhatsApp"    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-orange-500 transition-all" />
-                    </div>
-                    <div className="relative mt-2">
-                      <select
-                        value={selectedVoice}
-                        onChange={e => setSelectedVoice(e.target.value)}
-                        className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-green-500 appearance-none cursor-pointer"
-                      >
-                        {VOICES_CONFIG[language as keyof typeof VOICES_CONFIG]?.map(v => (
-                          <option key={v.id} value={v.id} disabled={v.pro && !isPro}>
-                            {v.name} {v.pro && !isPro ? "🔒" : ""}
-                          </option>
-                        ))}
-                      </select>
-                      <Volume2 className="absolute right-4 top-3.5 text-slate-500 pointer-events-none" size={16} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SUBMIT BUTTON */}
-            <div className="mt-12 pt-8 border-t border-white/10 max-w-2xl mx-auto relative z-10">
-              <div className="mb-6 p-6 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl text-center">
-                <span className="inline-block px-3 py-1 bg-cyan-500 text-black text-xs font-black uppercase tracking-widest rounded-full mb-3">
-                  ✨ REGIA AI INCLUSA
-                </span>
-                <p className="text-lg text-slate-300 leading-relaxed">
-                  Oltre al cambio sfondo, la nostra Intelligenza Artificiale trasformerà <strong>fino a {isPro ? '4' : '2'} foto in veri video in movimento</strong> (l&apos;auto che sfreccia sull&apos;asfalto o carrellate cinematiche nel salone).
-                </p>
-              </div>
-
-              <div className="relative mb-4">
-                <Mail className="absolute left-4 top-4 text-slate-500" size={20} />
-                <input
-                  type="email"
-                  placeholder="La tua Email per ricevere il video..."
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  onBlur={e => checkEmailUsed(e.target.value)}
-                  className="w-full bg-black border border-white/20 rounded-xl py-4 pl-12 pr-4 text-white focus:border-cyan-500 outline-none shadow-inner transition-all"
-                />
-              </div>
-
-              <button
-                onClick={(e) => {
-                  if ((!isPro && freeUsed) || (isPro && videoRimanenti === 0)) {
-                    e.preventDefault();
-                    setShowProModal(true);
-                  } else {
-                    processAndTrigger();
-                  }
-                }}
-                disabled={btnDisabled}
-                className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black py-6 rounded-xl flex items-center justify-center gap-3 transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(34,211,238,0.25)] transform active:scale-95 text-xl sm:text-2xl cursor-pointer"
-              >
-                {loadingVideo ? <Loader2 className="animate-spin" size={24} /> : <Video size={24} />}
-                {btnLabel()}
-              </button>
-              {videoCompleted && (
-                <div className="mt-4 flex items-center justify-center gap-2 text-green-400 text-sm font-medium bg-green-400/10 p-3 rounded-lg border border-green-400/20">
-                  <CheckCircle2 size={18} /> Inviato! Riceverai il video via email tra circa 3-5 minuti.
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* ── SEZIONE TARIFFE CON STRIPE ON-THE-FLY ── */}
-        <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
-              🚀 Offerta Speciale di Lancio
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Investi sul tuo Marketing, <br/><span className="text-cyan-400">non sui costi fissi.</span></h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Sistema Pay-per-Result: acquisti i crediti una volta, li usi quando vuoi. <br className="hidden md:block"/> 
-              <strong>Senza abbonamenti. Senza scadenze.</strong>
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto items-stretch">
-            {/* Starter */}
-            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all justify-between">
-              <div>
-                <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Starter Pack</h3>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-slate-500 line-through text-lg">€29</span>
-                  <div className="text-4xl font-black text-white">€ 14,90</div>
-                </div>
-                <p className="text-cyan-500/80 text-xs font-bold mb-6">Il prezzo di una pizza per vendere un&apos;auto.</p>
-                <ul className="space-y-4 text-sm text-slate-300 mb-8">
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> 1 Video HD Professionale</li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Sfondo AI Personalizzato</li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Post Social Pronti all&apos;uso</li>
-                </ul>
-              </div>
-              <button 
-                onClick={() => avviaCheckoutDriveMotion("starter")} 
-                disabled={checkoutLoading === "starter"}
-                className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm cursor-pointer disabled:opacity-50"
-              >
-                {checkoutLoading === "starter" ? "Apertura Checkout..." : "Inizia Ora"}
-              </button>
-            </div>
-
-            {/* Pro */}
-            <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border-2 rounded-[2rem] p-8 flex flex-col relative transform md:-translate-y-4 z-10 scale-105 justify-between gold-decoy-card">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">SCELTO DAL 74% DEI SALONI</div>
-              <div>
-                <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack (5 Video)</h3>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-slate-400 line-through text-lg">€99</span>
-                  <div className="text-5xl font-black text-white">€ 59</div>
-                </div>
-                <p className="text-white text-xs font-bold mb-6">Solo 11,80€ per video cinematografico.</p>
-                <ul className="space-y-4 text-sm text-white mb-8">
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>Il Tuo Logo nel Video</strong></li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Lingue Straniere Sbloccate</li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Crediti Senza Scadenza</li>
-                </ul>
-              </div>
-              <button 
-                onClick={() => avviaCheckoutDriveMotion("pro")} 
-                disabled={checkoutLoading === "pro"}
-                className="block text-center w-full bg-cyan-500 text-black hover:bg-cyan-400 py-4 rounded-full font-black transition-all shadow-lg shadow-cyan-500/25 cursor-pointer disabled:opacity-50"
-              >
-                {checkoutLoading === "pro" ? "Apertura Checkout..." : "ACQUISTA 5 VIDEO 🔥"}
-              </button>
-            </div>
-
-            {/* Maxi */}
-            <div className="bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-8 flex flex-col hover:border-white/30 transition-all group justify-between">
-              <div>
-                <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Maxi Pack (15 Video)</h3>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-slate-500 line-through text-lg">€199</span>
-                  <div className="text-4xl font-black text-white">€ 129</div>
-                </div>
-                <p className="text-cyan-500/80 text-xs font-bold mb-6">Il miglior rapporto qualità/prezzo.</p>
-                <ul className="space-y-4 text-sm text-slate-300 mb-8">
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>15 Video Credits HD</strong></li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Inserimento Logo Salone</li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Elaborazione Prioritaria</li>
-                  <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> Tutte le funzioni Pro</li>
-                </ul>
-              </div>
-              <button 
-                onClick={() => avviaCheckoutDriveMotion("max")} 
-                disabled={checkoutLoading === "max"}
-                className="block text-center w-full border border-white/20 hover:bg-white/10 py-3.5 rounded-full font-bold transition-all text-sm cursor-pointer disabled:opacity-50"
-              >
-                {checkoutLoading === "max" ? "Apertura Checkout..." : "Sblocca 15 Video"}
-              </button>
-            </div>
-          </div>
-          <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
-        </section>
-
-        {/* ── SEZIONE FAQ: 10 DOMANDE & RISPOSTE ── */}
-        <section className="max-w-4xl mx-auto px-6 py-20 border-t border-white/5">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-4">
-              <HelpCircle size={14} /> Dubbi Frequenti
-            </div>
-            <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
-              Tutto quello che c&apos;è da sapere
-            </h2>
-            <p className="text-slate-400 mt-3 text-base">Risposte chiare e trasparenti prima di iniziare.</p>
-          </div>
-
-          <div className="space-y-4">
-            {FAQS.map((faq, idx) => {
-              const isOpen = openFaq === idx;
-              return (
-                <div 
-                  key={idx} 
-                  className="bg-[#0a0a0c]/90 border border-white/10 rounded-2xl overflow-hidden transition-all duration-300 hover:border-cyan-500/30"
-                >
-                  <button
-                    onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className="w-full p-6 text-left flex justify-between items-center gap-4 cursor-pointer"
-                  >
-                    <span className="font-bold text-white text-base sm:text-lg">{faq.q}</span>
-                    <ChevronDown className={`text-cyan-400 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} size={20} />
-                  </button>
-                  {isOpen && (
-                    <div className="px-6 pb-6 text-slate-400 text-sm leading-relaxed border-t border-white/5 pt-4">
-                      {faq.a}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* ── SEZIONE TRUST & ECOSISTEMA ORBITALE ── */}
-        <section id="ecosistema" className="border-t border-white/10 bg-[#020202]/80 py-24 px-6 relative">
-          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16">
-            <div 
-              ref={orbitContainerRef}
-              className="w-full lg:w-1/2 flex justify-center items-center relative min-h-[440px] orbit-area"
-              id="orbit-template-container"
-            />
-            <div className="w-full lg:w-1/2">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6">
-                Esperienza & Autorevolezza
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tighter text-white">
-                Non ti vendo software.<br />
-                <span className="text-cyan-400">Ti costruisco un vantaggio.</span>
-              </h2>
-              <p className="text-white/60 mb-6 leading-relaxed text-lg font-light italic">
-                &ldquo;Prendo i tuoi colli di bottiglia e li trasformo in ecosistemi autonomi che producono media,
-                gestiscono clienti e generano vendite H24.&rdquo;
-              </p>
-              <p className="text-lg text-white/40 mb-8 leading-relaxed font-light">
-                Sono Riccardo Modena, founder di <b>RM Studio</b>. Ho fondato questo lab perché oggi l&apos;AI non è più
-                un lusso, è l&apos;unico modo per scalare senza un esercito di dipendenti. Come evidenziato nelle <a href="https://www.w3.org/community/tourism/" target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline hover:text-cyan-300">linee guida del consorzio internazionale W3C sull&apos;IA applicata al turismo</a>, l&apos;integrazione di sistemi conversazionali intelligenti abbatte la frizione operativa e ottimizza l&apos;esperienza d&apos;uso dell&apos;utente finale.
-              </p>
-              <a href="#creatore" className="inline-flex items-center gap-2 border-b-2 border-cyan-400 text-cyan-400 pb-1 font-black uppercase text-sm tracking-widest hover:text-white hover:border-white transition-all">
-                Esplora le Soluzioni ↓
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ── AUTOREVOLEZZA SCIENTIFICA ED E-E-A-T ── */}
-        <section className="bg-slate-950/60 border-y border-white/5 py-12 px-6">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-slate-500 text-sm">
-            <p className="text-center md:text-left text-slate-400 font-medium max-w-xl">
-              I sistemi di elaborazione e la conformità di DriveMotion aderiscono alle metodologie raccomandate dalle principali organizzazioni di regolamentazione tecnica e di sicurezza dei dati.
-            </p>
-            <div className="flex flex-wrap justify-center items-center gap-6 text-xs font-semibold">
-              <a href="https://www.nar.realtor" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition underline decoration-dotted underline-offset-4">
-                National Association of Realtors
-              </a>
-              <span className="text-slate-800">|</span>
-              <a href="https://www.iso.org/standard/27001" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition underline decoration-dotted underline-offset-4">
-                ISO/IEC 27001 Security Standard
-              </a>
-              <span className="text-slate-800">|</span>
-              <a href="https://www.health.harvard.edu" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition underline decoration-dotted underline-offset-4">
-                Harvard Health Publishing
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ── FOOTER RIFINITO CON ECOSISTEMA STRUTTURATO ── */}
-        <footer className="border-t border-white/10 bg-black py-16 relative z-10">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 text-center md:text-left">
-            <div className="md:col-span-2">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
-                <img src="/logo.png" alt="DriveMotion AI Logo" className="h-10 w-auto object-contain" />
-                <span className="font-extrabold text-white text-lg">DriveMotion AI</span>
-              </div>
-              <p className="text-slate-500 text-sm leading-relaxed max-w-sm">
-                Tecnologia proprietaria RM Studio. Semplifichiamo il marketing automotive attraverso l&apos;Intelligenza Artificiale Generativa e la Computer Vision 3D.
-              </p>
-              <div className="text-slate-600 text-xs mt-6 flex flex-wrap items-center gap-3 justify-center md:justify-start">
-                <span>© {new Date().getFullYear()} RM Studio. Tutti i diritti riservati.</span>
-                <span>|</span>
-                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
-                  Privacy Policy
-                </a>
-                <span>|</span>
-                <a href="https://rmstudio.app/termini.html" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-cyan-400 transition-colors underline">
-                  Termini
-                </a>
-              </div>
-            </div>
-
-            {/* Soluzioni Ecosistema RM */}
-            <div>
-              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Piattaforme RM</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="https://hometour.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">HomeTour AI (Immobiliare)</a></li>
-                <li><a href="https://concierge24.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Concierge24 (Hospitality)</a></li>
-                <li><a href="https://dentis.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Dentis AI (Dentisti)</a></li>
-                <li><a href="https://lexis.rmstudio.app" target="_blank" className="hover:text-cyan-400 transition-colors">Lexis AI (Studi Legali)</a></li>
-                <li><a href="https://blogs.rmstudio.app/drivemotion/" target="_blank" className="hover:text-cyan-400 transition-colors font-bold text-cyan-400">Blog DriveMotion</a></li>
-              </ul>
-            </div>
-
-            {/* Social & Supporto */}
-            <div>
-              <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-4">Social Hub</h4>
-              <div className="flex justify-center md:justify-start gap-3 mb-6">
-                <a href="https://www.instagram.com/riccardo_mode_/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-cyan-500/50 hover:bg-cyan-500/10 transition-all"><InstagramIcon size={18} /></a>
-                <a href="https://www.facebook.com/riccardo.modena.792" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-500/50 hover:bg-blue-500/10 transition-all"><FacebookIcon size={18} /></a>
-                <a href="https://www.linkedin.com/in/riccardo-modena-13918a61/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-blue-600/50 hover:bg-blue-600/10 transition-all"><LinkedinIcon size={18} /></a>
-                <a href="https://www.tiktok.com/@mr3d.riccardo" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:border-pink-500/50 hover:bg-pink-500/10 transition-all"><TiktokIcon size={18} /></a>
-              </div>
-              <button onClick={() => setShowSupportModal(true)} className="text-xs bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded-full border border-white/15 transition-all">
-                Scrivi all&apos;Assistenza
-              </button>
-            </div>
-          </div>
-        </footer>
+        <Navbar isPro={isPro} videoRimanenti={videoRimanenti} onOpenSupport={() => setShowSupportModal(true)} />
+        <Hero demoStep={demoStep} />
+        <Features />
+        <VideoGeneratorForm 
+          images={images} logo={logo} email={email} setEmail={setEmail}
+          carMake={carMake} setCarMake={setCarMake} carPrice={carPrice} setCarPrice={setCarPrice}
+          carYear={carYear} setCarYear={setCarYear} carEngine={carEngine} setCarEngine={setCarEngine}
+          agencyName={agencyName} setAgencyName={setAgencyName} agencyAddress={agencyAddress} setAgencyAddress={setAgencyAddress}
+          agencyPhone={agencyPhone} setAgencyPhone={setAgencyPhone} selectedEnvId={selectedEnvId} setSelectedEnvId={setSelectedEnvId}
+          customEnv={customEnv} setCustomEnv={setCustomEnv} videoFormat={videoFormat} setVideoFormat={setVideoFormat}
+          language={language} handleLanguageChange={handleLanguageChange} selectedVoice={selectedVoice} setSelectedVoice={setSelectedVoice}
+          isPro={isPro} freeUsed={freeUsed} videoRimanenti={videoRimanenti} loadingVideo={loadingVideo} videoCompleted={videoCompleted}
+          handleMultipleFileUpload={handleMultipleFileUpload} removeImage={removeImage} handleLogoUpload={handleLogoUpload} setLogo={setLogo}
+          processAndTrigger={processAndTrigger} setShowProModal={setShowProModal} checkEmailUsed={checkEmailUsed}
+          predefinedEnvironments={PREDEFINED_ENVIRONMENTS} voicesConfig={VOICES_CONFIG} languages={LANGUAGES}
+        />
+        <PricingSection email={email} />
+        <FaqSection faqs={FAQS} />
+        <EcosystemSection orbitContainerRef={orbitContainerRef} />
+        <Footer onOpenSupport={() => setShowSupportModal(true)} />
       </div>
 
-      {/* ── MODAL PRO ── */}
-      {showProModal && (
-        <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
-          <div className="bg-[#0a0a0c] border border-cyan-500/30 rounded-[2.5rem] p-10 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
-            <Lock className="text-cyan-400 mx-auto mb-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" size={48} />
-            <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L&apos;inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
-            <div className="space-y-3">
-              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 text-center">Vedi i Piani</a>
-              <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest cursor-pointer">Chiudi</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── MODAL CONTATTI ── */}
-      {showSupportModal && (
-        <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
-          <div className="relative w-full max-w-xl">
-            <button onClick={() => setShowSupportModal(false)} className="absolute -top-12 right-0 text-slate-400 hover:text-white transition-colors z-10 cursor-pointer">
-              <X size={28} />
-            </button>
-            {supportSuccess ? (
-              <div className="bg-[#0a0a0c] border border-cyan-500/30 p-8 rounded-2xl text-center shadow-2xl">
-                <CheckCircle2 size={48} className="text-cyan-400 mx-auto mb-4 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
-                <h4 className="text-white font-bold text-xl mb-1">Messaggio Inviato!</h4>
-                <p className="text-slate-400 text-sm">Il nostro team ti risponderà il prima possibile.</p>
-              </div>
-            ) : (
-              <div className="bg-[#0a0a0c]/90 backdrop-blur-md border border-white/10 p-8 rounded-2xl shadow-2xl">
-                <h3 className="text-white font-bold text-2xl mb-6 flex items-center gap-2">
-                  <span className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,211,238,0.5)]"></span> Scrivici
-                </h3>
-                <form onSubmit={handleSupportSubmit} className="grid sm:grid-cols-2 gap-5 text-left">
-                  <div className="sm:col-span-1">
-                    <label className="block text-sm font-medium text-slate-400 mb-1">Il tuo Nome</label>
-                    <input type="text" name="name" required className="w-full bg-black border border-white/10 text-white rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors" placeholder="Mario Rossi" />
-                  </div>
-                  <div className="sm:col-span-1">
-                    <label className="block text-sm font-medium text-slate-400 mb-1">La tua Email</label>
-                    <input type="email" name="email" required className="w-full bg-black border border-white/10 text-white rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors" placeholder="mario@email.it" />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-slate-400 mb-1">Messaggio</label>
-                    <textarea name="message" required rows={4} className="w-full bg-black border border-white/10 text-white rounded-lg px-4 py-3 outline-none focus:border-cyan-400 transition-colors resize-none" placeholder="Come possiamo aiutarti?"></textarea>
-                  </div>
-                  <div className="sm:col-span-2 mt-2">
-                    <button type="submit" disabled={supportLoading} className="w-full bg-white hover:bg-slate-200 text-black font-bold py-4 rounded-xl transition-transform active:scale-95 shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 cursor-pointer">
-                      {supportLoading ? <Loader2 className="animate-spin" size={20} /> : <Mail size={20} />}
-                      {supportLoading ? "Invio in corso..." : "Invia Messaggio"}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <Modals showProModal={showProModal} setShowProModal={setShowProModal} showSupportModal={showSupportModal} setShowSupportModal={setShowSupportModal} />
+      <Chatbot />
     </div>
   );
 }
