@@ -33,7 +33,7 @@ export async function avviaCheckoutDriveMotion(
     body: JSON.stringify(payload)
   });
 
-  if (!res.ok) throw new Error("Errore sessione Stripe");
+  if (!res.ok) throw new Error("Errore sessione");
   const data = await res.json();
   const redirectUrl = data.url || data.checkout_url || data.session_url;
 
