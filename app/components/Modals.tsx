@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import { Lock, X, CheckCircle2, Loader2, Mail } from "lucide-react";
 
@@ -47,29 +45,21 @@ export default function Modals({
 
   return (
     <>
-      {/* MODAL PRO */}
       {showProModal && (
         <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
           <div className="bg-[#0a0a0c] border border-cyan-500/30 rounded-[2.5rem] p-10 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
             <Lock className="text-cyan-400 mx-auto mb-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" size={48} />
             <h3 className="text-2xl font-black text-white mb-2 uppercase tracking-tighter">Sblocca il Potenziale</h3>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">
-              L&apos;inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.
-            </p>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed font-medium">L&apos;inserimento del logo aziendale e le voci AI premium in lingua straniera sono disponibili esclusivamente con i piani a pagamento.</p>
             <div className="space-y-3">
-              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 text-center">
-                Vedi i Piani
-              </a>
-              <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest cursor-pointer">
-                Chiudi
-              </button>
+              <a href="#prezzi" onClick={() => setShowProModal(false)} className="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-cyan-600/20 text-center">Vedi i Piani</a>
+              <button onClick={() => setShowProModal(false)} className="block w-full text-slate-500 hover:text-white py-2 font-bold text-sm transition-colors uppercase tracking-widest cursor-pointer">Chiudi</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* MODAL CONTATTI */}
       {showSupportModal && (
         <div className="fixed inset-0 bg-black/90 z-[999] flex items-center justify-center px-4 backdrop-blur-md">
           <div className="relative w-full max-w-xl">
