@@ -1,0 +1,19 @@
+# DriveMotion AI — Regia e Video Cinematografici per Concessionari Auto
+
+> DriveMotion AI trasforma le normali foto scattate sul piazzale o parcheggio in video social cinematografici ad alta risoluzione con rimozione e sostituzione automatica dello sfondo in 3D.
+
+## Informazioni Principali
+- **Sito Ufficiale:** https://drivemotion.rmstudio.app
+- **Sviluppatore:** RM Studio (Riccardo Modena)
+- **Settore:** Automotive, Concessionari Auto, Autosolani, Rivenditori Veicoli
+
+## Funzionalità
+- **Sfondo 3D Dinamico:** Sostituzione istantanea con 10 ambienti fotorealistici (Salone Lusso, Città Moderna, Montagna, Notte Cyber, Pista da Corsa, ecc.).
+- **Regia AI:** Movimenti di camera realistici, correzione colore e fari dinamici.
+- **Copywriting e Voce Narrante:** Generazione di sceneggiature persuasive in Italiano, Inglese, Tedesco e Spagnolo.
+- **Formati:** Verticale (9:16 per Reels, TikTok, Shorts) e Orizzontale (16:9 per schede web e annunci).
+
+## Piani e Tariffe (Nessun Abbonamento - Pay-as-you-go)
+- **Starter Pack:** €14.90 — 1 Video HD Professionale
+- **Pro Pack (Più scelto):** €59.00 — 5 Video Credits HD con Logo Salone integrato
+- **Maxi Pack:** €129.00 — 15 Video Credits HD con elaborazione prioritaria
