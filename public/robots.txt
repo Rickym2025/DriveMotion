@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Disallow private and checkout callbacks if any
+Disallow: /api/
+
+Sitemap: https://drivemotion.rmstudio.app/sitemap.xml
