@@ -1,6 +1,14 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
-import { avviaCheckoutDriveMotion } from "../utils/stripe";
+import {
+  avviaCheckoutDriveMotion,
+  getLivePricesDriveMotion,
+  DRIVEMOTION_PRICES,
+  DriveMotionPlanKey,
+  DriveMotionPlan
+} from "../utils/stripe";
 
 interface PricingProps {
   email?: string;
@@ -8,11 +16,17 @@ interface PricingProps {
 
 export default function PricingSection({ email }: PricingProps) {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [prices, setPrices] = useState<Record<DriveMotionPlanKey, DriveMotionPlan>>(DRIVEMOTION_PRICES);
 
-  const handleCheckout = async (planKey: "starter" | "pro" | "max") => {
+  // Scarica il listino live da Supabase S2 all'avvio
+  useEffect(() => {
+    getLivePricesDriveMotion().then(liveData => setPrices(liveData));
+  }, []);
+
+  const handleCheckout = async (planKey: DriveMotionPlanKey) => {
     try {
       setLoadingPlan(planKey);
-      await avviaCheckoutDriveMotion(planKey, email);
+      await avviaCheckoutDriveMotion(planKey, email, prices[planKey].price);
     } catch (err) {
       console.error(err);
       window.location.hash = "#prezzi";
@@ -21,15 +35,22 @@ export default function PricingSection({ email }: PricingProps) {
     }
   };
 
+  const formatPrice = (val: number) => {
+    return val % 1 === 0 ? `€ ${val}` : `€ ${val.toFixed(2).replace(".", ",")}`;
+  };
+
   return (
     <section id="prezzi" className="max-w-6xl mx-auto px-6 py-24">
       <div className="text-center mb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
           🚀 Offerta Speciale di Lancio
         </div>
-        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Investi sul tuo Marketing, <br/><span className="text-cyan-400">non sui costi fissi.</span></h2>
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          Investi sul tuo Marketing, <br />
+          <span className="text-cyan-400">non sui costi fissi.</span>
+        </h2>
         <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-          Sistema Pay-per-Result: acquisti i crediti una volta, li usi quando vuoi. <br className="hidden md:block"/> 
+          Sistema Pay-per-Result: acquisti i crediti una volta, li usi quando vuoi. <br className="hidden md:block" />
           <strong>Senza abbonamenti. Senza scadenze.</strong>
         </p>
       </div>
@@ -41,7 +62,7 @@ export default function PricingSection({ email }: PricingProps) {
             <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Starter Pack</h3>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-slate-500 line-through text-lg">€29</span>
-              <div className="text-4xl font-black text-white">€ 14,90</div>
+              <div className="text-4xl font-black text-white">{formatPrice(prices.starter.price)}</div>
             </div>
             <p className="text-cyan-500/80 text-xs font-bold mb-6">Il prezzo di una pizza per vendere un&apos;auto.</p>
             <ul className="space-y-4 text-sm text-slate-300 mb-8">
@@ -61,14 +82,16 @@ export default function PricingSection({ email }: PricingProps) {
 
         {/* Pro */}
         <div className="bg-gradient-to-b from-cyan-900/40 to-[#0a0a0c]/90 backdrop-blur-xl border-2 rounded-[2rem] p-8 flex flex-col relative transform md:-translate-y-4 z-10 scale-105 justify-between gold-decoy-card">
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">SCELTO DAL 74% DEI SALONI</div>
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+            SCELTO DAL 74% DEI SALONI
+          </div>
           <div>
             <h3 className="text-cyan-400 font-bold uppercase tracking-widest text-sm mb-2">Pro Pack (5 Video)</h3>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-slate-400 line-through text-lg">€99</span>
-              <div className="text-5xl font-black text-white">€ 59</div>
+              <div className="text-5xl font-black text-white">{formatPrice(prices.pro.price)}</div>
             </div>
-            <p className="text-white text-xs font-bold mb-6">Solo 11,80€ per video cinematografico.</p>
+            <p className="text-white text-xs font-bold mb-6">Solo {(prices.pro.price / 5).toFixed(2).replace(".", ",")}€ per video cinematografico.</p>
             <ul className="space-y-4 text-sm text-white mb-8">
               <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>5 Video Credits</strong></li>
               <li className="flex gap-3 items-start"><CheckCircle2 size={18} className="text-cyan-400 shrink-0" /> <strong>Il Tuo Logo nel Video</strong></li>
@@ -91,7 +114,7 @@ export default function PricingSection({ email }: PricingProps) {
             <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm mb-2">Maxi Pack (15 Video)</h3>
             <div className="flex items-baseline gap-2 mb-1">
               <span className="text-slate-500 line-through text-lg">€199</span>
-              <div className="text-4xl font-black text-white">€ 129</div>
+              <div className="text-4xl font-black text-white">{formatPrice(prices.max.price)}</div>
             </div>
             <p className="text-cyan-500/80 text-xs font-bold mb-6">Il miglior rapporto qualità/prezzo.</p>
             <ul className="space-y-4 text-sm text-slate-300 mb-8">
@@ -110,7 +133,9 @@ export default function PricingSection({ email }: PricingProps) {
           </button>
         </div>
       </div>
-      <p className="text-center text-slate-500 text-xs mt-12 italic">Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.</p>
+      <p className="text-center text-slate-500 text-xs mt-12 italic">
+        Tutti i prezzi sono una tantum. I crediti acquistati non scadono mai e rimangono nel tuo account finché non li usi.
+      </p>
     </section>
   );
 }
