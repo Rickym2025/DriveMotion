@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="it"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
@@ -48,6 +48,9 @@ export default function RootLayout({
 
         {/* 2. BANNER DEI COOKIE RM STUDIO */}
         <Script src="https://rmstudio.app/cookie-banner.js" strategy="afterInteractive" />
+
+        {/* 3. SELETTORE LINGUE UNIVERSALE RM STUDIO */}
+        <Script src="https://rmstudio.app/translate.js" strategy="afterInteractive" />
       </body>
     </html>
   );
