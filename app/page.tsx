@@ -12,34 +12,45 @@ import Footer from "./components/Footer";
 import Modals from "./components/Modals";
 import Chatbot from "./components/Chatbot";
 
+const ADMIN_SUPERUSER_EMAIL = "modena.riccardo@gmail.com";
+
 const PREDEFINED_ENVIRONMENTS = [
-  { id: "luxury",  icon: "✨", it: "Salone Lusso",      en: "Luxury car showroom, bright studio lighting, floor reflections" },
-  { id: "city",    icon: "🏙️", it: "Città Moderna",     en: "Modern city street downtown, daylight, realistic urban setting" },
-  { id: "mountain",icon: "⛰️", it: "Montagna",           en: "Winding mountain road, scenic view, nature background" },
-  { id: "night",   icon: "🌃", it: "Notte Cyber",        en: "Night city street, neon lights, cyberpunk style, wet reflections" },
-  { id: "loft",    icon: "🧱", it: "Loft Industriale",   en: "Industrial loft interior, brick walls, cinematic lighting" },
-  { id: "studio",  icon: "📸", it: "Studio Foto",        en: "Professional photo studio, infinite white cove, softbox lights" },
-  { id: "coast",   icon: "🌅", it: "Tramonto Mare",      en: "Coastal road at sunset, golden hour, ocean in background" },
-  { id: "desert",  icon: "🏜️", it: "Deserto",            en: "Desert landscape, warm sand, dramatic sky" },
-  { id: "snow",    icon: "❄️", it: "Neve",               en: "Snowy forest road, winter landscape, crisp lighting" },
-  { id: "track",   icon: "🏁", it: "Pista da Corsa",     en: "Professional race track, curbs, motion blur background" },
+  { id: "luxury",   icon: "✨", it: "Salone Lusso",     en: "Luxury car showroom, bright studio lighting, floor reflections" },
+  { id: "city",     icon: "🏙️", it: "Città Moderna",    en: "Modern city street downtown, daylight, realistic urban setting" },
+  { id: "mountain", icon: "⛰️", it: "Montagna",          en: "Winding mountain road, scenic view, nature background" },
+  { id: "night",    icon: "🌃", it: "Notte Cyber",       en: "Night city street, neon lights, cyberpunk style, wet reflections" },
+  { id: "loft",     icon: "🧱", it: "Loft Industriale",  en: "Industrial loft interior, brick walls, cinematic lighting" },
+  { id: "studio",   icon: "📸", it: "Studio Foto",       en: "Professional photo studio, infinite white cove, softbox lights" },
+  { id: "coast",    icon: "🌅", it: "Tramonto Mare",     en: "Coastal road at sunset, golden hour, ocean in background" },
+  { id: "desert",   icon: "🏜️", it: "Deserto",           en: "Desert landscape, warm sand, dramatic sky" },
+  { id: "snow",     icon: "❄️", it: "Neve",              en: "Snowy forest road, winter landscape, crisp lighting" },
+  { id: "track",    icon: "🏁", it: "Pista da Corsa",    en: "Professional race track, curbs, motion blur background" },
 ];
 
 const VOICES_CONFIG = {
   it: [
-    { id: "nova", name: "Nova (F) — Naturale & Solare", pro: false },
-    { id: "shimmer", name: "Shimmer (F) — Elegante & Lusso", pro: true },
-    { id: "coral", name: "Coral (F) — Vibrante & Emozionale", pro: true },
-    { id: "onyx", name: "Onyx (M) — Profonda & Autorevole", pro: true },
-    { id: "echo", name: "Echo (M) — Calda & Rassicurante", pro: true },
-    { id: "fable", name: "Fable (M) — Narrativa & Coinvolgente", pro: true },
-    { id: "ash", name: "Ash (M) — Chiara & Professionale", pro: true },
-    { id: "alloy", name: "Alloy (M/F) — Bilanciata", pro: true }
+    { id: "nova",    name: "Nova (F) — Naturale & Solare",    pro: false },
+    { id: "shimmer", name: "Shimmer (F) — Elegante & Lusso",   pro: true },
+    { id: "coral",   name: "Coral (F) — Vibrante & Emozionale", pro: true },
+    { id: "onyx",    name: "Onyx (M) — Profonda & Autorevole", pro: true },
+    { id: "echo",    name: "Echo (M) — Calda & Rassicurante",  pro: true },
+    { id: "fable",   name: "Fable (M) — Narrativa & Coinvolgente", pro: true },
+    { id: "ash",     name: "Ash (M) — Chiara & Professionale", pro: true },
+    { id: "alloy",   name: "Alloy (M/F) — Bilanciata",         pro: true }
   ],
   en: [
-    { id: "nova", name: "Nova (F) — Bright & Clear", pro: true },
-    { id: "shimmer", name: "Shimmer (F) — Soft & Elegant", pro: true },
-    { id: "onyx", name: "Onyx (M) — Deep & Bold", pro: true }
+    { id: "nova",    name: "Nova (F) — Bright & Clear",        pro: true },
+    { id: "shimmer", name: "Shimmer (F) — Soft & Elegant",     pro: true },
+    { id: "onyx",    name: "Onyx (M) — Deep & Bold",           pro: true },
+    { id: "echo",    name: "Echo (M) — Smooth & Warm",         pro: true }
+  ],
+  de: [
+    { id: "nova",    name: "Nova (F) — Natürlich & Klar",      pro: true },
+    { id: "onyx",    name: "Onyx (M) — Tief & Autoratär",      pro: true }
+  ],
+  es: [
+    { id: "nova",    name: "Nova (F) — Natural & Clara",       pro: true },
+    { id: "onyx",    name: "Onyx (M) — Profunda & Elegante",   pro: true }
   ]
 };
 
@@ -55,7 +66,7 @@ const FAQS = [
   { q: "Quanto tempo ci vuole per ricevere il video completato?", a: "Una volta inviato il form con le foto, i nostri server di rendering ad alta potenza elaborano il video in circa 3-5 minuti. Il link definitivo per scaricare il file MP4 in Full HD viene inviato istantaneamente all'indirizzo email indicato." },
   { q: "Che tipo di foto devo caricare per ottenere la massima resa?", a: "Bastano da 3 a 8 scatti eseguiti con un comune smartphone. Consigliamo almeno una foto frontale a 3/4 (la preferita per l'animazione di testa), una laterale, una del retro e qualche dettaglio degli interni o del cruscotto." },
   { q: "L'AI rielabora anche le foto degli interni o solo gli esterni?", a: "La sostituzione dello sfondo fotorealistico 3D viene applicata con massima precisione sulla carrozzeria esterna. Per gli interni, l'AI applica correzione colore cinematografica, stabilizzazione e zoom dinamici mantenendo inalterata la fedeltà del veicolo." },
-  { q: "I crediti video acquistati hanno una data di scadenza?", a: "Assolutamente no. Non applichiamo alcun abbonamento mensile vincolante. I crediti acquistati (1, 5 o 15 video) rimangono per sempre nel tuo saldo finché non decidi di utilizzarli." },
+  { q: "I crediti video acquistati hanno una data di scadenza?", a: "Assolutamente no. Non applichiamo alcun abbonamento mensile vincolante. I crediti acquistati rimangono per sempre nel tuo saldo finché non decidi di utilizzarli." },
   { q: "Posso inserire il logo del mio autosalone e i miei contatti nel video?", a: "Sì, a partire dal piano PRO puoi caricare il logo trasparente (PNG/SVG) della tua concessionaria, che verrà integrato in sovrimpressione con animazione d'ingresso professionale, insieme a indirizzo, telefono e prezzo del veicolo." },
   { q: "In quali formati vengono esportati i video e dove posso pubblicarli?", a: "Puoi selezionare sia il formato Verticale (9:16), ottimizzato per Instagram Reels, TikTok, YouTube Shorts e Facebook Ads, sia il formato Orizzontale (16:9), ideale per le schede del tuo sito web e i portali di annunci (AutoScout24, Subito)." },
   { q: "Come funziona la voce narrante e in quali lingue parla?", a: "La nostra voce sintetica avanzata legge una sceneggiatura persuasiva generata sull'allestimento dell'auto. È disponibile in Italiano, Inglese, Tedesco e Spagnolo, perfetta per intercettare anche acquirenti esteri." },
@@ -95,11 +106,12 @@ export default function AutoBestPage() {
   const [customEnv, setCustomEnv] = useState("");
   const [videoFormat, setVideoFormat] = useState("verticale");
   const [language, setLanguage] = useState("it");
-  const [selectedVoice, setSelectedVoice] = useState("d718e944-b313-4998-b011-d1cc078d4ef3");
+  const [selectedVoice, setSelectedVoice] = useState("nova");
 
   const [loadingVideo, setLoadingVideo] = useState(false);
   const [videoCompleted, setVideoCompleted] = useState(false);
 
+  // Caricamento Widget Orbitale
   useEffect(() => {
     fetch("https://raw.githubusercontent.com/Rickym2025/mrstudio/main/public/orbit-template.html")
       .then((res) => res.text())
@@ -110,6 +122,7 @@ export default function AutoBestPage() {
     return () => clearInterval(interval);
   }, []);
 
+  // Verifica Token URL o LocalStorage
   useEffect(() => {
     const checkToken = async () => {
       const urlToken = new URLSearchParams(window.location.search).get("token");
@@ -135,9 +148,23 @@ export default function AutoBestPage() {
     checkToken();
   }, []);
 
+  // 👑 Sblocco Superuser Automatico Riccardo Modena
+  const handleEmailChange = (newEmail: string) => {
+    setEmail(newEmail);
+    const sanitized = newEmail.trim().toLowerCase();
+    if (sanitized === ADMIN_SUPERUSER_EMAIL) {
+      setIsPro(true);
+      setToken("ADMIN-RICCARDO-MASTER");
+      setVideoRimanenti(9999);
+      localStorage.setItem("ab_token", "ADMIN-RICCARDO-MASTER");
+    }
+  };
+
+  // Cambio lingua sicuro (senza crash su DE/ES)
   const handleLanguageChange = (lang: string) => {
     setLanguage(lang);
-    setSelectedVoice(VOICES_CONFIG[lang as keyof typeof VOICES_CONFIG][0].id);
+    const availableVoices = VOICES_CONFIG[lang as keyof typeof VOICES_CONFIG] || VOICES_CONFIG.it;
+    setSelectedVoice(availableVoices[0].id);
   };
 
   const handleMultipleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,7 +177,7 @@ export default function AutoBestPage() {
           const img = new Image();
           img.src = event.target?.result as string;
           img.onload = () => {
-            const MAX_SIZE = 1080;
+            const MAX_SIZE = 1280;
             let width = img.width;
             let height = img.height;
             if (width > MAX_SIZE || height > MAX_SIZE) {
@@ -163,7 +190,7 @@ export default function AutoBestPage() {
             canvas.height = height;
             const ctx = canvas.getContext("2d")!;
             ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL("image/jpeg", 0.95));
+            resolve(canvas.toDataURL("image/jpeg", 0.90));
           };
         };
       });
@@ -187,24 +214,34 @@ export default function AutoBestPage() {
     setLoadingVideo(true);
     setVideoCompleted(false);
 
-    const englishPrompt = selectedEnvId === "custom" ? customEnv : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
+    const isAdmin = email.trim().toLowerCase() === ADMIN_SUPERUSER_EMAIL;
+    const effectiveIsPro = isAdmin ? true : isPro;
+    const effectiveToken = isAdmin ? "ADMIN-RICCARDO-MASTER" : token;
+
+    const englishPrompt = selectedEnvId === "custom" 
+      ? customEnv 
+      : PREDEFINED_ENVIRONMENTS.find(e => e.id === selectedEnvId)?.en || "";
 
     try {
-      const logoPayload = (isPro && logo) ? logo : FALLBACK_LOGO_URL;
+      const logoPayload = (effectiveIsPro && logo) ? logo : FALLBACK_LOGO_URL;
+
       const res = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sector: "auto",
-          descrizione: `${carMake} ${carEngine} ${carYear}`,
+          descrizione: `${carMake} ${carEngine} ${carYear}`.trim(),
           prezzo: carPrice,
           images,
           logo: logoPayload,
-          email,
+          email: email.trim().toLowerCase(),
           formato: videoFormat,
           lingua: language,
+          voce: selectedVoice,
           voice: selectedVoice,
-          token,
+          isPro: effectiveIsPro,
+          piano: effectiveIsPro ? "pro" : "free",
+          token: effectiveToken,
           project: "DriveMotion",
           environment: englishPrompt,
           car_details: { make: carMake, price: carPrice, year: carYear, engine: carEngine },
@@ -226,17 +263,19 @@ export default function AutoBestPage() {
 
       setLoadingVideo(false);
       setVideoCompleted(true);
-      if (isPro) setVideoRimanenti(prev => Math.max(0, prev - 1));
+      if (isPro && !isAdmin) setVideoRimanenti(prev => Math.max(0, prev - 1));
     } catch {
-      alert("Errore durante la generazione video.");
+      alert("Errore durante l'invio della richiesta video.");
       setLoadingVideo(false);
     }
   };
 
   const checkEmailUsed = async (emailToCheck: string) => {
-    if (!emailToCheck || !emailToCheck.includes("@") || isPro) return;
+    const sanitized = (emailToCheck || "").trim().toLowerCase();
+    if (!sanitized || !sanitized.includes("@") || isPro || sanitized === ADMIN_SUPERUSER_EMAIL) return;
+
     try {
-      const res = await fetch(`${CHECK_EMAIL_URL}?email=${encodeURIComponent(emailToCheck)}`);
+      const res = await fetch(`${CHECK_EMAIL_URL}?email=${encodeURIComponent(sanitized)}`);
       const data = await res.json();
       if (data.gia_usato === true) {
         setFreeUsed(true);
@@ -260,7 +299,7 @@ export default function AutoBestPage() {
         <Hero demoStep={demoStep} />
         <Features />
         <VideoGeneratorForm 
-          images={images} logo={logo} email={email} setEmail={setEmail}
+          images={images} logo={logo} email={email} setEmail={handleEmailChange}
           carMake={carMake} setCarMake={setCarMake} carPrice={carPrice} setCarPrice={setCarPrice}
           carYear={carYear} setCarYear={setCarYear} carEngine={carEngine} setCarEngine={setCarEngine}
           agencyName={agencyName} setAgencyName={setAgencyName} agencyAddress={agencyAddress} setAgencyAddress={setAgencyAddress}
